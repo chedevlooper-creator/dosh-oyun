@@ -1,8 +1,8 @@
 import { applyTheme } from "./engine/theme.js";
 import { renderHome } from "./screens/home.js";
-import { show, $ } from "./utils/helpers.js";
+import { show, $, initSplashParticles, hapticTap } from "./utils/helpers.js";
 import { GL } from "./fx/scene3d.js";
-import { ac, MUSIC } from "./engine/audio.js";
+import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { load, save } from "./engine/save.js";
 import { G, setOnThemeChange, S } from "./engine/store.js";
 import { buildGrid, fillCell, initGameScreens } from "./screens/game.js";
@@ -33,16 +33,20 @@ initGameScreens();
 (function(){
   const sp = $("splash");
   if (!sp) return;
-  const off = () => sp.classList.add("off");
+  initSplashParticles();
+  const off = () => {
+    sp.classList.add("off");
+    try{ SFX.transition(); }catch(e){}
+  };
   setTimeout(off, 1400);
-  sp.addEventListener("pointerdown", off);
+  sp.addEventListener("pointerdown", () => { off(); hapticTap(); });
   setTimeout(() => sp.remove(), 2600);
 })();
 
 // ilk dokunuşta ses motorunu + müziği başlat (tarayıcı autoplay kuralı)
 addEventListener("pointerdown", function once(){
   removeEventListener("pointerdown", once);
-  try { ac(); MUSIC.start(); } catch (e) {}
+  try { ac(); MUSIC.start(); hapticTap(); } catch (e) {}
 }, { once: true });
 
 // PWA service worker (vite-plugin-pwa üzerinden otomatik)

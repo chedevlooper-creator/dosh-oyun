@@ -22,6 +22,15 @@ export const SFX = {
   win(){ [523,659,784,1046,1318].forEach((f,i)=>tone(f,.22,"sine",.16,i*.1)); },
   hint(){ tone(987,.14,"sine",.13); tone(1318,.14,"sine",.11,.1); },
   gift(){ [659,784,987,1318].forEach((f,i)=>tone(f,.18,"triangle",.15,i*.09)); },
+  // V6 ek sesler
+  press(){ tone(280,.04,"sine",.08); tone(360,.04,"sine",.06,.02); },
+  hover(){ tone(720,.03,"sine",.05); },
+  click(){ tone(520,.05,"square",.10); },
+  unlock(){ [523,659,784,1046].forEach((f,i)=>tone(f,.18,"triangle",.16,i*.08)); },
+  shuffle(){ [440,330,440,550,440].forEach((f,i)=>tone(f,.06,"square",.10,i*.04)); },
+  error(){ tone(220,.15,"sawtooth",.14); tone(180,.18,"sawtooth",.12,.08); },
+  levelup(){ [392,523,659,784,1046,1318].forEach((f,i)=>tone(f,.16,"sine",.18,i*.07)); },
+  transition(){ tone(880,.08,"sine",.10); tone(1175,.08,"sine",.10,.06); },
 };
 
 /* ---------- ORTAM MÜZİĞİ (sentezlenmiş, dosyasız) ---------- */

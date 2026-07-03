@@ -33,6 +33,38 @@
 @keyframes starBounce{0%{transform:scale(.3) rotate(-14deg)}55%{transform:scale(1.18) rotate(5deg)}100%{transform:scale(1)}}
 @keyframes sparkleTwinkle{0%,100%{opacity:0}50%{opacity:.9}}
 
+/* ---------- V6 ULTRA POLISH: video-tarzı premium efektler ---------- */
+/* Haptik: buton basılma geri bildirimi (titreşim hissi) */
+@keyframes pressBounce{0%{transform:scale(1)}30%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+/* Parıltı geçişi: başarı anlarında yumuşak flaş */
+@keyframes flashGlow{0%{box-shadow:0 0 0 0 rgba(255,201,77,0)}50%{box-shadow:0 0 40px 12px rgba(255,201,77,.55)}100%{box-shadow:0 0 0 0 rgba(255,201,77,0)}}
+/* Döner parıltı: ödül/koleksiyon için */
+@keyframes rotateGlow{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+/* Splash logo giriş: ekran açılışı */
+@keyframes splashLogoIn{0%{opacity:0;transform:scale(.4) rotateY(45deg)}60%{opacity:1;transform:scale(1.1) rotateY(-8deg)}100%{opacity:1;transform:scale(1) rotateY(0)}}
+/* Konfeti: küçük parçacık düşüşü */
+@keyframes confettiFall{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(80px) rotate(540deg);opacity:0}}
+/* Toast kayma giriş/çıkış (zıplamalı) */
+@keyframes toastIn{0%{transform:translate(-50%,-30px) scale(.7);opacity:0}50%{transform:translate(-50%,4px) scale(1.05);opacity:1}100%{transform:translate(-50%,0) scale(1);opacity:1}}
+/* Splash fade-out */
+@keyframes splashFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15);visibility:hidden}}
+/* Particles drift yavaşça yukarı */
+@keyframes driftUp{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-120px) translateX(20px);opacity:0}}
+/* Pin drop: harita düğümünün yerleşmesi (yumuşak iniş) */
+@keyframes pinDrop{0%{transform:translateY(-40px) scale(.6);opacity:0}70%{transform:translateY(4px) scale(1.08);opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+/* Banner inme: başarı bandı */
+@keyframes bannerIn{0%{transform:translateY(-100%);opacity:0}60%{transform:translateY(8px);opacity:1}100%{transform:translateY(0);opacity:1}}
+/* Shake yoğun: yanlış kelime */
+@keyframes strongShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-8px,3px) rotate(-1deg)}30%{transform:translate(8px,-3px) rotate(1deg)}50%{transform:translate(-6px,2px)}70%{transform:translate(6px,-2px)}90%{transform:translate(-3px,1px)}}
+/* Pulse ring: dikkat çekici bildiri */
+@keyframes pulseRing{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+/* Skeleton shimmer: yükleme durumu */
+@keyframes skeletonShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+/* Bounce in: yeni öğelerin girişi */
+@keyframes bounceIn{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.1)}70%{transform:scale(.95)}100%{transform:scale(1);opacity:1}}
+/* Glow sweep: parlama dalgası */
+@keyframes glowSweep{0%{transform:translateX(-100%) skewX(-20deg)}100%{transform:translateX(200%) skewX(-20deg)}}
+
 /* Hareket azaltma tercihi: tüm animasyon/geçişleri sustur (WCAG 2.3.3) */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{
@@ -41,3 +73,13 @@
     transition-duration:.001ms !important;
   }
 }
+
+/* ---------- UYGULANABILIR YARDIMCI SINIFLAR ---------- */
+.press:active{animation:pressBounce .25s ease-out}
+.flash-glow{animation:flashGlow .6s ease-out}
+.pulse-ring{position:relative}
+.pulse-ring::after{content:"";position:absolute;inset:0;border-radius:inherit;border:2px solid var(--gold);animation:pulseRing 1.4s ease-out infinite;pointer-events:none}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.06) 75%);background-size:200% 100%;animation:skeletonShimmer 1.6s linear infinite}
+.glow-sweep{position:relative;overflow:hidden}
+.glow-sweep::before{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:glowSweep 2.5s ease-in-out infinite;pointer-events:none}
+.bounce-in{animation:bounceIn .45s cubic-bezier(.34,1.56,.64,1) backwards}
