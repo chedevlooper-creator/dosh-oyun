@@ -14,7 +14,7 @@ export function openMap(){
   updateCoins();
   const cur = firstUnsolved();
   const wrap = $("map-scroll"); wrap.innerHTML = "";
-  let grid = null, lastPack = null;
+  let grid = null, lastPack = null, ni = 0;
   for(const lv of LEVELS){
     const pack = lv.pack || Math.floor(lv.id/25)+1;
     if(pack !== lastPack){
@@ -24,7 +24,8 @@ export function openMap(){
       wrap.appendChild(lab);
       grid = document.createElement("div"); grid.className="map-grid"; wrap.appendChild(grid);
     }
-    const n = document.createElement("button"); n.className = "node";
+    const n = document.createElement("button"); n.className = "node in";
+    n.style.animationDelay = Math.min(ni++ * 12, 380) + "ms"; // kademeli giriş, ekran dışı için tavan
     const st = S.stars[lv.id] || 0;
     const locked = lv.id > cur;
     n.setAttribute("aria-label", "ТӀегӀа " + (lv.id + 1) + (st ? ", " + st + " седа" : (locked ? ", гӀайгӀа" : ", хӀинца")));

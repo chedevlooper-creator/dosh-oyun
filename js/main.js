@@ -5,7 +5,7 @@ import { GL } from "./fx/scene3d.js";
 import { ac, MUSIC } from "./engine/audio.js";
 import { load, save } from "./engine/save.js";
 import { G, setOnThemeChange, S } from "./engine/store.js";
-import { buildGrid, fillCell } from "./screens/game.js";
+import { buildGrid, fillCell, initGameScreens } from "./screens/game.js";
 
 "use strict";
 
@@ -27,6 +27,7 @@ if (urlParams.get('debug') === '1') {
 /* ================= BAŞLAT ================= */
 applyTheme(); renderHome(); show("scr-home");
 GL.init(); GL.retheme();
+initGameScreens();
 
 // açılış ekranı: sahne hazır olunca yumuşakça kapan
 (function(){

@@ -18,3 +18,24 @@
 @keyframes gshake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(2px,1px)}}
 @keyframes ringSpin{to{transform:rotate(360deg)}}
 @keyframes rise{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ---------- POLISH: mikro-etkileşim keyframe'leri ---------- */
+@keyframes bubIn{from{transform:scale(0);opacity:0}70%{transform:scale(1.12)}to{transform:scale(1);opacity:1}}
+@keyframes wheelShuffle{from{transform:rotateX(12deg) rotate(0)}to{transform:rotateX(12deg) rotate(360deg)}}
+@keyframes capIn{from{transform:scale(.3) translateY(6px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@keyframes capOk{40%{transform:scale(1.1)}}
+@keyframes nodeIn{from{opacity:0;transform:translateY(14px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes selPing{from{transform:scale(.6);opacity:.8}to{transform:scale(1.7);opacity:0}}
+@keyframes ctaPulse{50%{filter:brightness(1.08) drop-shadow(0 0 14px rgba(67,217,163,.45))}}
+@keyframes logoShine{to{background-position:-250% 0}}
+@keyframes borderFlow{to{background-position:-300% 0}}
+@keyframes raysPulse{50%{opacity:.55;transform:translate(-50%,-50%) scale(1.15)}}
+
+/* Hareket azaltma tercihi: tüm animasyon/geçişleri sustur (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+}

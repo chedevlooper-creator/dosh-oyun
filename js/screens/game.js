@@ -210,6 +210,7 @@ function buildWheel(letters) {
     const y = D / 2 + R * Math.sin(ang);
     const el = document.createElement("div");
     el.className = "bub";
+    el.style.animationDelay = (i * 35) + "ms"; // kademeli pop-in
     el.style.width = el.style.height = bs + "px";
     el.style.left = (x - bs / 2) + "px";
     el.style.top = (y - bs / 2) + "px";
@@ -241,6 +242,16 @@ function shuffleWheel() {
     [ls[i], ls[j]] = [ls[j], ls[i]];
   }
   buildWheel(ls);
+  // çark tam tur döner; bubIn animasyonlarıyla karışmasın diye ada göre filtrele
+  const wheel = document.getElementById("wheel");
+  wheel.classList.remove("shuffling");
+  void wheel.offsetWidth; // animasyonu yeniden tetikle
+  wheel.classList.add("shuffling");
+  wheel.addEventListener("animationend", function h(e) {
+    if (e.animationName !== "wheelShuffle") return;
+    wheel.classList.remove("shuffling");
+    wheel.removeEventListener("animationend", h);
+  });
   SFX.coin();
 }
 
@@ -268,7 +279,7 @@ function renderSel() {
   if (!G) return;
   const pv = document.getElementById("preview");
   if (!G.sel.length) { pv.innerHTML = ""; return; }
-  pv.innerHTML = `<div class="cap">${G.sel.map(b => dispG(b.letter)).join("")}</div>`;
+  pv.innerHTML = `<div class="cap">${G.sel.map(b => `<span>${dispG(b.letter)}</span>`).join("")}</div>`;
   const svg = document.querySelector("#wheel svg polyline");
   const wr = document.getElementById("wheel").getBoundingClientRect();
   svg.setAttribute("points", G.sel.map(b => {
@@ -520,7 +531,7 @@ function levelComplete() {
     <div class="reward-line"><span>ТӀегӀа</span><b>${G.lv.id + 1}</b></div>
     <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
     <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
-    <div class="reward-line"><span>Карина сом</span><b>+${G.earned} 🪙</b></div>
+    <div class="reward-line"><span>Карина сом</span><b id="lc-coins">+0 🪙</b></div>
     <div class="btnrow">
       <button class="btn small ghost" id="lc-map">Карта</button>
       ${isLast ? "" : `<button class="btn small" id="lc-next">Кхин дӀа ▶</button>`}
@@ -528,6 +539,18 @@ function levelComplete() {
 
   const row = document.getElementById("stars-row").children;
   for (let i = 0; i < st; i++) setTimeout(() => { row[i].classList.add("lit"); SFX.coin(); }, 400 + i * 350);
+
+  // kazanılan coin sayacı: 0'dan hedefe akar
+  const cEl = document.getElementById("lc-coins");
+  if (cEl) {
+    const total = G.earned, t0 = performance.now();
+    const tick = (t) => {
+      const k = Math.min(1, (t - t0) / 900);
+      cEl.textContent = "+" + Math.round(total * (1 - Math.pow(1 - k, 3))) + " 🪙";
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
   document.getElementById("lc-map").onclick = () => { closePanel(); goToMap(); };
   const nx = document.getElementById("lc-next");
   if (nx) nx.onclick = () => { closePanel(); startLevel(G.lv.id + 1); };

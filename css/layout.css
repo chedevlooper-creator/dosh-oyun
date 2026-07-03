@@ -37,7 +37,7 @@ body.gl-on #bg{display:none}
 #gl{position:fixed;inset:0;z-index:1;pointer-events:none}
 body.gl-on #bg svg{display:none}
 main{perspective:1100px}
-.screen{transform:translateY(16px) translateZ(-40px) rotateX(3deg);transition:opacity .4s,transform .45s cubic-bezier(.22,1,.36,1)}
+.screen{transform:translateY(26px) translateZ(-70px) rotateX(5deg);transition:opacity .4s,transform .5s cubic-bezier(.22,1,.36,1)}
 .screen.on{transform:none}
 .screen.st.on>*{opacity:0;animation:rise .6s cubic-bezier(.22,1,.36,1) forwards}
 .screen.st.on>*:nth-child(1){animation-delay:.04s}
