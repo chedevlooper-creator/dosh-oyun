@@ -11,7 +11,16 @@ export function openDict(){
     const list = words.filter(w=>!q || w.includes(norm(q)));
     if(!words.length) return `<p class="empty-state">ХӀинца а цахила.<br>Дешнаш кхочушдича, хьан дошам хӀокху чу йовлар ю.</p>`;
     if(!list.length) return `<p class="empty-state">Ца карийна.<br>Кхин а къастам я лаха.</p>`;
-    return list.map(w=>`<div class="dict-item"><div class="w">${dispG(w)}</div>${INFO[w]?`<div class="d">${INFO[w]}</div>`:""}</div>`).join("");
+    return list.map(w=>{
+      const info = INFO[w];
+      const ce = info ? (info.ce ?? "") : "";
+      const tr = info ? (info.tr ?? "") : "";
+      return `<div class="dict-item">
+        <div class="w">${dispG(w)}</div>
+        ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
+        ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
+      </div>`;
+    }).join("");
   };
   openPanel(`
     <h2>Дошам 📖</h2>

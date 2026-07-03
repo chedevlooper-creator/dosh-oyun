@@ -418,7 +418,12 @@ function solveWord(w, byHint) {
   const info = INFO[w.norm];
   if (info) {
     const strip = document.getElementById("info-strip");
-    strip.innerHTML = `<b>${dispG(w.norm)}</b> — ${info}`;
+    const ce = info.ce ?? info;
+    const tr = info.tr ?? "";
+    strip.innerHTML = `
+      <div class="info-word">${dispG(w.norm)}</div>
+      <div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>
+      <div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>`;
     strip.className = "on";
   }
 

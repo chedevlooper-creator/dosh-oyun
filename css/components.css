@@ -71,10 +71,16 @@ button:active{transform:scale(.95)}
 .cell.fill{background:var(--cell-fill);border-color:transparent;animation:pop .38s cubic-bezier(.34,1.56,.64,1)}
 .cell.hintfill{background:var(--cell-hint)}
 .cell.target{cursor:pointer;animation:targetBlink .8s infinite}
-#info-strip{min-height:22px;text-align:center;font-size:14px;color:var(--ink2);padding:0 20px;
+#info-strip{min-height:22px;text-align:center;font-size:14px;color:var(--ink2);padding:4px 18px 6px;
   opacity:0;transition:opacity .4s}
 #info-strip.on{opacity:1}
 #info-strip b{color:var(--gold)}
+#info-strip .info-word{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-size:17px;
+  color:var(--gold);letter-spacing:.08em;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+#info-strip .info-line{font-size:13px;line-height:1.35;margin-top:1px;color:var(--ink)}
+#info-strip .info-line .lang{display:inline-block;min-width:30px;padding:1px 6px;margin-right:6px;
+  border-radius:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  background:rgba(242,181,61,.18);color:var(--gold);border:1px solid rgba(242,181,61,.35)}
 .toolrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:8px 14px}
 .tool{position:relative;min-height:76px;border-radius:18px;background:var(--card);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;padding:11px 6px 18px;
@@ -153,8 +159,11 @@ button:active{transform:scale(.95)}
 .dict-search{width:100%;padding:11px 15px;border-radius:13px;border:1px solid rgba(255,255,255,.16);
   background:rgba(255,255,255,.08);color:var(--ink);font-size:16px;outline:none;margin-bottom:12px;font-family:inherit}
 .dict-item{padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
-.dict-item .w{font-weight:800;font-size:17px;color:var(--gold)}
-.dict-item .d{font-size:13.5px;color:var(--ink2);margin-top:2px}
+.dict-item .w{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-weight:400;font-size:17px;color:var(--gold);letter-spacing:.04em}
+.dict-item .d{font-size:13.5px;color:var(--ink);margin-top:2px;display:flex;align-items:baseline;gap:6px}
+.dict-item .d .lang{display:inline-block;min-width:34px;padding:1px 6px;flex:0 0 auto;text-align:center;
+  border-radius:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  background:rgba(242,181,61,.18);color:var(--gold);border:1px solid rgba(242,181,61,.35)}
 #toast{position:fixed;left:50%;top:16%;transform:translate(-50%,-16px);z-index:90;
   background:var(--card2);border:1px solid rgba(255,255,255,.14);border-radius:999px;
   padding:11px 24px;font-weight:700;font-size:16px;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.4)}
