@@ -1,0 +1,24 @@
+body.theme-night{
+  --sky1:#1b2450; --sky2:#101538; --sky3:#070a20;
+  --mtn1:#252d5c; --mtn2:#181f45; --mtn3:#0d1230;
+  --card:rgba(10,12,40,.75); --card2:rgba(6,8,30,.9);
+  --accent:#8f7bff; --accent2:#6a55e0; --gold:#ffd76e;
+}
+body.theme-forest{
+  --sky1:#a8d5a2; --sky2:#4c9a6a; --sky3:#1d5c40;
+  --mtn1:#2f6b4f; --mtn2:#1f5038; --mtn3:#123626;
+  --card:rgba(10,40,28,.75); --card2:rgba(6,28,20,.9);
+  --accent:#ffd76e; --accent2:#e8a020; --gold:#ffd76e;
+}
+body.theme-autumn{
+  --sky1:#ffd9a0; --sky2:#e08a4e; --sky3:#8a4530;
+  --mtn1:#a05a3c; --mtn2:#7c4028; --mtn3:#552818;
+  --card:rgba(60,24,12,.75); --card2:rgba(42,16,8,.9);
+  --accent:#ffc94d; --accent2:#e8a020; --gold:#ffe08a;
+}
+body.theme-winter{
+  --sky1:#dceefb; --sky2:#8fb8d8; --sky3:#4a7ba6;
+  --mtn1:#9db8d2; --mtn2:#7a99b8; --mtn3:#587a9c;
+  --card:rgba(30,52,76,.78); --card2:rgba(20,38,58,.9);
+  --accent:#7ad0ff; --accent2:#3fa8e0; --gold:#ffd76e;
+}

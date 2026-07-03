@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Дош Level Editor</title>
+<link rel="stylesheet" href="css/editor.css"/>
+</head>
+<body>
+
+<!-- ============ ÜST ARAÇ ÇUBUĞU ============ -->
+<header id="toolbar">
+  <div class="tb-left">
+    <h1>Дош Editor</h1>
+    <span class="sep"></span>
+    <label>ID <input type="number" id="lvl-id" value="0" min="0" max="999"/></label>
+    <label>Pack <input type="number" id="lvl-pack" value="0" min="0" max="9" placeholder="—"/></label>
+    <a href="./" class="btn ghost small" style="text-decoration:none;">← Oyuna Dön</a>
+  </div>
+  <div class="tb-right">
+    <button class="btn" id="btn-validate">✓ Doğrula</button>
+    <button class="btn" id="btn-export">↓ Export JSON</button>
+    <button class="btn" id="btn-import">↑ Import JSON</button>
+    <input type="file" id="import-file" accept=".json" hidden/>
+    <button class="btn ghost" id="btn-clear">Temizle</button>
+  </div>
+</header>
+
+<!-- ============ ANA ALAN ============ -->
+<main id="main">
+  <!-- SOL: IZGARA -->
+  <section id="grid-section">
+    <div id="grid-controls">
+      <label>Satır <input type="number" id="grid-rows" value="4" min="1" max="20"/></label>
+      <label>Sütun <input type="number" id="grid-cols" value="4" min="1" max="20"/></label>
+      <button class="btn small" id="btn-resize">Yeniden Boyutlandır</button>
+      <select id="dir-select">
+        <option value="across">→ Across</option>
+        <option value="down">↓ Down</option>
+      </select>
+      <button class="btn small ghost" id="btn-def-word">Kelime Tanımla</button>
+      <button class="btn small ghost" id="btn-load-level">📂 Level Yükle</button>
+    </div>
+    <div id="grid-wrap">
+      <table id="grid"></table>
+    </div>
+  </section>
+
+  <!-- SAĞ: PANEL -->
+  <aside id="panel">
+    <div class="panel-box">
+      <h3>Kelimeler <span id="word-count">0</span></h3>
+      <ul id="word-list"></ul>
+    </div>
+
+    <div class="panel-box">
+      <h3>Bonus <span id="bonus-count">0</span></h3>
+      <div class="row">
+        <input type="text" id="bonus-input" placeholder="yeni bonus..."/>
+        <button class="btn small" id="btn-add-bonus">+</button>
+      </div>
+      <ul id="bonus-list"></ul>
+    </div>
+
+    <div class="panel-box">
+      <h3>Ek Harfler <span id="extra-count">0</span></h3>
+      <div class="row">
+        <input type="text" id="extra-input" placeholder="ör: кк, тт, а, б..."/>
+        <button class="btn small" id="btn-add-extra">+</button>
+      </div>
+      <ul id="extra-list"></ul>
+      <div class="hint">Bonus kelimeler için havuzda olmayan harfleri ekleyin</div>
+    </div>
+
+    <div class="panel-box">
+      <h3>Harf Havuzu <span id="pool-count">0</span></h3>
+      <div id="pool-display"></div>
+    </div>
+
+    <div class="panel-box" id="validation-box">
+      <h3>Doğrulama</h3>
+      <div id="validation-msg">—</div>
+    </div>
+  </aside>
+</main>
+
+<!-- ============ MODAL ============ -->
+<dialog id="export-modal">
+  <div class="modal-head"><h2>Export</h2><button class="btn ghost small" id="modal-close">✕</button></div>
+  <textarea id="export-text" readonly></textarea>
+  <div class="modal-foot"><button class="btn" id="modal-copy">Kopyala</button></div>
+</dialog>
+
+<script type="module" src="js/editor/main.js"></script>
+</body>
+</html>

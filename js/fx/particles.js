@@ -1,0 +1,94 @@
+/* ================= KONFETİ / PARTICLE F/X ================= */
+
+import { prefersReducedMotion } from "../utils/helpers.js";
+
+const fx = document.getElementById("fx");
+const fctx = fx ? fx.getContext("2d") : null;
+let parts = [];
+
+/** Canvas boyutunu güncelle */
+function fxSize() {
+  if (!fx || !fctx) return;
+  fx.width = innerWidth * devicePixelRatio;
+  fx.height = innerHeight * devicePixelRatio;
+  fctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+
+/** Boyut değişikliğini dinle */
+addEventListener("resize", fxSize);
+
+/**
+ * Konfeti patlat
+ * @param {number} n - Parçacık sayısı
+ */
+function confetti(n = 90) {
+  if (!fctx || prefersReducedMotion()) return;
+  const colors = ["#ffc94d", "#43d9a3", "#7ad0ff", "#ff8fa3", "#c9a3ff", "#ffffff"];
+  for (let i = 0; i < n; i++) {
+    parts.push({
+      x: innerWidth / 2 + (Math.random() - 0.5) * 160,
+      y: innerHeight * 0.32,
+      vx: (Math.random() - 0.5) * 11,
+      vy: -Math.random() * 11 - 3,
+      g: .28,
+      r: Math.random() * 5 + 3,
+      c: colors[(Math.random() * colors.length) | 0],
+      a: 1,
+      rot: Math.random() * 6.28,
+      vr: (Math.random() - 0.5) * 0.3,
+    });
+  }
+}
+
+/** Parçacık animasyon döngüsü */
+(function loop() {
+  if (!fctx) { requestAnimationFrame(loop); return; }
+  fctx.clearRect(0, 0, innerWidth, innerHeight);
+  parts = parts.filter(p => p.a > 0.02 && p.y < innerHeight + 30);
+  for (const p of parts) {
+    p.x += p.vx; p.y += p.vy; p.vy += p.g;
+    p.rot += p.vr; p.a -= 0.004;
+    fctx.save();
+    fctx.globalAlpha = p.a;
+    fctx.translate(p.x, p.y);
+    fctx.rotate(p.rot);
+    fctx.fillStyle = p.c;
+    fctx.fillRect(-p.r, -p.r * 0.6, p.r * 2, p.r * 1.2);
+    fctx.restore();
+  }
+  requestAnimationFrame(loop);
+})();
+
+/**
+ * Uçan para animasyonu
+ * @param {HTMLElement|null} fromEl - Kaynak element
+ * @param {number} n - Para sayısı
+ */
+function flyCoins(fromEl, n = 5) {
+  if (prefersReducedMotion() || !fctx) return;
+  const target = document.getElementById("game-coins");
+  if (!target) return;
+  const targetRect = target.getBoundingClientRect();
+  const fromRect = fromEl
+    ? fromEl.getBoundingClientRect()
+    : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+
+  for (let i = 0; i < Math.min(n, 7); i++) {
+    const c = document.createElement("div");
+    c.className = "flycoin"; c.textContent = "🪙";
+    c.style.left = (fromRect.left + fromRect.width / 2) + "px";
+    c.style.top = (fromRect.top + fromRect.height / 2) + "px";
+    document.body.appendChild(c);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        c.style.left = targetRect.left + "px";
+        c.style.top = targetRect.top + "px";
+        c.style.opacity = "0";
+        c.style.transform = "scale(.4)";
+      }, i * 70);
+    });
+    setTimeout(() => c.remove(), 1100 + i * 70);
+  }
+}
+
+export { confetti, flyCoins, fxSize };

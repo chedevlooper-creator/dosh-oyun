@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ce">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e2a3f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Дош — Нохчийн дош</title>
+<meta name="description" content="Дош — Нохчийн дош. Çeçence kelime bulmaca oyunu. Harfleri birleştir, kelimeleri bul ve sözlüğünü geliştir.">
+<meta name="keywords" content="çeçence, kelime oyunu, bulmaca, dosh, нохчийн мотт, дешнаш">
+<meta property="og:title" content="Дош — Нохчийн дош">
+<meta property="og:description" content="Çeçence kelime bulmaca oyunu. Harfleri birleştir, kelimeleri bul ve sözlüğünü geliştir.">
+<meta property="og:image" content="icon-512.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Дош — Нохчийн дош">
+<meta name="twitter:description" content="Çeçence kelime bulmaca oyunu. Harfleri birleştir, kelimeleri bul ve sözlüğünü geliştir.">
+<meta name="twitter:image" content="icon-512.png">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="theme-kavkaz">
+
+<div id="photo">
+  <div class="ph" data-t="kavkaz" style="background-image:url('bg-kavkaz.jpg')"></div>
+  <div class="ph" data-t="night"  style="background-image:url('bg-night.jpg')"></div>
+  <div class="ph" data-t="forest" style="background-image:url('bg-forest.jpg')"></div>
+  <div class="ph" data-t="autumn" style="background-image:url('bg-autumn.jpg')"></div>
+  <div class="ph" data-t="winter" style="background-image:url('bg-winter.jpg')"></div>
+</div>
+<div id="bg">
+  <div class="sun"></div>
+  <svg viewBox="0 0 900 400" preserveAspectRatio="none">
+    <polygon points="0,400 0,240 120,120 210,210 330,70 450,220 560,110 680,230 790,140 900,260 900,400" fill="var(--mtn1)" opacity=".8"/>
+    <polygon points="120,120 90,150 150,150" fill="#ffffff" opacity=".7"/>
+    <polygon points="330,70 295,110 365,110" fill="#ffffff" opacity=".8"/>
+    <polygon points="560,110 528,146 592,146" fill="#ffffff" opacity=".7"/>
+    <polygon points="0,400 0,300 150,200 300,310 430,190 580,320 720,220 900,330 900,400" fill="var(--mtn2)" opacity=".92"/>
+    <polygon points="0,400 0,350 200,280 400,370 600,290 780,380 900,320 900,400" fill="var(--mtn3)"/>
+  </svg>
+</div>
+<canvas id="gl"></canvas>
+<canvas id="fx"></canvas>
+
+<main>
+  <!-- HOME -->
+  <section class="screen st" id="scr-home">
+    <div class="logo" id="logo">Дош</div>
+    <div class="subtitle">Нохчийн дош</div>
+    <div class="hero glass">
+      <div class="hero-top">
+        <span class="coins-chip">🪙 <span class="c" id="home-coins">0</span></span>
+        <span class="coins-chip">⭐ <span class="c" id="home-stars">0</span></span>
+      </div>
+      <div class="progressbar"><i id="home-bar"></i></div>
+      <div class="home-progress" id="home-progress" aria-live="polite"></div>
+      <button class="btn" id="btn-start">ДӀадоладе ▶</button>
+    </div>
+    <div class="dock">
+      <button class="icon-btn glass" id="btn-gift" title="+100"><span class="ic" aria-hidden="true">🎁</span><span class="lb">Денна</span></button>
+      <button class="icon-btn glass" id="btn-dict"><span class="ic" aria-hidden="true">📖</span><span class="lb">Дошам</span></button>
+      <button class="icon-btn glass" id="btn-stats"><span class="ic" aria-hidden="true">📊</span><span class="lb">Статистика</span></button>
+      <button class="icon-btn glass" id="btn-settings"><span class="ic" aria-hidden="true">⚙️</span><span class="lb">Нисдарш</span></button>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="screen" id="scr-map">
+    <div class="topbar">
+      <button class="rbtn" id="map-back" aria-label="Geri">←</button>
+      <div class="title">ТӀегӀанийн карта</div>
+      <div class="coins-chip">🪙 <span class="c" id="map-coins">0</span></div>
+    </div>
+    <div class="map-scroll" id="map-scroll"></div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="scr-game">
+    <div class="gtop">
+      <button class="rbtn" id="game-back" aria-label="Geri">←</button>
+      <div class="lvl"><small>ТӀЕГӀА</small><span id="lvl-num"></span></div>
+      <div class="coins-chip">🪙 <span class="c" id="game-coins">0</span></div>
+      <button class="rbtn" id="game-settings" aria-label="Ayarlar">⚙️</button>
+    </div>
+    <div id="grid-wrap"><div id="grid"></div></div>
+    <div id="info-strip"></div>
+    <div class="toolrow">
+      <button class="tool" id="bonus-chest" title="Бонус дешнаш" aria-label="Бонус дешнаш">
+        <span class="tool-ic" aria-hidden="true">💎</span><span class="tool-label">Бонус<br>дешнаш</span><span id="bonus-count">0</span>
+      </button>
+      <button class="tool" id="hint-letter" title="ХӀарф хьахо" aria-label="ХӀарф хьахо">
+        <span class="tool-ic" aria-hidden="true">💡</span><span class="tool-label">ХӀарф<br>хьахо</span><span class="price">25 🪙</span>
+      </button>
+      <button class="tool" id="hint-target" title="ХӀан хьахо" aria-label="ХӀан хьахо">
+        <span class="tool-ic" aria-hidden="true">🎯</span><span class="tool-label">ХӀан<br>хьахо</span><span class="price">35 🪙</span>
+      </button>
+      <button class="tool" id="hint-wand" title="Хьехаман тай" aria-label="Хьехаман тай">
+        <span class="tool-ic" aria-hidden="true">🪄</span><span class="tool-label">Хьехаман<br>тай</span><span class="price">60 🪙</span>
+      </button>
+    </div>
+    <div id="preview"></div>
+    <div id="wheel-zone"><div id="wheel"><svg></svg><button id="shuffle" aria-label="Karıştır">🔀</button></div></div>
+  </section>
+</main>
+
+<div id="veil" role="dialog" aria-hidden="true"><div class="panel glass" id="panel" tabindex="-1"></div></div>
+<div id="toast"></div>
+<div id="splash"><div class="slogo">Дош</div><div class="sbar"><i></i></div></div>
+
+<script src="three.min.js"></script>
+<script src="fx.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

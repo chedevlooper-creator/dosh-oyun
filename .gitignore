@@ -1,0 +1,37 @@
+node_modules
+dist
+.env
+.vite
+.DS_Store
+*.log
+_trae
+.uploads
+.vercel
+.vercelignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Large data caches
+_lexicon_expansion/raw_wik/
+_lexicon_expansion/wik_api_cache/
+_lexicon_expansion/__pycache__/
+_lexicon_expansion/_wikt_run.log
+_lexicon_expansion/_batch_wikt.log
+
+# Lexicon batch outputs (regenerate from scripts)
+_lexicon_expansion/raw_parsed.json
+_lexicon_expansion/_wikt_raw.json
+_lexicon_expansion/_unresolved_all.json
+_lexicon_expansion/lex_batch_*.json
+_lexicon_expansion/lex_batch_*.txt
+_lexicon_expansion/batch_*.json
+_lexicon_expansion/batch_*.txt
+
+# OS
+Thumbs.db
+desktop.ini
