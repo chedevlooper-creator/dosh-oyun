@@ -53,8 +53,17 @@
 <main>
   <!-- HOME -->
   <section class="screen st" id="scr-home">
+    <svg class="tower" viewBox="0 0 64 88" aria-hidden="true">
+      <rect x="24" y="2"  width="16" height="4"  rx="1.4" fill="var(--gold)"/>
+      <rect x="20" y="8"  width="24" height="5"  rx="1.6" fill="var(--gold)"/>
+      <rect x="16" y="15" width="32" height="6"  rx="2"   fill="var(--gold)"/>
+      <path d="M20 24 L44 24 L52 86 Q52 88 50 88 L14 88 Q12 88 12 86 Z" fill="#f7f1de"/>
+      <path d="M28 44 h8 v14 a4 4 0 0 1-8 0 Z" fill="#2b2415"/>
+      <rect x="30" y="30" width="4" height="7" rx="2" fill="#2b2415"/>
+    </svg>
     <div class="logo" id="logo">Дош</div>
     <div class="subtitle">Нохчийн дош</div>
+    <div class="deco" aria-hidden="true">◆ ◆</div>
     <div class="hero glass">
       <div class="hero-top">
         <span class="coins-chip">🪙 <span class="c" id="home-coins">0</span></span>
@@ -107,13 +116,25 @@
       </button>
     </div>
     <div id="preview"></div>
-    <div id="wheel-zone"><div id="wheel"><svg></svg><button id="shuffle" aria-label="Karıştır">🔀</button></div></div>
+    <div id="wheel-zone"><div id="wheel"><svg></svg><button id="shuffle" aria-label="Karıştır"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h4l10 12h6"/><path d="M18 4l4 2-4 2"/><path d="M2 18h4l3-3.6"/><path d="M14 8.5 16 6h6"/><path d="M18 20l4-2-4-2"/></svg></button></div></div>
   </section>
 </main>
 
 <div id="veil" role="dialog" aria-hidden="true"><div class="panel glass" id="panel" tabindex="-1"></div></div>
 <div id="toast"></div>
-<div id="splash"><div class="slogo">Дош</div><div class="sbar"><i></i></div></div>
+<div id="splash">
+  <svg class="tower" viewBox="0 0 64 88" aria-hidden="true">
+    <rect x="24" y="2"  width="16" height="4"  rx="1.4" fill="#f2b53d"/>
+    <rect x="20" y="8"  width="24" height="5"  rx="1.6" fill="#f2b53d"/>
+    <rect x="16" y="15" width="32" height="6"  rx="2"   fill="#f2b53d"/>
+    <path d="M20 24 L44 24 L52 86 Q52 88 50 88 L14 88 Q12 88 12 86 Z" fill="#f7f1de"/>
+    <path d="M28 44 h8 v14 a4 4 0 0 1-8 0 Z" fill="#2b2415"/>
+    <rect x="30" y="30" width="4" height="7" rx="2" fill="#2b2415"/>
+  </svg>
+  <div class="slogo">Дош</div>
+  <div class="ssub">нохчийн дош</div>
+  <div class="sbar"><i></i></div>
+</div>
 
 <script src="three.min.js"></script>
 <script src="fx.js"></script>

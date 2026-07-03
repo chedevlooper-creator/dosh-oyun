@@ -1,13 +1,14 @@
 :root{
-  --sky1:#7ec8e3; --sky2:#2a6f97; --sky3:#123c5a;
-  --mtn1:#3d5a80; --mtn2:#293f5e; --mtn3:#1b2a45;
-  --card:rgba(13,32,52,.72); --card2:rgba(9,24,40,.86);
-  --ink:#f4f9ff; --ink2:#b8cfe0;
-  --gold:#ffc94d; --gold2:#e8a020;
-  --accent:#43d9a3; --accent2:#22b585;
-  --wheel:rgba(8,22,38,.55); --bubble:#f7fbff; --bubble-ink:#14324e;
-  --sel:#ffc94d; --sel-ink:#3c2a00;
-  --cell:rgba(255,255,255,.14); --cell-b:rgba(255,255,255,.28);
-  --cell-fill:#f7fbff; --cell-ink:#14324e; --cell-hint:#ffe9b3;
+  /* Video paleti: karartılmış dağ fotoğrafı + krem taşlar + altın vurgular */
+  --sky1:#8a8f8c; --sky2:#565b56; --sky3:#262823;
+  --mtn1:#4a5248; --mtn2:#37403a; --mtn3:#242b26;
+  --card:rgba(26,22,14,.68); --card2:rgba(19,16,10,.90);
+  --ink:#f7f1de; --ink2:#cfc4a6;
+  --gold:#f2b53d; --gold2:#d68910;
+  --accent:#3ec97e; --accent2:#22a35f;
+  --wheel:rgba(16,13,8,.74); --bubble:#f7f1de; --bubble-ink:#3a2c10;
+  --sel:#f2b53d; --sel-ink:#3a2c10;
+  --cell:rgba(247,241,222,.12); --cell-b:rgba(247,241,222,.26);
+  --cell-fill:#f7f1de; --cell-ink:#3a2c10; --cell-hint:#ffe9b3;
   --danger:#ff6b6b;
 }

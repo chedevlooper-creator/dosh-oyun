@@ -1,9 +1,12 @@
 node_modules
 dist
+dev-dist
 .env
 .vite
 .DS_Store
 *.log
+video-frames/
+*.mp4
 _trae
 .uploads
 .vercel
