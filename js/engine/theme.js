@@ -39,7 +39,7 @@ export function applyTheme(){
     if (el.dataset.t === activeId) {
       // lazy: eğer daha önce yüklenmediyse şimdi yükle
       if (!el.style.backgroundImage) {
-        const t = THEMES.find(t => t.id === el.dataset.t);
+        const t = THEMES.find(th => th.id === el.dataset.t);
         if (t) el.style.backgroundImage = `url('${t.img}')`;
       }
       el.classList.add("on");

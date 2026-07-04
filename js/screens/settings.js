@@ -14,8 +14,8 @@ export function openSettings(){
   openPanel(`
     <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg> ${t("settings.title").replace(" ⚙️","")}</h2>
     <div class="opt-row"><span>${t("settings.theme")}</span>
-      <div class="theme-dots">${THEMES.map(t=>
-        `<button class="tdot ${S.settings.theme===t.id?"on":""}" data-t="${t.id}" title="${t.name}" aria-label="${t.name}" aria-pressed="${S.settings.theme===t.id}" style="background:${t.dot}"></button>`).join("")}
+      <div class="theme-dots">${THEMES.map(th=>
+        `<button class="tdot ${S.settings.theme===th.id?"on":""}" data-t="${th.id}" title="${th.name}" aria-label="${th.name}" aria-pressed="${S.settings.theme===th.id}" style="background:${th.dot}"></button>`).join("")}
       </div></div>
     <div class="opt-row"><span class="opt-label"><svg class="o-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg> ${t("settings.sound").replace(" 🔔","")}</span>
       <button class="toggle ${S.settings.sound?"on":""}" id="snd-toggle" role="switch" aria-checked="${S.settings.sound}" aria-label="${t("settings.sound")}"></button></div>
@@ -36,7 +36,7 @@ export function openSettings(){
     applyTheme();
     // 3D sahnenin retheme()'i lazy yüklü olabilir; import edip çağır
     import("../fx/scene3d.js").then((m) => {
-      try { m.GL.retheme(); } catch (e) {}
+      try { m.GL.retheme(); } catch {}
     }).catch(() => {});
     document.querySelectorAll(".tdot").forEach(x=>{
       x.classList.toggle("on",x===d);

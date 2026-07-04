@@ -1,12 +1,12 @@
 // @ts-check
 /* ================= OYUN MOTORU ================= */
 
-import { S, commitG, addFoundWord, setG } from "../engine/store.js";
+import { S, addFoundWord, setG } from "../engine/store.js";
 import { LEVELS } from "../data/levels.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
-import { $, show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
+import { show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
 import { onResize } from "../utils/resize.js";
 import { openPanel, closePanel } from "./panel.js";
 import { SFX } from "../engine/audio.js";
@@ -332,7 +332,7 @@ function setupWheelListeners() {
     const b = bubbleAt(e.clientX, e.clientY);
     if (!b) return;
     dragging = true;
-    try { wheel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    try { wheel.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     G.sel = [];
     bubbles.forEach(x => x.el.classList.remove("sel"));
     selAdd(b);

@@ -14,9 +14,12 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 /* ================= 3D SAHNE (Three.js — Kafkas dağları) ================= */
 export const GL = (() => {
   const PHOTO_MODE = true; // gerçek fotoğraf arka plan: 3D yalnızca partikül + kartal katmanı çizer
-  let renderer, scene, camera, terrain, stars, snow, clouds = [], sun, dirLight, ambLight, hemiLight;
+  let renderer, scene, camera, terrain, stars, snow, sun, dirLight, ambLight, hemiLight;
+  const clouds = [];
   let composer = null, bloomPass = null, motes = null, farRidge = null;
-  let towerWindows = [], eagle = null, wingL = null, wingR = null, stoneMats = [];
+  const towerWindows = [];
+  let eagle = null, wingL = null, wingR = null;
+  const stoneMats = [];
   let px = 0, py = 0, tpx = 0, tpy = 0, ok = false;
   let camY = 9, camYT = 9, lookY = 12, lookYT = 12; // ekrana göre kamera hedefleri
   const PAL3D = {
@@ -86,7 +89,7 @@ export const GL = (() => {
     if(typeof THREE === "undefined") return;
     try{
       renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias:true, alpha:PHOTO_MODE });
-    }catch(e){ return; }
+    }catch{ return; }
     ok = true;
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2.5)); // 4K/retina keskinliği
     renderer.toneMapping = THREE.ACESFilmicToneMapping;      // sinematik ton eşleme
@@ -307,9 +310,9 @@ export const GL = (() => {
         bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.65, 0.82);
         composer.addPass(bloomPass);
         // OutputPass tonemap & renk düzeltmesi son aşamada uygular
-        try { composer.addPass(new OutputPass()); } catch (e) { /* Output yoksa da olur */ }
+        try { composer.addPass(new OutputPass()); } catch { /* Output yoksa da olur */ }
       }
-    }catch(e){ composer = null; }
+    }catch{ composer = null; }
     resize(); retheme();
     onResize(resize);
     addEventListener("pointermove", e => { tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5; }, { passive:true });

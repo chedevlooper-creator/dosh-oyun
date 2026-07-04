@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { snapshot, SAVE_VERSION } from "../engine/store.js";
 
 /* ================= snapshot() schema ================= */

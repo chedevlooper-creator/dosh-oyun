@@ -426,7 +426,7 @@ $("import-file").addEventListener("change", (e) => {
 $("btn-resize").addEventListener("click", () => {
   const rows = +$("grid-rows").value || 4, cols = +$("grid-cols").value || 4;
   const ng = Array.from({ length: rows }, (_, r) =>
-    Array.from({ length: cols }, (_, c) => (state.grid[r] && state.grid[r][c]) || ""));
+    Array.from({ length: cols }, (_c, c) => (state.grid[r] && state.grid[r][c]) || ""));
   state.rows = rows; state.cols = cols; state.grid = ng;
   exitWordDef(); updateAll();
 });
@@ -461,4 +461,4 @@ document.addEventListener("keydown", (e) => {
 initGrid(4, 4);
 $("grid-rows").value = 4; $("grid-cols").value = 4;
 updateAll();
-console.log("🏗️ Дош Editor (oyun içi) hazır! /editor");
+console.warn("🏗️ Дош Editor (oyun içi) hazır! /editor");

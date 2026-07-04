@@ -4,7 +4,7 @@ import { renderHome } from "./screens/home.js";
 import { show, $, initSplashParticles, hapticTap } from "./utils/helpers.js";
 import { onResize } from "./utils/resize.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
-import { load, save } from "./engine/save.js";
+import { load } from "./engine/save.js";
 import { G, setOnThemeChange, S } from "./engine/store.js";
 import { buildGrid, fillCell, initGameScreens } from "./screens/game.js";
 
@@ -33,12 +33,12 @@ function loadGL() {
 /* ================= STATE YÜKLE ================= */
 load();
 // documentElement.lang'i kayıtlı dile senkronize et (varsayılan ce kalır)
-try { if (S && S.settings && typeof S.settings.lang === "string") document.documentElement.lang = S.settings.lang; } catch (e) {}
+try { if (S && S.settings && typeof S.settings.lang === "string") document.documentElement.lang = S.settings.lang; } catch {}
 
 /* ================= TEMA → 3D SAHNE BAĞLANTISI ================= */
 // Tema değiştiğinde sahne yüklüyse retheme çağır, değilse yükleme tetikle
 setOnThemeChange(() => {
-  if (GL) { try { GL.retheme(); } catch (e) {} }
+  if (GL) { try { GL.retheme(); } catch {} }
   else if (S.settings.scene3d !== false) loadGL();
 });
 
@@ -46,8 +46,8 @@ setOnThemeChange(() => {
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('debug') === '1') {
   window.__DOSH_DEBUG__ = true;
-  console.log("[DEBUG] Debug modu aktif. Store durumu:", S);
-  console.log("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
+  console.warn("[DEBUG] Debug modu aktif. Store durumu:", S);
+  console.warn("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
 }
 
 /* ================= BAŞLAT ================= */
@@ -70,7 +70,7 @@ if (S.settings.scene3d !== false) {
   initSplashParticles();
   const off = () => {
     sp.classList.add("off");
-    try{ SFX.transition(); }catch(e){}
+    try{ SFX.transition(); }catch{}
   };
   setTimeout(off, 1400);
   sp.addEventListener("pointerdown", () => { off(); hapticTap(); });
@@ -80,7 +80,7 @@ if (S.settings.scene3d !== false) {
 // ilk dokunuşta ses motorunu + müziği başlat (tarayıcı autoplay kuralı)
 addEventListener("pointerdown", function once(){
   removeEventListener("pointerdown", once);
-  try { ac(); MUSIC.start(); hapticTap(); } catch (e) {}
+  try { ac(); MUSIC.start(); hapticTap(); } catch {}
 }, { once: true });
 
 // PWA service worker (vite-plugin-pwa üzerinden otomatik)
