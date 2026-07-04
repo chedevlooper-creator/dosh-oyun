@@ -53,6 +53,17 @@ export const PACKS = [
     },
     theme: "winter",
   },
+  {
+    id: 5,
+    title: { ce: "БУЬЙСА — Дешнаш", tr: "Gece", ru: "Ночь" },
+    subtitle: { ce: "Дошам, болх, дахар", tr: "Sözlük, iş, yaşam", ru: "Словарь, труд, жизнь" },
+    intro: {
+      ce: "Кхин дӀа — дешнаш а, дошам а.",
+      tr: "Devam et — yeni bulmacalar, aynı sözlük.",
+      ru: "Продолжай — новые уровни, тот же словарь.",
+    },
+    theme: "night",
+  },
 ];
 
 export function packFor(packId) {
