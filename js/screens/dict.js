@@ -5,6 +5,7 @@ import { INFO } from "../data/info.js";
 import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";
 import { openFeedback } from "./feedback.js";
+import { t } from "../utils/i18n.js";
 
 /* ================= SÖZLÜK ================= */
 
@@ -18,8 +19,8 @@ export function openDict(){
   const words = Object.keys(S.dict).sort();
   const render = q => {
     const list = words.filter(w=>!q || w.includes(norm(q)));
-    if(!words.length) return `<p class="empty-state">ХӀинца а цахила.<br>Дешнаш кхочушдича, хьан дошам хӀокху чу йовлар ю.</p>`;
-    if(!list.length) return `<p class="empty-state">Ца карийна.<br>Кхин а къастам я лаха.</p>`;
+    if(!words.length) return `<p class="empty-state">${t("dict.empty")}</p>`;
+    if(!list.length) return `<p class="empty-state">${t("dict.notFound")}</p>`;
     return list.map(w=>{
       const info = INFO[w];
       const ce = info ? (info.ce ?? "") : "";
@@ -38,11 +39,11 @@ export function openDict(){
     }).join("");
   };
   openPanel(`
-    <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg> Дошам</h2>
-    <p class="panel-subtitle">Кхочушдина дешнаш а цар маьӀнаш а хӀокху чу кхолла.</p>
-    <input class="dict-search" id="dict-q" placeholder="Лаха…" aria-label="Лаха дош">
+    <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg> ${t("dict.title")}</h2>
+    <p class="panel-subtitle">${t("dict.desc")}</p>
+    <input class="dict-search" id="dict-q" placeholder="${t("dict.search")}" aria-label="${t("dict.searchLabel")}">
     <div id="dict-list">${render("")}</div>
-    <div class="btnrow"><button class="btn small" id="dc-close">Юха</button></div>`);
+    <div class="btnrow"><button class="btn small" id="dc-close">${t("settings.back")}</button></div>`);
   $("dict-q").addEventListener("input", e=>{ $("dict-list").innerHTML = render(e.target.value); });
   // kelimeye özel geri bildirim (delegasyon: liste aramada yeniden çizilir)
   $("dict-list").addEventListener("click", e=>{

@@ -36,6 +36,8 @@ function loadGL() {
 
 /* ================= STATE YÜKLE ================= */
 load();
+// Küresel hata yakalayıcıları kur (Sentry + window.onerror + unhandledrejection)
+installGlobalHandler();
 // documentElement.lang ve dir'i kayıtlı dile senkronize et (varsayılan ce, ltr)
 try {
   if (S && S.settings && typeof S.settings.lang === "string") {

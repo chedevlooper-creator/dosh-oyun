@@ -11,6 +11,7 @@ import { norm, splitG, dispG } from "../engine/grapheme.js";
 import { show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
 import { onResize } from "../utils/resize.js";
 import { openPanel, closePanel } from "./panel.js";
+import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
 import { confetti } from "../fx/particles.js";
 
@@ -149,7 +150,7 @@ function buildGrid() {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
   grid.setAttribute("role", "grid");
-  grid.setAttribute("aria-label", "Bulmaca ızgarası");
+  grid.setAttribute("aria-label", t("game.gridLabel"));
 
   let maxR = 0, maxC = 0;
   for (const c of G.cells.values()) { maxR = Math.max(maxR, c.r); maxC = Math.max(maxC, c.c); }
@@ -178,7 +179,7 @@ function buildGrid() {
     el.setAttribute("tabindex", "0");
     el.dataset.row = cell.r;
     el.dataset.col = cell.c;
-    el.setAttribute("aria-label", `Satır ${cell.r + 1}, sütun ${cell.c + 1}`);
+    el.setAttribute("aria-label", t("game.cellPos", cell.r + 1, cell.c + 1));
     el.addEventListener("click", () => onCellTap(cell));
     el.addEventListener("keydown", (e) => onCellKey(e, cell));
     cell.el = el;
@@ -212,10 +213,9 @@ function fillCell(cell, hint = false) {
   if (!cell.el) return;
   cell.el.textContent = dispG(cell.ch);
   cell.el.classList.add("fill");
-  if (hint) cell.el.classList.add("hintfill");
-  // doldurulmuş hücrenin aria-label'ını harfle güncelle (ekran okuyucu)
+  if (hint) cell.el.classList.add("hintfill");    // doldurulmuş hücrenin aria-label'ını harfle güncelle (ekran okuyucu)
   cell.el.setAttribute("aria-label",
-    `Satır ${cell.r + 1}, sütun ${cell.c + 1}, harf ${dispG(cell.ch)}`);
+    t("game.cellFilled", cell.r + 1, cell.c + 1, dispG(cell.ch)));
 }
 
 /* ================= ÇARK ================= */
@@ -262,7 +262,7 @@ function buildWheel(letters) {
     el.textContent = dispG(L);
     el.setAttribute("role", "button");
     el.setAttribute("tabindex", "0");
-    el.setAttribute("aria-label", "Harf " + dispG(L));
+    el.setAttribute("aria-label", t("game.letterLabel", dispG(L)));
     el.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -392,7 +392,7 @@ function submitSel() {
 
   if (G.words.some(w => w.solved && w.norm === word) || G.foundBonus.has(word)) {
     clear("dup");
-    toast("ХӀара дош карийна!");
+    toast(t("game.found"));
     return;
   }
 
@@ -407,7 +407,7 @@ function submitSel() {
     updateCoins();
     SFX.bonus();
     flyCoins(document.getElementById("bonus-chest"), 3);
-    toast("💎 Карина бонус  +" + CFG.bonusWordCoins + " 🪙", "gold");
+    toast(t("game.bonusMsg", CFG.bonusWordCoins), "gold");
     return;
   }
 
@@ -417,7 +417,7 @@ function submitSel() {
   clear("bad");
   SFX.bad();
   vibrate([40, 50, 40]);
-  toast("Дош нийса дац!", "bad");
+  toast(t("game.wrong"), "bad");
   onWrongGuess();
 }
 
@@ -432,7 +432,7 @@ function onWrongGuess() {
       hb.classList.add("pulse-ring");
       setTimeout(() => hb.classList.remove("pulse-ring"), 4200);
     }
-    toast("Хьехам 💡");
+    toast(t("game.hintPrompt"));
   }
   if (G.wrongRow >= 6 && !G.rescued && S.coins < CFG.hintCost) {
     G.rescued = true;
@@ -440,7 +440,7 @@ function onWrongGuess() {
     if (u.length) {
       fillCell(u[(Math.random() * u.length) | 0], true);
       SFX.hint();
-      toast("Хьехам 🎁", "gold");
+      toast(t("game.hintGift"), "gold");
       checkAutoSolve();
       checkDone();
     }
@@ -490,7 +490,7 @@ function solveWord(w, byHint) {
     G.earned += coins + combo;
     SFX.solve();
     flyCoins(document.getElementById("grid"), 4);
-    if (combo) setTimeout(() => { toast("🔥 x" + G.streak + "  +" + combo + " 🪙", "gold"); SFX.coin(); }, 500);
+    if (combo) setTimeout(() => { toast(t("game.combo", G.streak, combo), "gold"); SFX.coin(); }, 500);
   }
 
   showWordInfo(w);
@@ -537,7 +537,7 @@ function unfilled() {
 }
 
 function spend(cost) {
-  if (S.coins < cost) { toast(cost + " 🪙 оьшу", "bad"); SFX.bad(); return false; }
+  if (S.coins < cost) { toast(t("game.needCoins", cost), "bad"); SFX.bad(); return false; }
   S.coins -= cost;             // proxy otomatik save
   S.stats.coinsSpent += cost;
   S.stats.hints++;
@@ -560,12 +560,12 @@ function hintLetter() {
 function hintTarget() {
   if (!G || G.done) return;
   if (!unfilled().length) return;
-  if (S.coins < CFG.targetHintCost) { toast(CFG.targetHintCost + " 🪙 оьшу", "bad"); SFX.bad(); return; }
+  if (S.coins < CFG.targetHintCost) { toast(t("game.needCoins", CFG.targetHintCost), "bad"); SFX.bad(); return; }
   G.targeting = !G.targeting;
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.toggle("target", G.targeting);
   }
-  if (G.targeting) toast("Яьшка харжа 🎯");
+  if (G.targeting) toast(t("game.targetMsg"));
 }
 
 function onCellTap(cell) {
@@ -610,7 +610,7 @@ function checkDone() {
 function showBonusChest() {
   if (!G) return;
   const list = [...G.foundBonus].map(dispG).join(", ") || "—";
-  toast("💎 " + list);
+  toast(t("game.bonusChest", list));
 }
 
 /* ---------- SEVİYE SONU ---------- */
@@ -647,16 +647,16 @@ function levelComplete() {
 
   const isLast = G.lv.id >= LAST_LEVEL_ID;
   openPanel(`
-    <h2>Декъал! 🎉</h2>
+    <h2>${t("end.title")}</h2>
     <div class="stars-row" id="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span></div>
-    <div class="reward-line"><span>ТӀегӀа</span><b>${G.lv.id + 1}</b></div>
-    <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
-    <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
-    <div class="reward-line"><span>Карина сом</span><b id="lc-coins">+0 🪙</b></div>
+    <div class="reward-line"><span>${t("end.level")}</span><b>${G.lv.id + 1}</b></div>
+    <div class="reward-line"><span>${t("end.words")}</span><b>${G.words.length}</b></div>
+    <div class="reward-line"><span>${t("end.bonus")}</span><b>${G.foundBonus.size}</b></div>
+    <div class="reward-line"><span>${t("end.earned")}</span><b id="lc-coins">+0 🪙</b></div>
     ${wordsRecapHTML()}
     <div class="btnrow">
-      <button class="btn small ghost" id="lc-map">Карта</button>
-      ${isLast ? "" : `<button class="btn small" id="lc-next">Кхин дӀа ▶</button>`}
+      <button class="btn small ghost" id="lc-map">${t("end.map")}</button>
+      ${isLast ? "" : `<button class="btn small" id="lc-next">${t("end.next")}</button>`}
     </div>`);
 
   const row = document.getElementById("stars-row").children;
@@ -666,8 +666,8 @@ function levelComplete() {
   const cEl = document.getElementById("lc-coins");
   if (cEl) {
     const total = G.earned, t0 = performance.now();
-    const tick = (t) => {
-      const k = Math.min(1, (t - t0) / 900);
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / 900);
       cEl.textContent = "+" + Math.round(total * (1 - Math.pow(1 - k, 3))) + " 🪙";
       if (k < 1) requestAnimationFrame(tick);
     };
