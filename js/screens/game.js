@@ -207,12 +207,10 @@ function buildWheel(letters) {
   const bs = Math.max(30, Math.min(D * 0.21, (D * 2.55) / n));
   const R = D / 2 - bs / 2 - 7;
 
-  // Karıştır butonu çarkla orantılı ölçeklensin (büyük çarkta kaybolmasın)
+  // Karıştır butonu çarkla orantılı ölçeklensin (ikon boyutu CSS % ile)
   const sh = document.getElementById("shuffle");
   const shs = Math.round(Math.max(44, Math.min(64, D * 0.17)));
   sh.style.width = sh.style.height = shs + "px";
-  const ico = sh.querySelector("svg");
-  if (ico) { ico.setAttribute("width", Math.round(shs * 0.46)); ico.setAttribute("height", Math.round(shs * 0.46)); }
 
   bubbles = letters.map((L, i) => {
     const ang = -Math.PI / 2 + i * (2 * Math.PI / n);
