@@ -1,8 +1,0 @@
-- [ ] `react` ve `react-dom` bağımlılıkları başarıyla yüklendi ve proje hatasız derleniyor.
-- [ ] `vite.config.js` dosyasında React eklentisi aktif.
-- [ ] Oyun, React DOM aracılığıyla `#root` div'ine başarıyla mount ediliyor.
-- [ ] `Home` ekranı React bileşeni olarak eksiksiz render ediliyor ve "Başla" butonu çalışıyor.
-- [ ] `Game` ekranı, kelime ızgarası (grid) ve harf çarkı (wheel) React state'i üzerinden çalışıyor.
-- [ ] Modal paneller (Ayarlar, İstatistikler vb.) manuel HTML string'leri yerine React bileşenleri ile açılıp kapanıyor.
-- [ ] `Three.js` 3D arka planı, React bileşen ağacıyla çakışmadan arka planda sorunsuz çalışmaya devam ediyor.
-- [ ] Vercel React Best Practices uyumluluğu: State güncellemeleri gereksiz tüm sayfa re-render'larına yol açmıyor (React DevTools profiler ile doğrulanabilir).
