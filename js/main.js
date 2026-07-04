@@ -1,7 +1,7 @@
 // @ts-check
 import { applyTheme } from "./engine/theme.js";
 import { renderHome } from "./screens/home.js";
-import { show, $, initSplashParticles, hapticTap } from "./utils/helpers.js";
+import { show, $, initSplashParticles, hapticTap, prefersReducedMotion } from "./utils/helpers.js";
 import { onResize } from "./utils/resize.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { load } from "./engine/save.js";
@@ -45,7 +45,7 @@ try {
 // Tema değiştiğinde sahne yüklüyse retheme çağır, değilse yükleme tetikle
 setOnThemeChange(() => {
   if (GL) { try { GL.retheme(); } catch {} }
-  else if (S.settings.scene3d !== false) loadGL();
+  else if (S.settings.scene3d !== false && !prefersReducedMotion()) loadGL();
 });
 
 // P3.5: Hata Ayıklama (Debug) Modu
@@ -60,8 +60,9 @@ if (urlParams.get('debug') === '1') {
 applyTheme(); renderHome(); show("scr-home");
 initGameScreens();
 
-// 3D sahne: scene3d setting false ise hiç yükleme, aksi halde idle'da başlat
-if (S.settings.scene3d !== false) {
+// 3D sahne: scene3d setting false ise hiç yükleme; OS "hareket azalt"
+// diyorsa da atla (statik fotoğraf arka plan yeterli) — aksi halde idle'da başlat
+if (S.settings.scene3d !== false && !prefersReducedMotion()) {
   if ("requestIdleCallback" in window) {
     requestIdleCallback(() => loadGL().then((gl) => { if (gl) { gl.init(); gl.retheme(); } }));
   } else {

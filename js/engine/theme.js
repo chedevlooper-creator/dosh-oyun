@@ -17,13 +17,25 @@ export const THEMES = [
   {id:"winter", name:"Ӏа",     dot:"linear-gradient(135deg,#dceefb,#4a7ba6)", img:"bg-winter.jpg"},
 ];
 
+/* WebP yarı boyut (scripts/optimize-images.mjs üretir); desteklemeyen
+ * eski Safari (<14) JPEG'e düşer. Canvas encode desteği decode desteğinin
+ * güvenli bir alt kümesi olduğundan yanlış pozitif vermez. */
+const WEBP_OK = (() => {
+  try {
+    return document.createElement("canvas").toDataURL("image/webp").startsWith("data:image/webp");
+  } catch { return false; }
+})();
+function themeImg(t){
+  return WEBP_OK ? t.img.replace(/\.jpg$/, ".webp") : t.img;
+}
+
 // başlangıçta aktif temanın fotoğrafını hemen yükle (FOUC'suz)
 function preloadInitial(){
   const initial = S?.settings?.theme || "kavkaz";
   const el = document.querySelector(`#photo .ph[data-t="${initial}"]`);
   if (el && !el.style.backgroundImage) {
     const theme = THEMES.find(t => t.id === initial) || THEMES[0];
-    el.style.backgroundImage = `url('${theme.img}')`;
+    el.style.backgroundImage = `url('${themeImg(theme)}')`;
   }
 }
 
@@ -40,7 +52,7 @@ export function applyTheme(){
       // lazy: eğer daha önce yüklenmediyse şimdi yükle
       if (!el.style.backgroundImage) {
         const t = THEMES.find(th => th.id === el.dataset.t);
-        if (t) el.style.backgroundImage = `url('${t.img}')`;
+        if (t) el.style.backgroundImage = `url('${themeImg(t)}')`;
       }
       el.classList.add("on");
     } else {

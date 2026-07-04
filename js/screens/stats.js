@@ -2,6 +2,7 @@
 import { S } from "../engine/store.js";
 import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";
+import { currentStreak } from "../engine/daily.js";
 
 /* ================= İSTATİSTİK ================= */
 export function openStats(){
@@ -24,6 +25,13 @@ export function openStats(){
         <div class="stat-card"><div class="v">${st.bonusWords}</div><div class="k">Карина бонус</div></div>
         <div class="stat-card"><div class="v">${st.hints}</div><div class="k">Хьехамаш</div></div>
         <div class="stat-card"><div class="v">${st.bestStreak} 🔥</div><div class="k">Уггаре дукха могӀа</div></div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Денна дош 📅</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v">${currentStreak()} 🔥</div><div class="k">МогӀа</div></div>
+        <div class="stat-card"><div class="v">${S.daily.best} 🔥</div><div class="k">Уггаре дукха могӀа</div></div>
       </div>
     </div>
     <div class="panel-section">
