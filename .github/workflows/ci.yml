@@ -30,6 +30,11 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: E2E (Playwright smoke)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
       - name: Build
         run: npm run build
         env:
