@@ -21,6 +21,7 @@ const _S = {
            bonusWords: 0, bestStreak: 0, levelsDone: 0 },
   lastDaily: "",
   lastGift: "",
+  daily: { last: "", streak: 0, best: 0 },
   tut: false,
 };
 let _G = null;
@@ -150,6 +151,10 @@ export function hydrate(persisted){
   if(typeof _S.settings.music !== "boolean") _S.settings.music = true;
   if(typeof _S.tut !== "boolean") _S.tut = false;
   if(typeof _S.lastGift !== "string") _S.lastGift = "";
+  if(!_S.daily || typeof _S.daily !== "object") _S.daily = {};
+  if(typeof _S.daily.last !== "string") _S.daily.last = "";
+  if(typeof _S.daily.streak !== "number") _S.daily.streak = 0;
+  if(typeof _S.daily.best !== "number") _S.daily.best = 0;
   if(!_S.stats || typeof _S.stats !== "object") _S.stats = {};
   for(const k of ["words","coinsEarned","coinsSpent","hints","bonusWords","bestStreak","levelsDone"]){
     if(typeof _S.stats[k] !== "number") _S.stats[k] = 0;
@@ -200,6 +205,7 @@ export function snapshot(){
     stats: Object.assign({}, _S.stats),
     lastDaily: _S.lastDaily,
     lastGift: _S.lastGift,
+    daily: Object.assign({}, _S.daily),
     tut: _S.tut,
   };
 }

@@ -2,7 +2,9 @@
 /* ================= OYUN MOTORU ================= */
 
 import { S, addFoundWord, setG } from "../engine/store.js";
-import { LEVELS } from "../data/levels.js";
+import { getLevel } from "../data/level-loader.js";
+import { LAST_LEVEL_ID } from "../data/level-index.js";
+import { recordDailyWin } from "../engine/daily.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
@@ -45,6 +47,7 @@ import { confetti } from "../fx/particles.js";
  * @property {Object[]} sel
  * @property {boolean} targeting
  * @property {boolean} done
+ * @property {boolean} [daily]
  */
 
 /**
@@ -81,10 +84,14 @@ let dragging = false;
 /**
  * Seviyeyi başlat
  * @param {number} id - Seviye ID
+ * @param {{ daily?: boolean }} [opts] - daily: günlük bulmaca modu (yıldız/harita ilerlemesi yazmaz)
  */
-function startLevel(id) {
-  const lv = LEVELS.find(l => l.id === id);
-  if (!lv) return;
+async function startLevel(id, opts = {}) {
+  const lv = await getLevel(id).catch((e) => {
+    console.warn("[game] seviye yüklenemedi:", e);
+    return null;
+  });
+  if (!lv) { toast("ТӀегӀа ца йеллало 😕"); return; }
 
   const words = lv.words.map(w => ({
     ...w,
@@ -116,6 +123,7 @@ function startLevel(id) {
     foundBonus: new Set(),
     mistakes: 0, hints: 0, streak: 0, earned: 0,
     sel: [], targeting: false, done: false,
+    daily: !!opts.daily,
   };
   setG(G); // store'a da bildir (atomik persist)
 
@@ -558,6 +566,7 @@ function showBonusChest() {
 function levelComplete() {
   if (!G || G.done) return;
   G.done = true;
+  if (G.daily) { dailyComplete(); return; }
   const st = starsFor(G.mistakes, G.hints);
   const prev = S.stars[G.lv.id] || 0;
   S.stars[G.lv.id] = Math.max(prev, st); // proxy otomatik save
@@ -566,7 +575,7 @@ function levelComplete() {
   SFX.win();
   vibrate([50, 60, 50, 60, 120]);
 
-  const isLast = G.lv.id >= LEVELS[LEVELS.length - 1].id;
+  const isLast = G.lv.id >= LAST_LEVEL_ID;
   openPanel(`
     <h2>Декъал! 🎉</h2>
     <div class="stars-row" id="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span></div>
@@ -598,6 +607,35 @@ function levelComplete() {
   if (nx) nx.onclick = () => { closePanel(); startLevel(G.lv.id + 1); };
 }
 
+/* ---------- GÜNLÜK BULMACA SONU ----------
+ * Yıldız/harita ilerlemesi yazılmaz; streak güncellenir, ödül coin'i
+ * burada eklenir (recordDailyWin sadece hesaplar). */
+function dailyComplete() {
+  const res = recordDailyWin();
+  if (!res.already && res.reward > 0) {
+    S.coins += res.reward;
+    S.stats.coinsEarned = (S.stats.coinsEarned || 0) + res.reward;
+  }
+  confetti(140);
+  SFX.win();
+  vibrate([50, 60, 50, 60, 120]);
+
+  openPanel(`
+    <h2>Декъал! 🎉</h2>
+    <div class="daily-flame">🔥 ${res.streak}</div>
+    <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
+    <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
+    <div class="reward-line"><span>Карина сом</span><b>+${G.earned + res.reward} 🪙</b></div>
+    <div class="btnrow">
+      <button class="btn small" id="lc-home">Юха</button>
+    </div>`);
+  updateCoins();
+  document.getElementById("lc-home").onclick = () => {
+    closePanel();
+    import("./home.js").then(m => { m.renderHome(); show("scr-home"); });
+  };
+}
+
 /** Map'e git (dinamik import ile sirküler bağımlılığı kır) */
 function goToMap() {
   import("./map.js").then(m => m.openMap());
@@ -610,7 +648,12 @@ function initGameScreens() {
     import("./home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
   };
 
-  document.getElementById("game-back").onclick = goToMap;
+  // günlük bulmacadan çıkış haritaya değil ana ekrana döner
+  document.getElementById("game-back").onclick = () => {
+    if (G && G.daily) {
+      import("./home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
+    } else goToMap();
+  };
   document.getElementById("game-settings").onclick = () => {
     import("./settings.js").then(({ openSettings }) => openSettings());
   };

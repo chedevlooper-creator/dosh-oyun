@@ -2,7 +2,7 @@
 /* Oyuna entegre versiyon — ../../css/editor.css ile kullanılır */
 
 import { norm, splitG, dispG, DSET } from "../engine/grapheme.js";
-import { LEVELS } from "../data/levels.js";
+import { loadAllLevels } from "../data/level-loader.js";
 
 /* ================= STATE ================= */
 
@@ -156,7 +156,8 @@ gridTable.addEventListener("click", (e) => {
 
 /* ================= LEVEL LOADER (from game data) ================= */
 
-$("btn-load-level").addEventListener("click", () => {
+$("btn-load-level").addEventListener("click", async () => {
+  const LEVELS = await loadAllLevels();
   const id = prompt(`Level ID girin (0-${LEVELS.length - 1}):`, "0");
   if (id === null) return;
   const n = parseInt(id);

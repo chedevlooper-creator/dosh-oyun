@@ -1,7 +1,10 @@
 // @ts-check
 import { describe, it, expect } from "vitest";
 import { PACKS, packFor } from "../data/packs.js";
-import { LEVELS } from "../data/levels.js";
+import { loadAllLevels } from "../data/level-loader.js";
+import { packOfLevel, LEVEL_COUNT, LAST_LEVEL_ID, PACK_RANGES } from "../data/level-index.js";
+
+const LEVELS = await loadAllLevels();
 
 describe("PACKS metadata", () => {
   it("has exactly 4 packs matching the 4 level packs", () => {
@@ -45,5 +48,35 @@ describe("PACKS metadata", () => {
       const pack = lv.pack || Math.floor(lv.id / 25) + 1;
       expect(ids.has(pack), `level ${lv.id} references unknown pack ${pack}`).toBe(true);
     }
+  });
+});
+
+/* level-index.js indeksi lazy-load'un tek senkron kaynağı — veriyle
+ * ayrışırsa harita/oyun yanlış paketten seviye arar. */
+describe("level-index consistency", () => {
+  it("LEVEL_COUNT and LAST_LEVEL_ID match the actual data", () => {
+    expect(LEVEL_COUNT).toBe(LEVELS.length);
+    expect(LAST_LEVEL_ID).toBe(LEVELS[LEVELS.length - 1].id);
+  });
+
+  it("PACK_RANGES cover all ids contiguously without overlap", () => {
+    const sorted = [...PACK_RANGES].sort((a, b) => a.from - b.from);
+    expect(sorted[0].from).toBe(0);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(sorted[i].from).toBe(sorted[i - 1].to + 1);
+    }
+    expect(sorted[sorted.length - 1].to).toBe(LAST_LEVEL_ID);
+  });
+
+  it("packOfLevel matches each level's own pack field", () => {
+    for (const lv of LEVELS) {
+      const expected = lv.pack || Math.floor(lv.id / 25) + 1;
+      expect(packOfLevel(lv.id), `level ${lv.id}`).toBe(expected);
+    }
+  });
+
+  it("packOfLevel returns null outside the range", () => {
+    expect(packOfLevel(-1)).toBeNull();
+    expect(packOfLevel(LAST_LEVEL_ID + 1)).toBeNull();
   });
 });

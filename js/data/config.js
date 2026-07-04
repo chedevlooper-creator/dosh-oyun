@@ -24,6 +24,9 @@ const CFG = {
   comboMilestone: 3,
   comboBonusCoins: 15,
   dailyGiftCoins: 100,
+  dailyRewardCoins: 50,
+  dailyStreakBonus: 10,
+  dailyStreakBonusCap: 7,
 };
 
 /**

@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { LEVELS } from "../data/levels.js";
+import { loadAllLevels } from "../data/level-loader.js";
+
+const LEVELS = await loadAllLevels();
 import { INFO } from "../data/info.js";
 import { norm, splitG } from "../engine/grapheme.js";
 
