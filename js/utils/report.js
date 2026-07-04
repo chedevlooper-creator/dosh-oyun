@@ -10,7 +10,17 @@
  *
  * ?debug=1 modunda her zaman console'a yazar (zaten var olan davranış). */
 
-const ENDPOINT = ""; // boş = sadece konsol
+/* Sentry DSN'den store endpoint'i türet (SDK'sız, ~sıfır maliyet).
+ * DSN build ortamından gelir: VITE_SENTRY_DSN=https://KEY@oXXX.ingest.sentry.io/PROJE
+ * Boş bırakılırsa yalnızca konsola yazılır. */
+const ENDPOINT = (() => {
+  try {
+    const dsn = import.meta.env?.VITE_SENTRY_DSN || "";
+    const m = dsn.match(/^https:\/\/([^@]+)@([^/]+)\/(\d+)$/);
+    if (!m) return "";
+    return `https://${m[2]}/api/${m[3]}/store/?sentry_version=7&sentry_key=${m[1]}`;
+  } catch { return ""; }
+})();
 let installed = false;
 
 function userConsented() {
@@ -43,14 +53,31 @@ export function reportError(err, context) {
   if (ENDPOINT && userConsented()) {
     // network: reportError çağrısı asla UI'ı bloklamamalı
     try {
+      // Sentry store API'sinin kabul ettiği asgari olay biçimi
+      const event = {
+        message: payload.msg,
+        level: "error",
+        platform: "javascript",
+        timestamp: payload.t / 1000,
+        extra: { where: payload.where, stack: payload.stack, ua: payload.ua },
+      };
       fetch(ENDPOINT, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(event),
         keepalive: true,
       }).catch(() => { /* sessiz */ });
     } catch { /* sessiz */ }
   }
+}
+
+/** Kullanıcının hata raporu iznini oku/yaz (ayarlar ekranı kullanır) */
+export function getConsent() { return userConsented(); }
+export function setConsent(on) {
+  try {
+    if (on) localStorage.setItem("dosh-consent", "1");
+    else localStorage.removeItem("dosh-consent");
+  } catch {}
 }
 
 /** global window.onerror hook'u kur. main.js'den çağrılabilir. */

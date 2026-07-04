@@ -4,6 +4,7 @@ import { THEMES, applyTheme } from "../engine/theme.js";
 import { S } from "../engine/store.js";
 import { clearAll, exportSave, importSave } from "../engine/save.js";
 import { toast, today } from "../utils/helpers.js";
+import { getConsent, setConsent } from "../utils/report.js";
 import { SFX, MUSIC } from "../engine/audio.js";
 import { tutorial } from "./tutorial.js";
 import { $ } from "../utils/helpers.js";
@@ -29,6 +30,8 @@ export function openSettings(){
     </div>
     <div class="opt-row"><span>${t("settings.tut")}</span>
       <button class="btn small ghost" id="set-tut">${t("home.play")}</button></div>
+    <div class="opt-row"><span class="opt-label">${t("settings.report")}</span>
+      <button class="toggle ${getConsent()?"on":""}" id="rep-toggle" role="switch" aria-checked="${getConsent()}" aria-label="${t("settings.report")}"></button></div>
     <div class="opt-row"><span>Хаамаш 💾</span>
       <span class="backup-btns">
         <button class="btn small ghost" id="set-export" aria-label="Хаамаш ⬇️">⬇️</button>
@@ -62,6 +65,12 @@ export function openSettings(){
     this.setAttribute("aria-checked", S.settings.music);
   };
   $("set-tut").onclick = ()=>{ closePanel(); tutorial(); };
+  $("rep-toggle").onclick = function(){
+    const next = !getConsent();
+    setConsent(next);
+    this.classList.toggle("on", next);
+    this.setAttribute("aria-checked", String(next));
+  };
   $("set-export").onclick = ()=>{
     const blob = new Blob([exportSave()], { type: "application/json" });
     const a = document.createElement("a");

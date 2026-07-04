@@ -6,8 +6,11 @@ import { onResize } from "./utils/resize.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { load } from "./engine/save.js";
 import { G, setOnThemeChange, S } from "./engine/store.js";
-import { buildGrid, fillCell, initGameScreens } from "./screens/game.js";
+import { buildGrid, fillCell, initGameScreens, startLevel } from "./screens/game.js";
 import { getDir } from "./utils/i18n.js";
+import { installGlobalHandler } from "./utils/report.js";
+
+installGlobalHandler();
 
 "use strict";
 
@@ -59,6 +62,13 @@ if (urlParams.get('debug') === '1') {
 /* ================= BAŞLAT ================= */
 applyTheme(); renderHome(); show("scr-home");
 initGameScreens();
+
+// PWA kısayolu: /?daily=1 → günlük bulmacayı doğrudan aç (yapılmadıysa)
+if (urlParams.get("daily") === "1") {
+  import("./engine/daily.js").then(({ dailyLevelId, isDailyDone }) => {
+    if (!isDailyDone()) startLevel(dailyLevelId(), { daily: true });
+  }).catch(() => {});
+}
 
 // 3D sahne: scene3d setting false ise hiç yükleme; OS "hareket azalt"
 // diyorsa da atla (statik fotoğraf arka plan yeterli) — aksi halde idle'da başlat
