@@ -29,6 +29,64 @@
 </head>
 <body class="theme-kavkaz">
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Hediye -->
+    <g id="i-gift" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.5" y="8.5" width="17" height="4" rx="1"/>
+      <path d="M5 12.5v7a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5v-7"/>
+      <path d="M12 8.5V21"/>
+      <path d="M12 8.5c-2.6 0-4.7-1-4.7-2.7C7.3 4.6 8.3 3.6 9.6 3.6c1.7 0 2.4 2.3 2.4 4.9Z"/>
+      <path d="M12 8.5c2.6 0 4.7-1 4.7-2.7 0-1.2-1-2.2-2.3-2.2-1.7 0-2.4 2.3-2.4 4.9Z"/>
+    </g>
+    <!-- Sözlük -->
+    <g id="i-book" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21Z"/>
+      <path d="M4 18.5V21a0 0 0 0 0 0 0"/>
+      <path d="M20 18.5V21H6.5A2.5 2.5 0 0 1 4 18.5"/>
+      <path d="M9 8h7M9 11.5h5"/>
+    </g>
+    <!-- İstatistik -->
+    <g id="i-chart" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4v15a1 1 0 0 0 1 1h15"/>
+      <path d="M8.5 15.5v-4"/>
+      <path d="M13 15.5V7.5"/>
+      <path d="M17.5 15.5v-6"/>
+    </g>
+    <!-- Ayarlar -->
+    <g id="i-gear" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3.2"/>
+      <path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.4.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.4-.9a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4.9 2-3.4Z"/>
+    </g>
+    <!-- Bonus (elmas) -->
+    <g id="i-gem" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 3.5h10l4 5.5-9 11.5L3 9Z"/>
+      <path d="M3 9h18M9.5 3.5 8 9l4 11.5M14.5 3.5 16 9l-4 11.5"/>
+    </g>
+    <!-- Harf ipucu (ampul) -->
+    <g id="i-bulb" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18h6M10 21h4"/>
+      <path d="M12 3a6 6 0 0 0-4 10.5c.8.7 1.3 1.5 1.5 2.5h5c.2-1 .7-1.8 1.5-2.5A6 6 0 0 0 12 3Z"/>
+    </g>
+    <!-- Hedef -->
+    <g id="i-target" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"/>
+      <circle cx="12" cy="12" r="5"/>
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>
+    </g>
+    <!-- Sihirli değnek -->
+    <g id="i-wand" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 20 15.5 8.5"/>
+      <path d="m15.5 8.5 2-2"/>
+      <path d="M19 3v2.4M19 8.6V11M15 7h2.4M20.6 7H23M20.8 3.7l-1.3 1.3M18.5 9.5l-1.3 1.3"/>
+    </g>
+    <!-- Geri ok -->
+    <g id="i-back" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15.5 5 8.5 12l7 7"/>
+    </g>
+  </defs>
+</svg>
+
 <div id="photo">
   <div class="ph" data-t="kavkaz" style="background-image:url('bg-kavkaz.jpg')"></div>
   <div class="ph" data-t="night"  style="background-image:url('bg-night.jpg')"></div>
@@ -74,17 +132,17 @@
       <button class="btn" id="btn-start">ДӀадоладе ▶</button>
     </div>
     <div class="dock">
-      <button class="icon-btn glass" id="btn-gift" title="+100"><span class="ic" aria-hidden="true">🎁</span><span class="lb">Денна</span></button>
-      <button class="icon-btn glass" id="btn-dict"><span class="ic" aria-hidden="true">📖</span><span class="lb">Дошам</span></button>
-      <button class="icon-btn glass" id="btn-stats"><span class="ic" aria-hidden="true">📊</span><span class="lb">Статистика</span></button>
-      <button class="icon-btn glass" id="btn-settings"><span class="ic" aria-hidden="true">⚙️</span><span class="lb">Нисдарш</span></button>
+      <button class="icon-btn glass" id="btn-gift" title="+100"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gift"/></svg></span><span class="lb">Денна</span></button>
+      <button class="icon-btn glass" id="btn-dict"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg></span><span class="lb">Дошам</span></button>
+      <button class="icon-btn glass" id="btn-stats"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chart"/></svg></span><span class="lb">Статистика</span></button>
+      <button class="icon-btn glass" id="btn-settings"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg></span><span class="lb">Нисдарш</span></button>
     </div>
   </section>
 
   <!-- MAP -->
   <section class="screen" id="scr-map">
     <div class="topbar">
-      <button class="rbtn" id="map-back" aria-label="Geri">←</button>
+      <button class="rbtn" id="map-back" aria-label="Geri"><svg class="ri" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg></button>
       <div class="title">ТӀегӀанийн карта</div>
       <div class="coins-chip">🪙 <span class="c" id="map-coins">0</span></div>
     </div>
@@ -94,25 +152,25 @@
   <!-- GAME -->
   <section class="screen" id="scr-game">
     <div class="gtop">
-      <button class="rbtn" id="game-back" aria-label="Geri">←</button>
+      <button class="rbtn" id="game-back" aria-label="Geri"><svg class="ri" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg></button>
       <div class="lvl"><small>ТӀЕГӀА</small><span id="lvl-num"></span></div>
       <div class="coins-chip">🪙 <span class="c" id="game-coins">0</span></div>
-      <button class="rbtn" id="game-settings" aria-label="Ayarlar">⚙️</button>
+      <button class="rbtn" id="game-settings" aria-label="Ayarlar"><svg class="ri" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg></button>
     </div>
     <div id="grid-wrap"><div id="grid"></div></div>
     <div id="info-strip"></div>
     <div class="toolrow">
       <button class="tool" id="bonus-chest" title="Бонус дешнаш" aria-label="Бонус дешнаш">
-        <span class="tool-ic" aria-hidden="true">💎</span><span class="tool-label">Бонус<br>дешнаш</span><span id="bonus-count">0</span>
+        <span class="tool-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gem"/></svg></span><span class="tool-label">Бонус <br>дешнаш</span><span id="bonus-count">0</span>
       </button>
       <button class="tool" id="hint-letter" title="ХӀарф хьахо" aria-label="ХӀарф хьахо">
-        <span class="tool-ic" aria-hidden="true">💡</span><span class="tool-label">ХӀарф<br>хьахо</span><span class="price">25 🪙</span>
+        <span class="tool-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-bulb"/></svg></span><span class="tool-label">ХӀарф <br>хьахо</span><span class="price">25 🪙</span>
       </button>
       <button class="tool" id="hint-target" title="ХӀан хьахо" aria-label="ХӀан хьахо">
-        <span class="tool-ic" aria-hidden="true">🎯</span><span class="tool-label">ХӀан<br>хьахо</span><span class="price">35 🪙</span>
+        <span class="tool-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg></span><span class="tool-label">ХӀан <br>хьахо</span><span class="price">35 🪙</span>
       </button>
       <button class="tool" id="hint-wand" title="Хьехаман тай" aria-label="Хьехаман тай">
-        <span class="tool-ic" aria-hidden="true">🪄</span><span class="tool-label">Хьехаман<br>тай</span><span class="price">60 🪙</span>
+        <span class="tool-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-wand"/></svg></span><span class="tool-label">Хьехаман <br>тай</span><span class="price">60 🪙</span>
       </button>
     </div>
     <div id="preview"></div>
