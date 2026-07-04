@@ -62,6 +62,34 @@ export function recordDailyWin(dateStr = today(), yKey = yesterdayKey()) {
 }
 
 /**
+ * Wordle tarzı paylaşım metni: bulmacanın ızgara silüeti (spoiler'sız),
+ * tarih, streak alevi ve bonus/temiz-oyun rozetleri.
+ * @param {{ cells: Iterable<{r:number,c:number}>, streak: number,
+ *           bonus?: number, mistakes?: number, dateStr?: string, url?: string }} p
+ * @returns {string}
+ */
+export function dailyShareText(p) {
+  const set = new Set();
+  let maxR = 0, maxC = 0;
+  for (const c of p.cells) {
+    set.add(c.r + "," + c.c);
+    maxR = Math.max(maxR, c.r);
+    maxC = Math.max(maxC, c.c);
+  }
+  const rows = [];
+  for (let r = 0; r <= maxR; r++) {
+    let line = "";
+    for (let c = 0; c <= maxC; c++) line += set.has(r + "," + c) ? "🟩" : "⬛";
+    rows.push(line);
+  }
+  const head = "Дош 📅 " + (p.dateStr || today()) + (p.streak > 1 ? " 🔥" + p.streak : "");
+  const badges = [];
+  if (p.bonus) badges.push("💎" + p.bonus);
+  if (p.mistakes === 0) badges.push("✨");
+  return [head, badges.join(" "), ...rows, p.url || ""].filter(Boolean).join("\n");
+}
+
+/**
  * Görüntülenecek güncel streak: dün ya da bugün oynanmadıysa seri koptu, 0 göster.
  * (Kayıttaki streak değerine dokunmaz; recordDailyWin zaten sıfırdan başlatır.)
  * @param {string} [dateStr]

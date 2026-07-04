@@ -4,7 +4,7 @@
 import { S, addFoundWord, setG } from "../engine/store.js";
 import { getLevel } from "../data/level-loader.js";
 import { LAST_LEVEL_ID } from "../data/level-index.js";
-import { recordDailyWin } from "../engine/daily.js";
+import { recordDailyWin, dailyShareText } from "../engine/daily.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
@@ -627,12 +627,29 @@ function dailyComplete() {
     <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
     <div class="reward-line"><span>Карина сом</span><b>+${G.earned + res.reward} 🪙</b></div>
     <div class="btnrow">
+      <button class="btn small ghost" id="lc-share" aria-label="ДӀахьажо 📤">📤</button>
       <button class="btn small" id="lc-home">Юха</button>
     </div>`);
   updateCoins();
   document.getElementById("lc-home").onclick = () => {
     closePanel();
     import("./home.js").then(m => { m.renderHome(); show("scr-home"); });
+  };
+  document.getElementById("lc-share").onclick = async () => {
+    const text = dailyShareText({
+      cells: G.cells.values(),
+      streak: res.streak,
+      bonus: G.foundBonus.size,
+      mistakes: G.mistakes,
+      url: location.protocol.startsWith("http") ? location.origin : "",
+    });
+    try {
+      if (navigator.share) { await navigator.share({ text }); return; }
+      await navigator.clipboard.writeText(text);
+      toast("✓ 📋");
+    } catch (e) {
+      if (e && e.name !== "AbortError") console.warn("[daily] paylaşım:", e);
+    }
   };
 }
 

@@ -1,6 +1,6 @@
 // @ts-check
 import { describe, it, expect, beforeEach } from "vitest";
-import { dailyLevelId, yesterdayKey, isDailyDone, recordDailyWin, currentStreak } from "../engine/daily.js";
+import { dailyLevelId, yesterdayKey, isDailyDone, recordDailyWin, currentStreak, dailyShareText } from "../engine/daily.js";
 import { LEVEL_COUNT } from "../data/level-index.js";
 import { CFG } from "../data/config.js";
 import { S } from "../engine/store.js";
@@ -89,6 +89,27 @@ describe("recordDailyWin", () => {
     const res = recordDailyWin("2026-7-4", "2026-7-3");
     expect(res.streak).toBe(31);
     expect(res.reward).toBe(CFG.dailyRewardCoins + CFG.dailyStreakBonusCap * CFG.dailyStreakBonus);
+  });
+});
+
+describe("dailyShareText", () => {
+  // L şekilli mini ızgara: (0,0) (1,0) (1,1)
+  const cells = [{ r: 0, c: 0 }, { r: 1, c: 0 }, { r: 1, c: 1 }];
+
+  it("renders the grid silhouette without spoiling letters", () => {
+    const text = dailyShareText({ cells, streak: 3, bonus: 2, mistakes: 0, dateStr: "2026-7-4", url: "https://dosh.example" });
+    expect(text).toBe([
+      "Дош 📅 2026-7-4 🔥3",
+      "💎2 ✨",
+      "🟩⬛",
+      "🟩🟩",
+      "https://dosh.example",
+    ].join("\n"));
+  });
+
+  it("omits flame, badges and url when not earned", () => {
+    const text = dailyShareText({ cells, streak: 1, bonus: 0, mistakes: 2, dateStr: "2026-7-4" });
+    expect(text).toBe(["Дош 📅 2026-7-4", "🟩⬛", "🟩🟩"].join("\n"));
   });
 });
 
