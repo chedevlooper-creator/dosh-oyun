@@ -1,85 +1,24 @@
+// @ts-check
 /* ================= OYUN MOTORU ================= */
 
-import { S, commitG, addFoundWord, setG } from "../engine/store.js";
+import { S, addFoundWord, setG } from "../engine/store.js";
 import { LEVELS } from "../data/levels.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
-import { $, show, openPanel, closePanel, updateCoins, toast } from "../utils/dom.js";
-import { vibrate, flyCoins } from "../utils/helpers.js";
+import { show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
+import { onResize } from "../utils/resize.js";
+import { openPanel, closePanel } from "./panel.js";
 import { SFX } from "../engine/audio.js";
-import { confetti } from "../fx/confetti.js";
+import { confetti } from "../fx/particles.js";
 
 /* ================= OYUN DURUMU ================= */
 
-/**
- * @typedef {Object} LevelData
- * @property {number} id
- * @property {string[]} letters
- * @property {WordData[]} words
- * @property {string[]} [bonus]
- * @property {number} [pack]
- */
-
-/**
- * @typedef {Object} WordData
- * @property {string} word
- * @property {number} row
- * @property {number} col
- * @property {string} dir
- */
-
-/**
- * @typedef {Object} GameState
- * @property {LevelData} lv
- * @property {ProcessedWord[]} words
- * @property {Map<string, CellData>} cells
- * @property {Set<string>} bonusSet
- * @property {Set<string>} foundBonus
- * @property {number} mistakes
- * @property {number} hints
- * @property {number} streak
- * @property {number} earned
- * @property {Object[]} sel
- * @property {boolean} targeting
- * @property {boolean} done
- */
-
-/**
- * @typedef {Object} ProcessedWord
- * @property {string} word
- * @property {number} row
- * @property {number} col
- * @property {string} dir
- * @property {string[]} g
- * @property {string} norm
- * @property {boolean} solved
- * @property {CellData[]} cells
- */
-
-/**
- * @typedef {Object} CellData
- * @property {number} r
- * @property {number} c
- * @property {string} ch
- * @property {boolean} filled
- * @property {boolean} hint
- * @property {HTMLElement|null} el
- */
-
-/** @type {GameState|null} */
 let G = null;
 
-/** @type {{ el: HTMLElement, letter: string, x: number, y: number, idx: number }[]} */
 let bubbles = [];
 let dragging = false;
 
-/* ================= SEVİYE BAŞLAT ================= */
-
-/**
- * Seviyeyi başlat
- * @param {number} id - Seviye ID
- */
 function startLevel(id) {
   const lv = LEVELS.find(l => l.id === id);
   if (!lv) return;
@@ -94,7 +33,6 @@ function startLevel(id) {
   let minR = 1e9, minC = 1e9;
   for (const w of words) { minR = Math.min(minR, w.row); minC = Math.min(minC, w.col); }
 
-  /** @type {Map<string, CellData>} */
   const cells = new Map();
   for (const w of words) {
     w.cells = [];
@@ -115,26 +53,26 @@ function startLevel(id) {
     mistakes: 0, hints: 0, streak: 0, earned: 0,
     sel: [], targeting: false, done: false,
   };
-  setG(G); // store'a da bildir (atomik persist)
+  setG(G);
 
   document.getElementById("lvl-num").textContent = id + 1;
   document.getElementById("bonus-count").textContent = "0";
   const strip = document.getElementById("info-strip");
   strip.className = "";
   strip.innerHTML = "";
-  updateCoins(S);
+  updateCoins();
   show("scr-game");
   buildWheel(lv.letters.slice());
   requestAnimationFrame(() => buildGrid());
 }
-
-/* ================= IZGARA ================= */
 
 function buildGrid() {
   if (!G) return;
   const wrap = document.getElementById("grid-wrap");
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
+  grid.setAttribute("role", "grid");
+  grid.setAttribute("aria-label", "Bulmaca ızgarası");
 
   let maxR = 0, maxC = 0;
   for (const c of G.cells.values()) { maxR = Math.max(maxR, c.r); maxC = Math.max(maxC, c.c); }
@@ -142,7 +80,6 @@ function buildGrid() {
   const availW = Math.min(wrap.clientWidth - 8, 536);
   const availH = wrap.clientHeight - 8;
   const gap = 5;
-  // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür
   const maxSize = (rows <= 4 && cols <= 5) ? 76 : (rows <= 6 && cols <= 7) ? 62 : 52;
   const size = Math.max(22, Math.min(maxSize, Math.floor(Math.min(
     (availW - gap * (cols - 1)) / cols,
@@ -159,26 +96,31 @@ function buildGrid() {
     el.style.left = (cell.c * (size + gap)) + "px";
     el.style.top = (cell.r * (size + gap)) + "px";
     el.style.fontSize = (cell.ch.length > 1 ? size * 0.42 : size * 0.52) + "px";
-    el.setAttribute("role", "button");
+    el.setAttribute("role", "gridcell");
     el.setAttribute("tabindex", "0");
-    el.setAttribute("aria-label", "Hücre");
+    el.dataset.row = cell.r;
+    el.dataset.col = cell.c;
+    el.setAttribute("aria-label", `Satır ${cell.r + 1}, sütun ${cell.c + 1}`);
     el.addEventListener("click", () => onCellTap(cell));
-    el.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onCellTap(cell);
-      }
-    });
+    el.addEventListener("keydown", (e) => onCellKey(e, cell));
     cell.el = el;
     grid.appendChild(el);
   }
 }
 
-/**
- * Hücreyi doldur
- * @param {CellData} cell
- * @param {boolean} [hint=false]
- */
+function onCellKey(e, cell) {
+  const map = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
+  if (e.key in map) {
+    e.preventDefault();
+    const [dr, dc] = map[e.key];
+    const target = G.cells.get(`${cell.r + dr},${cell.c + dc}`);
+    if (target && target.el) target.el.focus();
+  } else if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    onCellTap(cell);
+  }
+}
+
 function fillCell(cell, hint = false) {
   if (cell.filled) return;
   cell.filled = true;
@@ -187,9 +129,9 @@ function fillCell(cell, hint = false) {
   cell.el.textContent = dispG(cell.ch);
   cell.el.classList.add("fill");
   if (hint) cell.el.classList.add("hintfill");
+  cell.el.setAttribute("aria-label",
+    `Satır ${cell.r + 1}, sütun ${cell.c + 1}, harf ${dispG(cell.ch)}`);
 }
-
-/* ================= ÇARK ================= */
 
 function buildWheel(letters) {
   const wheel = document.getElementById("wheel");
@@ -203,22 +145,24 @@ function buildWheel(letters) {
   svg.setAttribute("viewBox", "0 0 " + D + " " + D);
   svg.innerHTML = "<polyline points=''/>";
 
-  // Baloncuk boyutu çark çapıyla orantılı: büyük çarkta boş görünmesin
   const bs = Math.max(30, Math.min(D * 0.21, (D * 2.55) / n));
   const R = D / 2 - bs / 2 - 7;
 
-  // Karıştır butonu çarkla orantılı ölçeklensin (ikon boyutu CSS % ile)
   const sh = document.getElementById("shuffle");
   const shs = Math.round(Math.max(44, Math.min(64, D * 0.17)));
   sh.style.width = sh.style.height = shs + "px";
 
+  const wheelRect = wheel.getBoundingClientRect();
+  const wox = wheelRect.left;
+  const woy = wheelRect.top;
+  const rad = bs / 2 + 6;
   bubbles = letters.map((L, i) => {
     const ang = -Math.PI / 2 + i * (2 * Math.PI / n);
     const x = D / 2 + R * Math.cos(ang);
     const y = D / 2 + R * Math.sin(ang);
     const el = document.createElement("div");
     el.className = "bub";
-    el.style.animationDelay = (i * 35) + "ms"; // kademeli pop-in
+    el.style.animationDelay = (i * 35) + "ms";
     el.style.width = el.style.height = bs + "px";
     el.style.left = (x - bs / 2) + "px";
     el.style.top = (y - bs / 2) + "px";
@@ -238,7 +182,10 @@ function buildWheel(letters) {
       }
     });
     wheel.appendChild(el);
-    return { el, letter: norm(L), x, y, idx: i };
+    return {
+      el, letter: norm(L), x, y, idx: i,
+      cx: wox + x, cy: woy + y, r: rad,
+    };
   });
 }
 
@@ -250,10 +197,9 @@ function shuffleWheel() {
     [ls[i], ls[j]] = [ls[j], ls[i]];
   }
   buildWheel(ls);
-  // çark tam tur döner; bubIn animasyonlarıyla karışmasın diye ada göre filtrele
   const wheel = document.getElementById("wheel");
   wheel.classList.remove("shuffling");
-  void wheel.offsetWidth; // animasyonu yeniden tetikle
+  void wheel.offsetWidth;
   wheel.classList.add("shuffling");
   wheel.addEventListener("animationend", function h(e) {
     if (e.animationName !== "wheelShuffle") return;
@@ -263,13 +209,9 @@ function shuffleWheel() {
   SFX.coin();
 }
 
-/* ---------- ÇARK SÜRÜKLEME ---------- */
-
 function bubbleAt(x, y) {
   for (const b of bubbles) {
-    const r = b.el.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2, rad = r.width / 2 + 6;
-    if ((x - cx) ** 2 + (y - cy) ** 2 <= rad * rad) return b;
+    if ((x - b.cx) ** 2 + (y - b.cy) ** 2 <= b.r * b.r) return b;
   }
   return null;
 }
@@ -289,10 +231,10 @@ function renderSel() {
   if (!G.sel.length) { pv.innerHTML = ""; return; }
   pv.innerHTML = `<div class="cap">${G.sel.map(b => `<span>${dispG(b.letter)}</span>`).join("")}</div>`;
   const svg = document.querySelector("#wheel svg polyline");
+  if (!svg) return;
   const wr = document.getElementById("wheel").getBoundingClientRect();
   svg.setAttribute("points", G.sel.map(b => {
-    const r = b.el.getBoundingClientRect();
-    return (r.left + r.width / 2 - wr.left) + "," + (r.top + r.height / 2 - wr.top);
+    return (b.cx - wr.left) + "," + (b.cy - wr.top);
   }).join(" "));
 }
 
@@ -303,7 +245,7 @@ function setupWheelListeners() {
     const b = bubbleAt(e.clientX, e.clientY);
     if (!b) return;
     dragging = true;
-    try { wheel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    try { wheel.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     G.sel = [];
     bubbles.forEach(x => x.el.classList.remove("sel"));
     selAdd(b);
@@ -329,8 +271,6 @@ function setupWheelListeners() {
     submitSel();
   });
 }
-
-/* ---------- KELİME GÖNDERME ---------- */
 
 function submitSel() {
   if (!G) return;
@@ -360,17 +300,15 @@ function submitSel() {
     clear("ok");
     G.foundBonus.add(word);
     document.getElementById("bonus-count").textContent = G.foundBonus.size;
-    // atomik bonus merge
     addFoundWord(word, { isBonus: true, coins: CFG.bonusWordCoins });
     G.earned += CFG.bonusWordCoins;
-    updateCoins(S);
+    updateCoins();
     SFX.bonus();
     flyCoins(document.getElementById("bonus-chest"), 3);
     toast("💎 Карина бонус  +" + CFG.bonusWordCoins + " 🪙", "gold");
     return;
   }
 
-  // Hata
   G.mistakes++;
   G.streak = 0;
   clear("bad");
@@ -379,11 +317,6 @@ function submitSel() {
   toast("Дош нийса дац!", "bad");
 }
 
-/**
- * Kelimeyi çöz
- * @param {Object} w
- * @param {boolean} byHint
- */
 function solveWord(w, byHint) {
   if (!G) return;
   w.solved = true;
@@ -406,9 +339,8 @@ function solveWord(w, byHint) {
     }
   }, i * 70));
 
-  addFoundWord(w.norm); // dict'e ekle
+  addFoundWord(w.norm);
   S.stats.words++;
-  // proxy üzerinden atama otomatik save tetikler
 
   if (!byHint) {
     G.streak++;
@@ -435,7 +367,7 @@ function solveWord(w, byHint) {
     strip.className = "on";
   }
 
-  updateCoins(S);
+  updateCoins();
   checkAutoSolve();
   if (G.words.every(x => x.solved)) setTimeout(levelComplete, w.cells.length * 70 + 600);
 }
@@ -447,8 +379,6 @@ function checkAutoSolve() {
   }
 }
 
-/* ---------- İPUÇLARI ---------- */
-
 function unfilled() {
   if (!G) return [];
   return [...G.cells.values()].filter(c => !c.filled);
@@ -456,11 +386,11 @@ function unfilled() {
 
 function spend(cost) {
   if (S.coins < cost) { toast(cost + " 🪙 оьшу", "bad"); SFX.bad(); return false; }
-  S.coins -= cost;             // proxy otomatik save
+  S.coins -= cost;
   S.stats.coinsSpent += cost;
   S.stats.hints++;
   if (G) G.hints++;
-  updateCoins(S);
+  updateCoins();
   return true;
 }
 
@@ -524,14 +454,12 @@ function showBonusChest() {
   toast("💎 " + list);
 }
 
-/* ---------- SEVİYE SONU ---------- */
-
 function levelComplete() {
   if (!G || G.done) return;
   G.done = true;
   const st = starsFor(G.mistakes, G.hints);
   const prev = S.stars[G.lv.id] || 0;
-  S.stars[G.lv.id] = Math.max(prev, st); // proxy otomatik save
+  S.stars[G.lv.id] = Math.max(prev, st);
   S.stats.levelsDone = Math.max(S.stats.levelsDone, Object.keys(S.stars).length);
   confetti(140);
   SFX.win();
@@ -553,7 +481,6 @@ function levelComplete() {
   const row = document.getElementById("stars-row").children;
   for (let i = 0; i < st; i++) setTimeout(() => { row[i].classList.add("lit"); SFX.coin(); }, 400 + i * 350);
 
-  // kazanılan coin sayacı: 0'dan hedefe akar
   const cEl = document.getElementById("lc-coins");
   if (cEl) {
     const total = G.earned, t0 = performance.now();
@@ -569,12 +496,9 @@ function levelComplete() {
   if (nx) nx.onclick = () => { closePanel(); startLevel(G.lv.id + 1); };
 }
 
-/** Map'e git (dinamik import ile sirküler bağımlılığı kır) */
 function goToMap() {
   import("./map.js").then(m => m.openMap());
 }
-
-/* ---------- İNİTİALİZASYON ---------- */
 
 function initGameScreens() {
   document.getElementById("map-back").onclick = () => {
@@ -595,13 +519,11 @@ function initGameScreens() {
   setupWheelListeners();
 }
 
-// Yeniden boyutlandırmada grid'i yeniden inşa et
-addEventListener("resize", () => {
-  if (G && document.getElementById("scr-game").classList.contains("on")) {
+onResize(() => {
+  if (G && document.getElementById("scr-game")?.classList.contains("on")) {
     const filled = [...G.cells.values()].filter(c => c.filled);
     buildGrid();
     filled.forEach(c => { c.filled = false; fillCell(c, c.hint); });
-    // Çark da yeni alana göre ölçeklensin (seçim yokken güvenli)
     if (!G.sel.length && !dragging) buildWheel(G.lv.letters);
   }
 });
