@@ -1,3 +1,4 @@
+// @ts-check
 /* ================= ÇOKLU DİL (i18n) ALTYAPISI ================= */
 
 import { S, commitSettings } from "../engine/store.js";
@@ -54,6 +55,53 @@ const translations = {
     "settings.resetMsg": "Массо а хаамаш дӀадаха?",
     "settings.resetNo": "ХӀан-хӀа",
     "settings.resetYes": "ХӀаъ, юхадаккха",
+  },
+  ru: {
+    // Russian (для второй аудитории)
+    "home.start": "Начать ▶",
+    "home.continue": "Продолжить ▶",
+    "home.play": "Играть",
+    "map.title": "Карта уровней",
+    "map.pack": "ПАКЕТ",
+    "map.level": "Уровень",
+    "map.now": "Сейчас",
+    "map.locked": "Заблокировано",
+    "map.lockMsg": "Сначала завершите предыдущий уровень 🔒",
+    "game.level": "УРОВЕНЬ",
+    "game.bonus": "Бонусные<br>слова",
+    "game.hintLetter": "Буква<br>подсказка",
+    "game.hintTarget": "Цель<br>подсказка",
+    "game.hintWand": "Волшебная<br>палочка",
+    "game.found": "Это слово уже найдено!",
+    "game.bonusFound": "Бонус найден",
+    "game.wrong": "Неверное слово!",
+    "game.needCoins": "🪙 нужно",
+    "game.targetMsg": "Выберите клетку 🎯",
+    "end.title": "Поздравляем! 🎉",
+    "end.words": "Найденные слова",
+    "end.bonus": "Бонусные слова 💎",
+    "end.earned": "Заработано",
+    "end.map": "Карта",
+    "end.next": "Дальше ▶",
+    "stats.title": "Статистика 📊",
+    "stats.desc": "Ваш прогресс и достижения.",
+    "dict.title": "Словарь 📖",
+    "dict.desc": "Найденные слова и их значения собираются здесь.",
+    "dict.search": "Поиск…",
+    "dict.empty": "Пока пусто.<br>По мере нахождения слов ваш словарь будет заполняться.",
+    "dict.notFound": "Не найдено.<br>Попробуйте другой поиск.",
+    "settings.title": "Настройки ⚙️",
+    "settings.theme": "Тема",
+    "settings.sound": "Звук 🔔",
+    "settings.music": "Музыка 🎵",
+    "settings.lang": "Язык 🌐",
+    "settings.tut": "Обучение",
+    "settings.reset": "Сброс",
+    "settings.back": "Назад",
+    "settings.resetTitle": "Сброс",
+    "settings.resetMsg": "Удалить весь прогресс?",
+    "settings.resetNo": "Нет",
+    "settings.resetYes": "Да, сбросить",
   },
   tr: {
     // Türkçe örnek çeviriler (diaspora için)
@@ -126,13 +174,18 @@ export function t(key, ...args) {
 export function getLanguages() {
   return [
     { code: "ce", name: "Нохчийн" },
-    { code: "tr", name: "Türkçe" }
+    { code: "tr", name: "Türkçe" },
+    { code: "ru", name: "Русский" }
   ];
 }
 
 export function setLanguage(code) {
   if (translations[code]) {
     commitSettings({ lang: code });
-    location.reload(); // Dil değiştiğinde arayüzü yenile
+    // documentElement.lang'i güncelle, sonra sayfayı yenile ki statik string'ler t() üzerinden tekrar render edilsin.
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = code;
+    }
+    location.reload();
   }
 }

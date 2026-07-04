@@ -15,7 +15,7 @@ export function show(scr){
   // 3D sahnenin view()'ı lazy yüklü; dynamic import ile tetikle.
   // Sahne yüklü değilse hata yutulur (kullanıcı deneyimi etkilenmez).
   import("../fx/scene3d.js").then((m) => {
-    try { m.GL.view(scr); } catch {}
+    try { m.GL.view(scr); } catch (e) {}
   }).catch(() => {});
 }
 let toastTimer = 0;
@@ -48,7 +48,7 @@ export function flyCoins(fromEl, n=5){
   }
 }
 export function today(){ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
-export function vibrate(p){ try{ navigator.vibrate ? navigator.vibrate(p) : 0; }catch{} }
+export function vibrate(p){ try{ navigator.vibrate ? navigator.vibrate(p) : 0; }catch(e){} }
 
 /* ---------- V6 YARDIMCI FONKSİYONLAR ---------- */
 let bannerTimer = 0;
@@ -59,13 +59,13 @@ export function banner(msg, cls=""){
   bannerTimer = setTimeout(()=>{ b.className = ""; }, 2200);
 }
 export function hapticTap(){
-  try{ if(navigator.vibrate) navigator.vibrate(10); }catch{}
+  try{ if(navigator.vibrate) navigator.vibrate(10); }catch(e){}
 }
 export function hapticSuccess(){
-  try{ if(navigator.vibrate) navigator.vibrate([15,40,20]); }catch{}
+  try{ if(navigator.vibrate) navigator.vibrate([15,40,20]); }catch(e){}
 }
 export function hapticError(){
-  try{ if(navigator.vibrate) navigator.vibrate([60,30,60]); }catch{}
+  try{ if(navigator.vibrate) navigator.vibrate([60,30,60]); }catch(e){}
 }
 /* Splash için parçacıklar üret */
 export function initSplashParticles(){
@@ -91,3 +91,4 @@ export function bumpNumber(el, from, to, dur=600){
   }
   requestAnimationFrame(step);
 }
+

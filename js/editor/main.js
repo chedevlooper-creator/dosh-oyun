@@ -4,19 +4,25 @@
 import { norm, splitG, dispG, DSET } from "../engine/grapheme.js";
 import { LEVELS } from "../data/levels.js";
 
+/* ================= STATE ================= */
+
 const state = {
   id: 0, pack: 0, rows: 4, cols: 4,
-  grid: [],
-  words: [],
-  bonus: [],
-  extraLetters: [],
+  grid: [],        // grid[r][c] = normalized grapheme string or ""
+  words: [],       // { word, row, col, dir }[]
+  bonus: [],       // string[]
+  extraLetters: [],// string[]
   wordDefMode: false,
   wordDefStart: null,
 };
 
+/* ================= DOM REFS ================= */
+
 const $ = (id) => document.getElementById(id);
 const gridTable = $("grid");
 const valMsg = $("validation-msg");
+
+/* ================= GRID ================= */
 
 function initGrid(rows, cols) {
   state.rows = rows; state.cols = cols;
@@ -78,6 +84,8 @@ function moveTo(r, c) {
   const inp = gridTable.querySelector(`td[data-r="${r}"][data-c="${c}"] .cell-input`);
   if (inp) { inp.focus(); inp.select(); }
 }
+
+/* ================= WORD DEFINITION ================= */
 
 $("btn-def-word").addEventListener("click", () => {
   if (state.wordDefMode) { exitWordDef(); return; }
@@ -146,6 +154,8 @@ gridTable.addEventListener("click", (e) => {
   valMsg.textContent = `✅ "${dispG(word)}" eklendi`; valMsg.className = "ok";
 });
 
+/* ================= LEVEL LOADER (from game data) ================= */
+
 $("btn-load-level").addEventListener("click", () => {
   const id = prompt(`Level ID girin (0-${LEVELS.length - 1}):`, "0");
   if (id === null) return;
@@ -192,6 +202,8 @@ function importLevelData(lv) {
   updateAll();
 }
 
+/* ================= BONUS ================= */
+
 $("btn-add-bonus").addEventListener("click", () => {
   const v = norm($("bonus-input").value);
   if (v.length < 2) { valMsg.textContent = "En az 2 grafem!"; valMsg.className = "err"; return; }
@@ -202,6 +214,8 @@ $("btn-add-bonus").addEventListener("click", () => {
 });
 $("bonus-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btn-add-bonus").click(); });
 
+/* ================= EXTRA LETTERS ================= */
+
 $("btn-add-extra").addEventListener("click", () => {
   const parts = norm($("extra-input").value).split(/[\s,]+/).filter(Boolean);
   for (const p of parts) {
@@ -211,6 +225,8 @@ $("btn-add-extra").addEventListener("click", () => {
   updateAll();
 });
 $("extra-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btn-add-extra").click(); });
+
+/* ================= RENDER ================= */
 
 function renderWords() {
   const list = $("word-list"); list.innerHTML = "";
@@ -269,6 +285,8 @@ function renderWordMarkers() {
     if (td) { td.classList.add("word-start"); td.dataset.wordIdx = String(i+1); }
   });
 }
+
+/* ================= VALIDATION ================= */
 
 function findCellConflicts(r, c) {
   const ch = state.grid[r][c];
@@ -337,6 +355,8 @@ function renderValidation() {
   }
 }
 
+/* ================= UPDATE ALL ================= */
+
 function updateAll() {
   renderGrid();
   renderWords();
@@ -348,6 +368,8 @@ function updateAll() {
   $("lvl-id").value = state.id;
   $("lvl-pack").value = state.pack;
 }
+
+/* ================= EXPORT / IMPORT ================= */
 
 function exportLevel() {
   const r = validate();
@@ -399,10 +421,12 @@ $("import-file").addEventListener("change", (e) => {
   e.target.value = "";
 });
 
+/* ================= UI CONTROLS ================= */
+
 $("btn-resize").addEventListener("click", () => {
   const rows = +$("grid-rows").value || 4, cols = +$("grid-cols").value || 4;
-  const ng = Array.from({ length: rows }, (_r, r) =>
-    Array.from({ length: cols }, (_c, c) => (state.grid[r] && state.grid[r][c]) || ""));
+  const ng = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => (state.grid[r] && state.grid[r][c]) || ""));
   state.rows = rows; state.cols = cols; state.grid = ng;
   exitWordDef(); updateAll();
 });
@@ -420,17 +444,21 @@ $("btn-validate").addEventListener("click", renderValidation);
 $("lvl-id").addEventListener("change", () => { state.id = +$("lvl-id").value || 0; });
 $("lvl-pack").addEventListener("change", () => { state.pack = +$("lvl-pack").value || 0; });
 
+// Paste JSON via double-click on validation area
 valMsg.addEventListener("dblclick", () => {
   const text = prompt("Level JSON yapıştır:");
   if (text) { try { importLevelData(JSON.parse(text)); } catch (err) { valMsg.textContent = "❌ " + err.message; valMsg.className = "err"; } }
 });
 
+// Keyboard shortcuts
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && e.key === "E") { e.preventDefault(); exportLevel(); }
   if (e.key === "Escape" && state.wordDefMode) exitWordDef();
 });
 
+/* ================= INIT ================= */
+
 initGrid(4, 4);
 $("grid-rows").value = 4; $("grid-cols").value = 4;
 updateAll();
-console.warn("🏗️ Дош Editor (oyun içi) hazır! /editor");
+console.log("🏗️ Дош Editor (oyun içi) hazır! /editor");

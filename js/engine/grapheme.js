@@ -1,3 +1,4 @@
+// @ts-check
 /* ================= ÇEÇEN GRAFEM İŞLEMLERİ ================= */
 
 /** Palochka karakteri (Ӏ) */

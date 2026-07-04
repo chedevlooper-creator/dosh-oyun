@@ -30,9 +30,7 @@ export default defineConfig({
         editor: "./editor.html",
       },
       output: {
-        manualChunks: {
-          three: ["three.min.js"],
-        },
+        manualChunks: undefined,
       },
     },
   },

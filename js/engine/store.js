@@ -1,3 +1,4 @@
+// @ts-check
 /* ================================================================
    STORE - Tek dogruluk kaynagi (Single Source of Truth)
    ---------------------------------------------------------------
@@ -134,10 +135,12 @@ export function addFoundWord(wordNorm, opts){
   return { coinDelta: _S.coins - before };
 }
 
-/* kalici kayit yukle (save.js tarafindan init aninda cagrilir) */
+/* kalici kayit yukle (save.js tarafindan init aninda cagrilir)
+ * `persisted` snapshot()'dan gelen eski sürüm olabilir; migration pipeline'dan geçirilir. */
 export function hydrate(persisted){
-  if(persisted && typeof persisted === "object"){
-    Object.assign(_S, persisted);
+  const migrated = migrate(persisted);
+  if(migrated && typeof migrated === "object"){
+    Object.assign(_S, migrated);
   }
   if(typeof _S.coins !== "number") _S.coins = 100;
   if(!_S.stars || typeof _S.stars !== "object") _S.stars = {};
@@ -158,9 +161,38 @@ export function hydrate(persisted){
   }
 }
 
+/* ---------- schema versiyonu ----------
+ * snapshot() her zaman geçerli SAVE_VERSION'ı yazar; hydrate() okurken
+ * eski sürümler için migration pipeline uygular. Şu an v1 ile v2 özdeş
+ * (henüz breaking değişiklik yok), ama altyapı yerinde. */
+export const SAVE_VERSION = 2;
+
+const MIGRATIONS = {
+  // 1 -> 2: identity migration (alan eklemedi / yeniden adlandırmadı)
+  1: (data) => ({ ...data, _v: 2 }),
+};
+
+function migrate(persisted){
+  let v = (persisted && typeof persisted === "object") ? (persisted._v | 0) : 1;
+  if (v === 0) v = 1; // eski snapshot'lar _v içermez
+  let cur = persisted;
+  while (v < SAVE_VERSION) {
+    const step = MIGRATIONS[v];
+    if (!step) {
+      console.warn(`[store] save migration: no path from v${v} to v${SAVE_VERSION}; aborting`);
+      return null;
+    }
+    cur = step(cur) || cur;
+    v = (cur && cur._v) | 0;
+  }
+  if (cur && cur._v !== SAVE_VERSION) cur = { ...cur, _v: SAVE_VERSION };
+  return cur;
+}
+
 /* snapshot - save()'e verilecek kopya */
 export function snapshot(){
   return {
+    _v: SAVE_VERSION,
     coins: _S.coins,
     stars: Object.assign({}, _S.stars),
     dict: Object.assign({}, _S.dict),

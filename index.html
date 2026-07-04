@@ -15,12 +15,14 @@
 <meta name="keywords" content="çeçence, kelime oyunu, bulmaca, dosh, нохчийн мотт, дешнаш">
 <meta property="og:title" content="Дош — Нохчийн дош">
 <meta property="og:description" content="Çeçence kelime bulmaca oyunu. Harfleri birleştir, kelimeleri bul ve sözlüğünü geliştir.">
-<meta property="og:image" content="icon-512.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="game">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Дош — Нохчийн дош">
 <meta name="twitter:description" content="Çeçence kelime bulmaca oyunu. Harfleri birleştir, kelimeleri bul ve sözlüğünü geliştir.">
-<meta name="twitter:image" content="icon-512.png">
+<meta name="twitter:image" content="og-image.png">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -114,11 +116,11 @@
 </svg>
 
 <div id="photo">
-  <div class="ph" data-t="kavkaz" style="background-image:url('bg-kavkaz.jpg')"></div>
-  <div class="ph" data-t="night"  style="background-image:url('bg-night.jpg')"></div>
-  <div class="ph" data-t="forest" style="background-image:url('bg-forest.jpg')"></div>
-  <div class="ph" data-t="autumn" style="background-image:url('bg-autumn.jpg')"></div>
-  <div class="ph" data-t="winter" style="background-image:url('bg-winter.jpg')"></div>
+  <div class="ph" data-t="kavkaz"></div>
+  <div class="ph" data-t="night"></div>
+  <div class="ph" data-t="forest"></div>
+  <div class="ph" data-t="autumn"></div>
+  <div class="ph" data-t="winter"></div>
 </div>
 <div id="bg">
   <div class="sun"></div>
@@ -153,7 +155,7 @@
         <span class="coins-chip">🪙 <span class="c" id="home-coins">0</span></span>
         <span class="coins-chip">⭐ <span class="c" id="home-stars">0</span></span>
       </div>
-      <div class="progressbar"><i id="home-bar"></i></div>
+      <div class="progressbar"><i id="home-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="İlerleme"></i></div>
       <div class="home-progress" id="home-progress" aria-live="polite"></div>
       <button class="btn" id="btn-start">ДӀадоладе ▶</button>
     </div>
@@ -222,8 +224,6 @@
   <div class="sparticles" aria-hidden="true"></div>
 </div>
 
-<script src="three.min.js"></script>
-<script src="fx.js"></script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

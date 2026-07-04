@@ -3,7 +3,7 @@
  * ve addFoundWord atomik merge'ini doğrular. Her test kendinden önceki
  * state'i hydrate(snapshot()) ile sıfırlar; bu sayede sıra bağımsız olur. */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   S, G, setG, getG,
   commitS, commitSettings, commitG, addFoundWord,

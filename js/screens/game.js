@@ -1,12 +1,12 @@
 // @ts-check
 /* ================= OYUN MOTORU ================= */
 
-import { S, addFoundWord, setG } from "../engine/store.js";
+import { S, commitG, addFoundWord, setG } from "../engine/store.js";
 import { LEVELS } from "../data/levels.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
-import { show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
+import { $, show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
 import { onResize } from "../utils/resize.js";
 import { openPanel, closePanel } from "./panel.js";
 import { SFX } from "../engine/audio.js";
@@ -14,11 +14,74 @@ import { confetti } from "../fx/particles.js";
 
 /* ================= OYUN DURUMU ================= */
 
+/**
+ * @typedef {Object} LevelData
+ * @property {number} id
+ * @property {string[]} letters
+ * @property {WordData[]} words
+ * @property {string[]} [bonus]
+ * @property {number} [pack]
+ */
+
+/**
+ * @typedef {Object} WordData
+ * @property {string} word
+ * @property {number} row
+ * @property {number} col
+ * @property {string} dir
+ */
+
+/**
+ * @typedef {Object} GameState
+ * @property {LevelData} lv
+ * @property {ProcessedWord[]} words
+ * @property {Map<string, CellData>} cells
+ * @property {Set<string>} bonusSet
+ * @property {Set<string>} foundBonus
+ * @property {number} mistakes
+ * @property {number} hints
+ * @property {number} streak
+ * @property {number} earned
+ * @property {Object[]} sel
+ * @property {boolean} targeting
+ * @property {boolean} done
+ */
+
+/**
+ * @typedef {Object} ProcessedWord
+ * @property {string} word
+ * @property {number} row
+ * @property {number} col
+ * @property {string} dir
+ * @property {string[]} g
+ * @property {string} norm
+ * @property {boolean} solved
+ * @property {CellData[]} cells
+ */
+
+/**
+ * @typedef {Object} CellData
+ * @property {number} r
+ * @property {number} c
+ * @property {string} ch
+ * @property {boolean} filled
+ * @property {boolean} hint
+ * @property {HTMLElement|null} el
+ */
+
+/** @type {GameState|null} */
 let G = null;
 
+/** @type {{ el: HTMLElement, letter: string, x: number, y: number, idx: number }[]} */
 let bubbles = [];
 let dragging = false;
 
+/* ================= SEVİYE BAŞLAT ================= */
+
+/**
+ * Seviyeyi başlat
+ * @param {number} id - Seviye ID
+ */
 function startLevel(id) {
   const lv = LEVELS.find(l => l.id === id);
   if (!lv) return;
@@ -33,6 +96,7 @@ function startLevel(id) {
   let minR = 1e9, minC = 1e9;
   for (const w of words) { minR = Math.min(minR, w.row); minC = Math.min(minC, w.col); }
 
+  /** @type {Map<string, CellData>} */
   const cells = new Map();
   for (const w of words) {
     w.cells = [];
@@ -53,7 +117,7 @@ function startLevel(id) {
     mistakes: 0, hints: 0, streak: 0, earned: 0,
     sel: [], targeting: false, done: false,
   };
-  setG(G);
+  setG(G); // store'a da bildir (atomik persist)
 
   document.getElementById("lvl-num").textContent = id + 1;
   document.getElementById("bonus-count").textContent = "0";
@@ -65,6 +129,8 @@ function startLevel(id) {
   buildWheel(lv.letters.slice());
   requestAnimationFrame(() => buildGrid());
 }
+
+/* ================= IZGARA ================= */
 
 function buildGrid() {
   if (!G) return;
@@ -80,6 +146,7 @@ function buildGrid() {
   const availW = Math.min(wrap.clientWidth - 8, 536);
   const availH = wrap.clientHeight - 8;
   const gap = 5;
+  // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür
   const maxSize = (rows <= 4 && cols <= 5) ? 76 : (rows <= 6 && cols <= 7) ? 62 : 52;
   const size = Math.max(22, Math.min(maxSize, Math.floor(Math.min(
     (availW - gap * (cols - 1)) / cols,
@@ -108,6 +175,7 @@ function buildGrid() {
   }
 }
 
+/* Klavye gezinmesi: ok tuşları komşu hücreye, Enter/Space hedefi seçer. */
 function onCellKey(e, cell) {
   const map = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
   if (e.key in map) {
@@ -121,6 +189,11 @@ function onCellKey(e, cell) {
   }
 }
 
+/**
+ * Hücreyi doldur
+ * @param {CellData} cell
+ * @param {boolean} [hint=false]
+ */
 function fillCell(cell, hint = false) {
   if (cell.filled) return;
   cell.filled = true;
@@ -129,9 +202,12 @@ function fillCell(cell, hint = false) {
   cell.el.textContent = dispG(cell.ch);
   cell.el.classList.add("fill");
   if (hint) cell.el.classList.add("hintfill");
+  // doldurulmuş hücrenin aria-label'ını harfle güncelle (ekran okuyucu)
   cell.el.setAttribute("aria-label",
     `Satır ${cell.r + 1}, sütun ${cell.c + 1}, harf ${dispG(cell.ch)}`);
 }
+
+/* ================= ÇARK ================= */
 
 function buildWheel(letters) {
   const wheel = document.getElementById("wheel");
@@ -145,13 +221,18 @@ function buildWheel(letters) {
   svg.setAttribute("viewBox", "0 0 " + D + " " + D);
   svg.innerHTML = "<polyline points=''/>";
 
+  // Baloncuk boyutu çark çapıyla orantılı: büyük çarkta boş görünmesin
   const bs = Math.max(30, Math.min(D * 0.21, (D * 2.55) / n));
   const R = D / 2 - bs / 2 - 7;
 
+  // Karıştır butonu çarkla orantılı ölçeklensin (ikon boyutu CSS % ile)
   const sh = document.getElementById("shuffle");
   const shs = Math.round(Math.max(44, Math.min(64, D * 0.17)));
   sh.style.width = sh.style.height = shs + "px";
 
+  // wheel'in viewport koordinatlarını bir kez oku; tüm balonlar için
+  // cx/cy/r'yi buradan türet. Sonradan her pointermove'da getBoundingClientRect
+  // çağırmaya gerek kalmaz.
   const wheelRect = wheel.getBoundingClientRect();
   const wox = wheelRect.left;
   const woy = wheelRect.top;
@@ -162,7 +243,7 @@ function buildWheel(letters) {
     const y = D / 2 + R * Math.sin(ang);
     const el = document.createElement("div");
     el.className = "bub";
-    el.style.animationDelay = (i * 35) + "ms";
+    el.style.animationDelay = (i * 35) + "ms"; // kademeli pop-in
     el.style.width = el.style.height = bs + "px";
     el.style.left = (x - bs / 2) + "px";
     el.style.top = (y - bs / 2) + "px";
@@ -184,6 +265,7 @@ function buildWheel(letters) {
     wheel.appendChild(el);
     return {
       el, letter: norm(L), x, y, idx: i,
+      // viewport-space cache: getBoundingClientRect yerine doğrudan bunları oku
       cx: wox + x, cy: woy + y, r: rad,
     };
   });
@@ -197,9 +279,10 @@ function shuffleWheel() {
     [ls[i], ls[j]] = [ls[j], ls[i]];
   }
   buildWheel(ls);
+  // çark tam tur döner; bubIn animasyonlarıyla karışmasın diye ada göre filtrele
   const wheel = document.getElementById("wheel");
   wheel.classList.remove("shuffling");
-  void wheel.offsetWidth;
+  void wheel.offsetWidth; // animasyonu yeniden tetikle
   wheel.classList.add("shuffling");
   wheel.addEventListener("animationend", function h(e) {
     if (e.animationName !== "wheelShuffle") return;
@@ -208,6 +291,8 @@ function shuffleWheel() {
   });
   SFX.coin();
 }
+
+/* ---------- ÇARK SÜRÜKLEME ---------- */
 
 function bubbleAt(x, y) {
   for (const b of bubbles) {
@@ -232,6 +317,8 @@ function renderSel() {
   pv.innerHTML = `<div class="cap">${G.sel.map(b => `<span>${dispG(b.letter)}</span>`).join("")}</div>`;
   const svg = document.querySelector("#wheel svg polyline");
   if (!svg) return;
+  // wheel rect'i bir kez oku; balon merkezlerini cached cx/cy'den türet
+  // (pointermove başına 14 getBoundingClientRect çağrısı → 1'e düşer)
   const wr = document.getElementById("wheel").getBoundingClientRect();
   svg.setAttribute("points", G.sel.map(b => {
     return (b.cx - wr.left) + "," + (b.cy - wr.top);
@@ -245,7 +332,7 @@ function setupWheelListeners() {
     const b = bubbleAt(e.clientX, e.clientY);
     if (!b) return;
     dragging = true;
-    try { wheel.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    try { wheel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     G.sel = [];
     bubbles.forEach(x => x.el.classList.remove("sel"));
     selAdd(b);
@@ -271,6 +358,8 @@ function setupWheelListeners() {
     submitSel();
   });
 }
+
+/* ---------- KELİME GÖNDERME ---------- */
 
 function submitSel() {
   if (!G) return;
@@ -300,6 +389,7 @@ function submitSel() {
     clear("ok");
     G.foundBonus.add(word);
     document.getElementById("bonus-count").textContent = G.foundBonus.size;
+    // atomik bonus merge
     addFoundWord(word, { isBonus: true, coins: CFG.bonusWordCoins });
     G.earned += CFG.bonusWordCoins;
     updateCoins();
@@ -309,6 +399,7 @@ function submitSel() {
     return;
   }
 
+  // Hata
   G.mistakes++;
   G.streak = 0;
   clear("bad");
@@ -317,6 +408,11 @@ function submitSel() {
   toast("Дош нийса дац!", "bad");
 }
 
+/**
+ * Kelimeyi çöz
+ * @param {Object} w
+ * @param {boolean} byHint
+ */
 function solveWord(w, byHint) {
   if (!G) return;
   w.solved = true;
@@ -339,8 +435,9 @@ function solveWord(w, byHint) {
     }
   }, i * 70));
 
-  addFoundWord(w.norm);
+  addFoundWord(w.norm); // dict'e ekle
   S.stats.words++;
+  // proxy üzerinden atama otomatik save tetikler
 
   if (!byHint) {
     G.streak++;
@@ -379,6 +476,8 @@ function checkAutoSolve() {
   }
 }
 
+/* ---------- İPUÇLARI ---------- */
+
 function unfilled() {
   if (!G) return [];
   return [...G.cells.values()].filter(c => !c.filled);
@@ -386,7 +485,7 @@ function unfilled() {
 
 function spend(cost) {
   if (S.coins < cost) { toast(cost + " 🪙 оьшу", "bad"); SFX.bad(); return false; }
-  S.coins -= cost;
+  S.coins -= cost;             // proxy otomatik save
   S.stats.coinsSpent += cost;
   S.stats.hints++;
   if (G) G.hints++;
@@ -454,12 +553,14 @@ function showBonusChest() {
   toast("💎 " + list);
 }
 
+/* ---------- SEVİYE SONU ---------- */
+
 function levelComplete() {
   if (!G || G.done) return;
   G.done = true;
   const st = starsFor(G.mistakes, G.hints);
   const prev = S.stars[G.lv.id] || 0;
-  S.stars[G.lv.id] = Math.max(prev, st);
+  S.stars[G.lv.id] = Math.max(prev, st); // proxy otomatik save
   S.stats.levelsDone = Math.max(S.stats.levelsDone, Object.keys(S.stars).length);
   confetti(140);
   SFX.win();
@@ -481,6 +582,7 @@ function levelComplete() {
   const row = document.getElementById("stars-row").children;
   for (let i = 0; i < st; i++) setTimeout(() => { row[i].classList.add("lit"); SFX.coin(); }, 400 + i * 350);
 
+  // kazanılan coin sayacı: 0'dan hedefe akar
   const cEl = document.getElementById("lc-coins");
   if (cEl) {
     const total = G.earned, t0 = performance.now();
@@ -496,9 +598,12 @@ function levelComplete() {
   if (nx) nx.onclick = () => { closePanel(); startLevel(G.lv.id + 1); };
 }
 
+/** Map'e git (dinamik import ile sirküler bağımlılığı kır) */
 function goToMap() {
   import("./map.js").then(m => m.openMap());
 }
+
+/* ---------- İNİTİALİZASYON ---------- */
 
 function initGameScreens() {
   document.getElementById("map-back").onclick = () => {
@@ -519,11 +624,13 @@ function initGameScreens() {
   setupWheelListeners();
 }
 
+// Yeniden boyutlandırmada grid'i yeniden inşa et
 onResize(() => {
   if (G && document.getElementById("scr-game")?.classList.contains("on")) {
     const filled = [...G.cells.values()].filter(c => c.filled);
     buildGrid();
     filled.forEach(c => { c.filled = false; fillCell(c, c.hint); });
+    // Çark da yeni alana göre ölçeklensin (seçim yokken güvenli)
     if (!G.sel.length && !dragging) buildWheel(G.lv.letters);
   }
 });

@@ -1,21 +1,22 @@
+// @ts-check
 /* ================= KONFETİ / PARTICLE F/X ================= */
 
 import { prefersReducedMotion } from "../utils/helpers.js";
+import { onResize } from "../utils/resize.js";
 
 const fx = document.getElementById("fx");
 const fctx = fx ? fx.getContext("2d") : null;
 let parts = [];
+let raf = 0;
+let lastDrawn = 0;
 
-/** Canvas boyutunu güncelle */
 function fxSize() {
   if (!fx || !fctx) return;
   fx.width = innerWidth * devicePixelRatio;
   fx.height = innerHeight * devicePixelRatio;
   fctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 }
-
-/** Boyut değişikliğini dinle */
-addEventListener("resize", fxSize);
+onResize(fxSize);
 
 /**
  * Konfeti patlat
@@ -38,26 +39,37 @@ function confetti(n = 90) {
       vr: (Math.random() - 0.5) * 0.3,
     });
   }
+  ensureLoop();
 }
 
-/** Parçacık animasyon döngüsü */
-(function loop() {
-  if (!fctx) { requestAnimationFrame(loop); return; }
-  fctx.clearRect(0, 0, innerWidth, innerHeight);
-  parts = parts.filter(p => p.a > 0.02 && p.y < innerHeight + 30);
-  for (const p of parts) {
-    p.x += p.vx; p.y += p.vy; p.vy += p.g;
-    p.rot += p.vr; p.a -= 0.004;
-    fctx.save();
-    fctx.globalAlpha = p.a;
-    fctx.translate(p.x, p.y);
-    fctx.rotate(p.rot);
-    fctx.fillStyle = p.c;
-    fctx.fillRect(-p.r, -p.r * 0.6, p.r * 2, p.r * 1.2);
-    fctx.restore();
-  }
-  requestAnimationFrame(loop);
-})();
+function ensureLoop() {
+  if (raf) return;
+  let last = 0;
+  const step = (t) => {
+    if (!fctx) { raf = 0; return; }
+    // parçacık yoksa ve 800ms'dir çizim yapılmadıysa loop'u durdur
+    if (parts.length === 0) {
+      if (t - lastDrawn > 800) { raf = 0; return; }
+    }
+    if (t - last < 16) { raf = requestAnimationFrame(step); return; }
+    last = t; lastDrawn = t;
+    fctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.a > 0.02 && p.y < innerHeight + 30);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += p.g;
+      p.rot += p.vr; p.a -= 0.004;
+      fctx.save();
+      fctx.globalAlpha = p.a;
+      fctx.translate(p.x, p.y);
+      fctx.rotate(p.rot);
+      fctx.fillStyle = p.c;
+      fctx.fillRect(-p.r, -p.r * 0.6, p.r * 2, p.r * 1.2);
+      fctx.restore();
+    }
+    raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+}
 
 /**
  * Uçan para animasyonu

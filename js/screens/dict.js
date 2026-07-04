@@ -1,5 +1,6 @@
+// @ts-check
 import { S } from "../engine/store.js";
-import { norm, dispG } from "../utils/graphemes.js";
+import { norm, dispG } from "../engine/grapheme.js";
 import { INFO } from "../data/info.js";
 import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";

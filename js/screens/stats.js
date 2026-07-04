@@ -1,3 +1,4 @@
+// @ts-check
 import { S } from "../engine/store.js";
 import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";

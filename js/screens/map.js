@@ -1,3 +1,4 @@
+// @ts-check
 import { LEVELS } from "../data/levels.js";
 import { S } from "../engine/store.js";
 import { updateCoins, $, show, toast } from "../utils/helpers.js";

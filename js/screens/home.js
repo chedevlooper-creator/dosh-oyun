@@ -1,14 +1,16 @@
+// @ts-check
 import { S } from "../engine/store.js";
 import { LEVELS } from "../data/levels.js";
-import { CFG } from "../utils/constants.js";
+import { CFG } from "../data/config.js";
 import { updateCoins, toast, today, $ } from "../utils/helpers.js";
+import { t } from "../utils/i18n.js";
 import { ac, SFX } from "../engine/audio.js";
 import { tutorial } from "./tutorial.js";
 import { openMap } from "./map.js";
 import { openSettings } from "./settings.js";
 import { openStats } from "./stats.js";
 import { openDict } from "./dict.js";
-import { confetti } from "../fx/confetti.js";
+import { confetti } from "../fx/particles.js";
 
 /* ================= ANA EKRAN ================= */
 export function renderHome(){
@@ -18,9 +20,15 @@ export function renderHome(){
   const percent = LEVELS.length ? (done/LEVELS.length*100) : 0;
   $("home-progress").innerHTML = `<strong>${done}</strong> / ${LEVELS.length} · <strong>${totalStars}</strong> ⭐ · ${percent.toFixed(0)}%`;
   $("home-stars").textContent = totalStars;
-  $("btn-start").innerHTML = `${S.tut ? "Кхин дӀа ▶" : "Ловза йолае ▶"}`;
-  $("btn-start").setAttribute("aria-label", S.tut ? "Кхин дӀа, тӀегӀанийн карта" : "Ловза йолае, хьехам доладу");
-  requestAnimationFrame(()=>{ $("home-bar").style.width = percent.toFixed(1) + "%"; });
+  $("btn-start").innerHTML = `${S.tut ? t("home.continue") : t("home.start")}`;
+  $("btn-start").setAttribute("aria-label", S.tut ? t("home.continue") : t("home.start"));
+  requestAnimationFrame(()=>{
+    const bar = $("home-bar");
+    if (bar) {
+      bar.style.width = percent.toFixed(1) + "%";
+      bar.setAttribute("aria-valuenow", percent.toFixed(0));
+    }
+  });
   $("btn-gift").classList.toggle("glow", S.lastGift !== today());
 }
 $("btn-start").onclick = ()=>{ ac(); SFX.coin();

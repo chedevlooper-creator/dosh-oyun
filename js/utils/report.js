@@ -14,12 +14,12 @@ const ENDPOINT = ""; // boş = sadece konsol
 let installed = false;
 
 function userConsented() {
-  try { return globalThis.localStorage?.getItem("dosh-consent") === "1"; } catch { return false; }
+  try { return globalThis.localStorage?.getItem("dosh-consent") === "1"; } catch (e) { return false; }
 }
 
 function debugOn() {
   try { return new URLSearchParams(globalThis.location?.search || "").get("debug") === "1"; }
-  catch { return false; }
+  catch (e) { return false; }
 }
 
 /**
@@ -38,7 +38,7 @@ export function reportError(err, context) {
   };
   if (debugOn() || userConsented()) {
     // konsola yaz (debug=1 modunda her zaman; aksi halde izin varsa)
-    try { console.warn("[report]", payload); } catch {}
+    try { console.warn("[report]", payload); } catch (e) {}
   }
   if (ENDPOINT && userConsented()) {
     // network: reportError çağrısı asla UI'ı bloklamamalı
@@ -49,7 +49,7 @@ export function reportError(err, context) {
         body: JSON.stringify(payload),
         keepalive: true,
       }).catch(() => { /* sessiz */ });
-    } catch { /* sessiz */ }
+    } catch (e) { /* sessiz */ }
   }
 }
 

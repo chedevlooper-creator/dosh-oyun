@@ -1,3 +1,4 @@
+// @ts-check
 import { S } from "../engine/store.js";
 import { closePanel, openPanel } from "./panel.js";
 import { openMap } from "./map.js";
