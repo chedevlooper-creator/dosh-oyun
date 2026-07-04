@@ -218,7 +218,8 @@ describe("INFO dictionary", () => {
 
   it("all INFO definitions are non-empty", () => {
     for (const [word, def] of Object.entries(INFO)) {
-      expect(def.length, `Definition for "${word}" is empty`).toBeGreaterThan(0);
+      expect(def?.ce?.length, `Chechen definition for "${word}" is empty`).toBeGreaterThan(0);
+      expect(def?.tr?.length, `Turkish definition for "${word}" is empty`).toBeGreaterThan(0);
     }
   });
 
