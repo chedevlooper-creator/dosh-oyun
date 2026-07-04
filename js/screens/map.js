@@ -31,7 +31,7 @@ export function openMap(){
     n.setAttribute("aria-label", "ТӀегӀа " + (lv.id + 1) + (st ? ", " + st + " седа" : (locked ? ", гӀайгӀа" : ", хӀинца")));
     if(st){ n.classList.add("done"); n.innerHTML = `<div>${lv.id+1}</div><div class="st">${"★".repeat(st)}</div>`; }
     else if(lv.id === cur){ n.classList.add("cur"); n.innerHTML = `<div>${lv.id+1}</div><div class="state">ХӀинца</div>`; }
-    else if(locked){ n.classList.add("lock"); n.innerHTML = `<div>🔒</div><div class="state">ГӀайгӀа</div>`; n.title = "Хьалхара тӀегӀа чекхйаккха"; n.setAttribute("aria-disabled","true"); }
+    else if(locked){ n.classList.add("lock"); n.innerHTML = `<svg class="lock-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lock"/></svg><div class="state">ГӀайгӀа</div>`; n.title = "Хьалхара тӀегӀа чекхйаккха"; n.setAttribute("aria-disabled","true"); }
     else n.textContent = lv.id+1;
     if(!locked) n.onclick = ()=>{ SFX.coin(); startLevel(lv.id); };
     else n.onclick = ()=>toast("Хьалхара тӀегӀа чекхйаккха 🔒");

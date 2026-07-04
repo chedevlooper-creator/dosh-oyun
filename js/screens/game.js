@@ -142,7 +142,9 @@ function buildGrid() {
   const availW = Math.min(wrap.clientWidth - 8, 536);
   const availH = wrap.clientHeight - 8;
   const gap = 5;
-  const size = Math.max(22, Math.min(52, Math.floor(Math.min(
+  // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür
+  const maxSize = (rows <= 4 && cols <= 5) ? 76 : (rows <= 6 && cols <= 7) ? 62 : 52;
+  const size = Math.max(22, Math.min(maxSize, Math.floor(Math.min(
     (availW - gap * (cols - 1)) / cols,
     (availH - gap * (rows - 1)) / rows,
   ))));
@@ -194,15 +196,21 @@ function buildWheel(letters) {
   wheel.querySelectorAll(".bub").forEach(b => b.remove());
   const n = letters.length;
   const zone = document.getElementById("wheel-zone");
-  const D = Math.max(190, Math.min(300, Math.min(innerWidth - 40, (zone.clientHeight || 260) + 140)));
+  const D = Math.max(190, Math.min(340, Math.min(innerWidth - 40, Math.max(zone.clientHeight || 260, 200) + 60)));
   wheel.style.width = wheel.style.height = D + "px";
 
   const svg = wheel.querySelector("svg");
   svg.setAttribute("viewBox", "0 0 " + D + " " + D);
   svg.innerHTML = "<polyline points=''/>";
 
-  const bs = Math.max(30, Math.min(56, (D * 2.55) / n));
+  // Baloncuk boyutu çark çapıyla orantılı: büyük çarkta boş görünmesin
+  const bs = Math.max(30, Math.min(D * 0.21, (D * 2.55) / n));
   const R = D / 2 - bs / 2 - 7;
+
+  // Karıştır butonu çarkla orantılı ölçeklensin (ikon boyutu CSS % ile)
+  const sh = document.getElementById("shuffle");
+  const shs = Math.round(Math.max(44, Math.min(64, D * 0.17)));
+  sh.style.width = sh.style.height = shs + "px";
 
   bubbles = letters.map((L, i) => {
     const ang = -Math.PI / 2 + i * (2 * Math.PI / n);
@@ -593,6 +601,8 @@ addEventListener("resize", () => {
     const filled = [...G.cells.values()].filter(c => c.filled);
     buildGrid();
     filled.forEach(c => { c.filled = false; fillCell(c, c.hint); });
+    // Çark da yeni alana göre ölçeklensin (seçim yokken güvenli)
+    if (!G.sel.length && !dragging) buildWheel(G.lv.letters);
   }
 });
 

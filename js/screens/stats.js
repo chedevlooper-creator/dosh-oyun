@@ -7,7 +7,7 @@ export function openStats(){
   const st = S.stats;
   const totalStars = Object.values(S.stars).reduce((a,b)=>a+b,0);
   openPanel(`
-    <h2>Статистика 📊</h2>
+    <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg> Статистика</h2>
     <p class="panel-subtitle">Хьан кхочушдина болх, ловзарийн маьӀна а сомийн бехкам.</p>
     <div class="panel-section">
       <div class="panel-section-title">Кхочушдар</div>
