@@ -2,7 +2,8 @@
 import { openPanel, closePanel } from "./panel.js";
 import { THEMES, applyTheme } from "../engine/theme.js";
 import { S } from "../engine/store.js";
-import { clearAll } from "../engine/save.js";
+import { clearAll, exportSave, importSave } from "../engine/save.js";
+import { toast, today } from "../utils/helpers.js";
 import { SFX, MUSIC } from "../engine/audio.js";
 import { tutorial } from "./tutorial.js";
 import { $ } from "../utils/helpers.js";
@@ -28,6 +29,12 @@ export function openSettings(){
     </div>
     <div class="opt-row"><span>${t("settings.tut")}</span>
       <button class="btn small ghost" id="set-tut">${t("home.play")}</button></div>
+    <div class="opt-row"><span>Хаамаш 💾</span>
+      <span class="backup-btns">
+        <button class="btn small ghost" id="set-export" aria-label="Хаамаш ⬇️">⬇️</button>
+        <button class="btn small ghost" id="set-import" aria-label="Хаамаш ⬆️">⬆️</button>
+        <input type="file" id="set-import-file" accept=".json,application/json" hidden>
+      </span></div>
     <div class="opt-row" style="border:none"><span>${t("settings.reset")}</span>
       <button class="btn small ghost danger" id="set-reset" aria-label="${t("settings.reset")}"><svg class="o-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-reset"/></svg></button></div>
     <div class="btnrow"><button class="btn small" id="set-close">${t("settings.back")}</button></div>`);
@@ -55,6 +62,28 @@ export function openSettings(){
     this.setAttribute("aria-checked", S.settings.music);
   };
   $("set-tut").onclick = ()=>{ closePanel(); tutorial(); };
+  $("set-export").onclick = ()=>{
+    const blob = new Blob([exportSave()], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `dosh-save-${today()}.json`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+    toast("✓ 💾");
+  };
+  $("set-import").onclick = ()=>$("set-import-file").click();
+  $("set-import-file").onchange = (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const res = importSave(String(reader.result));
+      if(res.ok){ location.reload(); }
+      else toast("JSON ⚠️", "bad");
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
   $("lang-select").onchange = (e) => { setLanguage(e.target.value); };
   $("set-reset").onclick = ()=>{
     openPanel(`<h2>${t("settings.resetTitle")}</h2><p class="center" style="font-size:16px">${t("settings.resetMsg")}</p>

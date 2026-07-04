@@ -43,6 +43,9 @@ button:active:not(#shuffle){transform:scale(.95)}
 .recap-item b{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-size:15px;color:var(--gold);letter-spacing:.05em;white-space:nowrap}
 .recap-gloss{font-size:13px;line-height:1.35;color:var(--ink)}
 .recap-miss{color:var(--ink2)}
+/* ayarlar: yedekleme butonları */
+.backup-btns{display:flex;gap:8px}
+.backup-btns .btn.small{padding:8px 14px}
 /* sözlükte anlamı eksik kelime: katkı daveti */
 .dict-miss a{color:var(--accent);font-size:13px;text-decoration:none;border-bottom:1px dashed var(--accent)}
 .coins-chip{display:inline-flex;align-items:center;gap:7px;background:var(--card);

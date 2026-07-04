@@ -37,3 +37,29 @@ export function save(){
 export function clearAll(){
   try{ localStorage.removeItem(KEY); }catch{}
 }
+
+/* ---------- yedekleme: dışa / içe aktarma ----------
+ * localStorage tek kopya — tarayıcı verisi silinince ilerleme gider.
+ * Export: snapshot'ın JSON'u (dosya olarak indirilir).
+ * Import: JSON doğrulanır, hydrate migration pipeline'ından geçer, kaydedilir. */
+
+export function exportSave(){
+  return JSON.stringify(snapshot(), null, 2);
+}
+
+/**
+ * @param {string} json
+ * @returns {{ ok: boolean, error?: "parse"|"format" }}
+ */
+export function importSave(json){
+  let data;
+  try{ data = JSON.parse(json); }catch{ return { ok:false, error:"parse" }; }
+  if(!data || typeof data !== "object" || Array.isArray(data)
+     || typeof data.coins !== "number"
+     || !data.settings || typeof data.settings !== "object"){
+    return { ok:false, error:"format" };
+  }
+  hydrate(data); // eski sürüm yedekler migration + varsayılanlarla onarılır
+  save();
+  return { ok:true };
+}
