@@ -64,7 +64,8 @@ button:active{transform:scale(.95)}
 .gtop .lvl small{display:block;font-weight:500;font-size:11px;color:var(--ink2);letter-spacing:.12em}
 .rbtn{width:42px;height:42px;border-radius:13px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
 .rbtn .ri{width:20px;height:20px;color:var(--ink)}
-#grid-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
+/* Fazla dikey boşluk grid ve çark arasında paylaşılır (uzun ekranlarda denge) */
+#grid-wrap{flex:3 1 0;max-height:48vh;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
 #grid{position:relative}
 .cell{position:absolute;border-radius:22%;background:var(--cell);border:1.5px solid var(--cell-b);
   display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--cell-ink);
@@ -106,7 +107,7 @@ button:active{transform:scale(.95)}
 #preview .cap.ok::before{content:"✓";margin-right:4px;font-weight:900}
 #preview .cap.bad{animation:shake .4s;background:var(--danger);color:#fff}
 #preview .cap.dup{animation:shake .4s}
-#wheel-zone{display:flex;align-items:center;justify-content:center;padding:4px 0 10px}
+#wheel-zone{flex:2 1 auto;min-height:200px;display:flex;align-items:center;justify-content:center;padding:4px 0 10px}
 #wheel{position:relative;border-radius:50%;background:var(--wheel);backdrop-filter:blur(6px);
   box-shadow:inset 0 0 0 1.5px rgba(242,181,61,.55),0 0 0 1px rgba(0,0,0,.3),0 14px 40px rgba(0,0,0,.45);touch-action:none}
 #wheel svg{position:absolute;inset:0;pointer-events:none}
