@@ -1,14 +1,23 @@
+// @ts-check
 import { S } from "../engine/store.js";
-import { $ } from "../utils/helpers.js";
+import { $, prefersReducedMotion } from "../utils/helpers.js";
+import { onResize } from "../utils/resize.js";
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
-/* ================= 3D SAHNE (Three.js — Kafkas dağları) ================= */
 export const GL = (() => {
-  const PHOTO_MODE = true; // gerçek fotoğraf arka plan: 3D yalnızca partikül + kartal katmanı çizer
-  let renderer, scene, camera, terrain, stars, snow, clouds = [], sun, dirLight, ambLight, hemiLight;
+  const PHOTO_MODE = true;
+  let renderer, scene, camera, terrain, stars, snow, sun, dirLight, ambLight, hemiLight;
+  const clouds = [];
   let composer = null, bloomPass = null, motes = null, farRidge = null;
-  let towerWindows = [], eagle = null, wingL = null, wingR = null, stoneMats = [];
+  const towerWindows = [];
+  let eagle = null, wingL = null, wingR = null;
+  const stoneMats = [];
   let px = 0, py = 0, tpx = 0, tpy = 0, ok = false;
-  let camY = 9, camYT = 9, lookY = 12, lookYT = 12; // ekrana göre kamera hedefleri
+  let camY = 9, camYT = 9, lookY = 12, lookYT = 12;
   const PAL3D = {
     kavkaz: { fog:0x7fb2d2, low:0x24405f, high:0x3d5a80, snowline:13, light:0xfff2d0, amb:0x8fb8d8, stars:0,   snow:0,
               skyTop:"#3f95cc", skyBot:"#cfe9f4", bloom:0.45, mote:{color:0xffffff, op:0.28, speed:0.006, size:0.55} },
@@ -25,8 +34,8 @@ export const GL = (() => {
     let h = Math.sin(x*0.055 + z*0.031) * Math.sin(z*0.043 - x*0.012) * 0.5 + 0.5;
     h += (Math.sin(x*0.11 + 1.7) * Math.sin(z*0.09 + 4.2) * 0.5 + 0.5) * 0.5;
     h += (Math.sin(x*0.23 + 9.1) * Math.sin(z*0.19 + 2.8) * 0.5 + 0.5) * 0.25;
-    h += (Math.sin(x*0.47 + 3.3) * Math.sin(z*0.41 + 7.6) * 0.5 + 0.5) * 0.12;  // ince detay
-    h += (Math.sin(x*0.93 + 5.9) * Math.sin(z*0.87 + 1.4) * 0.5 + 0.5) * 0.06;  // kaya dokusu
+    h += (Math.sin(x*0.47 + 3.3) * Math.sin(z*0.41 + 7.6) * 0.5 + 0.5) * 0.12;
+    h += (Math.sin(x*0.93 + 5.9) * Math.sin(z*0.87 + 1.4) * 0.5 + 0.5) * 0.06;
     return h / 1.93;
   }
   function skyTexture(top, bot){
@@ -34,7 +43,7 @@ export const GL = (() => {
     const g = c.getContext("2d"), gr = g.createLinearGradient(0,0,0,512);
     gr.addColorStop(0, top); gr.addColorStop(1, bot);
     g.fillStyle = gr; g.fillRect(0,0,2,512);
-    const t = new THREE.CanvasTexture(c); return t;
+    return new THREE.CanvasTexture(c);
   }
   function glowTexture(inner, outer){
     const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -76,10 +85,10 @@ export const GL = (() => {
     if(typeof THREE === "undefined") return;
     try{
       renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias:true, alpha:PHOTO_MODE });
-    }catch(e){ return; }
+    }catch{ return; }
     ok = true;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2.5)); // 4K/retina keskinliği
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;      // sinematik ton eşleme
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2.5));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(58, innerWidth/innerHeight, 0.1, 400);
@@ -89,7 +98,6 @@ export const GL = (() => {
     dirLight = new THREE.DirectionalLight(0xfff2d0, 0.95);
     dirLight.position.set(35, 60, -40); scene.add(dirLight);
     if(!PHOTO_MODE) buildTerrain();
-    // yıldızlar
     {
       const n = 900, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){
@@ -100,7 +108,6 @@ export const GL = (() => {
       stars = new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:1.3, transparent:true, opacity:0, sizeAttenuation:false }));
       scene.add(stars);
     }
-    // kar
     {
       const n = 700, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){ arr[i*3]=(Math.random()-0.5)*120; arr[i*3+1]=Math.random()*55; arr[i*3+2]=(Math.random()-0.5)*90 - 20; }
@@ -109,7 +116,6 @@ export const GL = (() => {
         map: glowTexture("rgba(255,255,255,1)","rgba(255,255,255,0)"), depthWrite:false }));
       scene.add(snow);
     }
-    // bulutlar
     if(!PHOTO_MODE){
       const tex = glowTexture("rgba(255,255,255,.85)", "rgba(255,255,255,0)");
       for(let i=0;i<7;i++){
@@ -120,12 +126,10 @@ export const GL = (() => {
         clouds.push(sp); scene.add(sp);
       }
     }
-    // güneş
     if(!PHOTO_MODE){
       sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture("rgba(255,244,214,1)","rgba(255,214,110,0)"), transparent:true, depthWrite:false }));
       sun.position.set(46, 48, -95); sun.scale.set(46,46,1); scene.add(sun);
     }
-    // uzak sırt (derinlik katmanı)
     if(!PHOTO_MODE){
       const geo = new THREE.PlaneGeometry(500, 70, 60, 10);
       geo.rotateX(-Math.PI/2);
@@ -139,7 +143,6 @@ export const GL = (() => {
       farRidge = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0x3d5a80, fog:true }));
       scene.add(farRidge);
     }
-    // ateş böceği / yaprak / toz parçacıkları (temaya göre)
     {
       const n = 130, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){ arr[i*3]=(Math.random()-0.5)*90; arr[i*3+1]=Math.random()*26+1; arr[i*3+2]=(Math.random()-0.5)*60 - 5; }
@@ -150,7 +153,6 @@ export const GL = (() => {
       motes.userData.speed = 0.005;
       scene.add(motes);
     }
-    // ---- Vainakh kuleleri (Нохчийн бӀаьвнаш) ----
     function groundY(x, z){
       const depth = THREE.MathUtils.clamp((-z - 8)/55, 0, 1);
       return Math.pow(hillNoise(x, z), 1.6) * 36 * depth - 2;
@@ -158,13 +160,12 @@ export const GL = (() => {
     function findPeak(x0, x1, z0, z1){
       let best = {x:x0, z:z0, y:-99};
       for(let x = x0; x <= x1; x += 1.5)
-        for(let z = z0; z <= z1; z += 1.5){
+        {for(let z = z0; z <= z1; z += 1.5){
           const y = groundY(x, z);
           if(y > best.y) best = {x, z, y};
-        }
+        }}
       return best;
     }
-    // taş örgü dokusu (prosedürel duvar taşları)
     function stoneTexture(){
       const c = document.createElement("canvas"); c.width = c.height = 128;
       const g = c.getContext("2d");
@@ -175,7 +176,7 @@ export const GL = (() => {
         let x = (row % 2) ? -6 : 0;
         while(x < 128){
           const w = 14 + ((x*13 + row*7) % 12);
-          const v = ((x*31 + row*17) % 22) - 11; // taş tonu değişimi
+          const v = ((x*31 + row*17) % 22) - 11;
           g.fillStyle = `rgb(${143+v},${133+v},${116+v})`;
           g.fillRect(x+1, y+1, w-2, h-2);
           x += w;
@@ -199,7 +200,6 @@ export const GL = (() => {
       w.position.set(0, hh, rAt + 0.03);
       g.add(w); towerWindows.push(w.material);
     }
-    // Savaş kulesi (бӀав) — yukarı daralan gövde, машикули, basamaklı piramit çatı, tepe taşı
     function buildCombatTower(s){
       const g = new THREE.Group();
       const stone = stoneMat(2, 5), roof = roofMat();
@@ -214,14 +214,13 @@ export const GL = (() => {
         ry += s*0.10;
       }
       add(new THREE.Mesh(new THREE.ConeGeometry(s*0.22, s*0.8, 4), roof), ry + s*0.42);
-      add(new THREE.Mesh(new THREE.SphereGeometry(s*0.09, 6, 5), roof), ry + s*0.86); // цӀогал tepe taşı
+      add(new THREE.Mesh(new THREE.SphereGeometry(s*0.09, 6, 5), roof), ry + s*0.86);
       for(let i=0;i<4;i++){
         const hh = s*(1.1 + i*0.95);
         addWindow(g, s, hh, s*(1.0 - 0.4*(hh/(s*4.6))) * 0.707);
       }
       return g;
     }
-    // Konut kulesi (гӀала) — daha geniş, 2 katlı, düz damlı, korkuluklu
     function buildHouseTower(s){
       const g = new THREE.Group();
       const stone = stoneMat(2, 2.4);
@@ -232,11 +231,9 @@ export const GL = (() => {
       addWindow(g, s*1.15, s*1.15, s*0.68);
       return g;
     }
-    // Sur duvarı parçası
     function buildWall(len, h){
       return new THREE.Mesh(new THREE.BoxGeometry(len, h, 0.5), stoneMat(len/2, h));
     }
-    // Nekropol mahzeni (Тсой-Педе tarzı: eğimli çatılı taş mezar evi)
     function buildVault(s){
       const g = new THREE.Group();
       const stone = stoneMat(1.6, 1);
@@ -246,7 +243,6 @@ export const GL = (() => {
       roof.rotation.y = Math.PI/4; roof.position.y = s*1.35; roof.scale.z = 1.35; g.add(roof);
       return g;
     }
-    // ---- yerleşim: sol tepede tarihî aul (köy) ----
     if(!PHOTO_MODE){
       const p = findPeak(-34, -16, -50, -34);
       const aul = new THREE.Group();
@@ -258,12 +254,10 @@ export const GL = (() => {
       aul.position.set(p.x, p.y - 0.5, p.z);
       scene.add(aul);
     }
-    // ---- sağ uzak zirvede tek nöbetçi kule ----
     if(!PHOTO_MODE){
       const p = findPeak(20, 40, -66, -46);
       const t = buildCombatTower(1.7); t.position.set(p.x, p.y - 0.4, p.z); scene.add(t);
     }
-    // ---- orta-uzak yamaçta nekropol (ölüler şehri) ----
     if(!PHOTO_MODE){
       const p = findPeak(2, 16, -58, -42);
       const nec = new THREE.Group();
@@ -276,7 +270,6 @@ export const GL = (() => {
       nec.position.set(p.x, p.y - 0.5, p.z);
       scene.add(nec);
     }
-    // ---- süzülen kartal (аьрзу) ----
     {
       eagle = new THREE.Group();
       const dark = new THREE.MeshBasicMaterial({ color:0x1c2430, side:THREE.DoubleSide });
@@ -289,17 +282,17 @@ export const GL = (() => {
       eagle.scale.setScalar(0.9);
       scene.add(eagle);
     }
-    // bloom (ışıma) — fx.js yüklüyse (fotoğraf modunda kapalı: şeffaflık bozulur)
     try{
-      if(!PHOTO_MODE && THREE.EffectComposer && THREE.UnrealBloomPass){
-        composer = new THREE.EffectComposer(renderer);
-        composer.addPass(new THREE.RenderPass(scene, camera));
-        bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.65, 0.82);
+      if(!PHOTO_MODE && EffectComposer && UnrealBloomPass){
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.65, 0.82);
         composer.addPass(bloomPass);
+        try { composer.addPass(new OutputPass()); } catch { /* Output yoksa da olur */ }
       }
-    }catch(e){ composer = null; }
+    }catch{ composer = null; }
     resize(); retheme();
-    addEventListener("resize", resize);
+    onResize(resize);
     addEventListener("pointermove", e => { tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5; }, { passive:true });
     document.body.classList.add("gl-on");
     let last = 0, paused = false;
@@ -307,14 +300,21 @@ export const GL = (() => {
     window.__doshGL = { pause(){ paused = true; }, resume(){ paused = false; } };
     (function anim(t){
       requestAnimationFrame(anim);
-      if(paused || t - last < 33) return; last = t; // ~30fps yeterli, pil dostu
+      if(paused || t - last < 33) return; last = t;
       const s = t/1000;
-      px += (tpx-px)*0.04; py += (tpy-py)*0.04;
-      camY += (camYT-camY)*0.03; lookY += (lookYT-lookY)*0.03;
-      camera.position.x = px*3 + Math.sin(s*0.10)*1.1;
-      camera.position.y = camY + py*1.6 + Math.sin(s*0.13)*0.4;
+      const rm = prefersReducedMotion();
+      if(rm){
+        px = 0; py = 0; camY = camYT; lookY = lookYT;
+      } else {
+        px += (tpx-px)*0.04; py += (tpy-py)*0.04;
+        camY += (camYT-camY)*0.03; lookY += (lookYT-lookY)*0.03;
+      }
+      camera.position.x = rm ? 0 : (px*3 + Math.sin(s*0.10)*1.1);
+      camera.position.y = rm ? camY : (camY + py*1.6 + Math.sin(s*0.13)*0.4);
       camera.lookAt(0, lookY, -60);
-      for(const c of clouds){ c.position.x += c.userData.v; if(c.position.x > 110) c.position.x = -110; }
+      if(!rm){
+        for(const c of clouds){ c.position.x += c.userData.v; if(c.position.x > 110) c.position.x = -110; }
+      }
       if(snow.material.opacity > 0.01){
         const p = snow.geometry.attributes.position;
         for(let i=0;i<p.count;i++){
@@ -325,7 +325,6 @@ export const GL = (() => {
         p.needsUpdate = true;
       }
       stars.rotation.y = s*0.004;
-      // kartal: geniş daireler çizer, kanat çırpar
       if(eagle){
         const a = s*0.09;
         eagle.position.set(Math.cos(a)*34, 24 + Math.sin(s*0.4)*2, -48 + Math.sin(a)*20);
@@ -337,12 +336,12 @@ export const GL = (() => {
         const p = motes.geometry.attributes.position, sp = motes.userData.speed;
         for(let i=0;i<p.count;i++){
           p.setX(i, p.getX(i) + Math.sin(s*0.7 + i*1.7)*sp*3);
-          let y = p.getY(i) + Math.cos(s*0.5 + i*2.3)*sp*2 - (sp > 0.01 ? sp : 0); // yapraklar süzülür
+          let y = p.getY(i) + Math.cos(s*0.5 + i*2.3)*sp*2 - (sp > 0.01 ? sp : 0);
           if(y < 0) y = 26;
           p.setY(i, y);
         }
         p.needsUpdate = true;
-        motes.material.size = motes.userData.baseSize * (1 + Math.sin(s*2.1)*0.25); // ışık nabzı
+        motes.material.size = motes.userData.baseSize * (1 + Math.sin(s*2.1)*0.25);
       }
       if(composer) composer.render(); else renderer.render(scene, camera);
     })(0);
@@ -361,7 +360,7 @@ export const GL = (() => {
       scene.fog = new THREE.Fog(p.fog, 55, 230);
     }
     dirLight.color.set(p.light); ambLight.color.set(p.amb);
-    stars.material.opacity = PHOTO_MODE ? p.stars*0.7 : p.stars; // fotoğrafın kendi yıldızlarına ek pırıltı
+    stars.material.opacity = PHOTO_MODE ? p.stars*0.7 : p.stars;
     snow.material.opacity = p.snow;
     if(sun){
       sun.material.opacity = p.stars > 0 ? 0.5 : 1.0;
@@ -374,19 +373,16 @@ export const GL = (() => {
     motes.userData.baseSize = p.mote.size;
     motes.material.size = p.mote.size;
     if(bloomPass) bloomPass.strength = p.bloom;
-    // kule pencereleri: gecede sıcak ışık (bloom parlatır), gündüz karanlık
     const winColor = p.stars > 0 ? 0xffc466 : 0x181310;
     towerWindows.forEach(m => m.color.set(winColor));
-    // taş yapılar tema ışığına boyanır
     const stoneTint = { kavkaz:0xffffff, night:0x8890c8, forest:0xe4f0da, autumn:0xffdfc0, winter:0xe8eff8 }[S.settings.theme] || 0xffffff;
     stoneMats.forEach(m => m.color.set(stoneTint));
     if(terrain) paintTerrain(p);
   }
   function view(scr){
-    if(scr === "scr-game"){ camYT = 7;  lookYT = 20; }   // oyunda: kamera alçak, bakış yukarı → ızgara arkası sade gök
-    else if(scr === "scr-map"){ camYT = 11; lookYT = 10; } // haritada: hafif kuşbakışı
-    else { camYT = 9; lookYT = 12; }                       // ana ekran
+    if(scr === "scr-game"){ camYT = 7;  lookYT = 20; }
+    else if(scr === "scr-map"){ camYT = 11; lookYT = 10; }
+    else { camYT = 9; lookYT = 12; }
   }
   return { init, retheme, view };
 })();
-
