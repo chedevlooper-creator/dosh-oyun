@@ -1,7 +1,7 @@
 /* ================= PACK ÜRETECİ =================
  * Yeni seviye paketi üretir: node scripts/generate-pack.mjs <packNo>
  *
- * İçerik politikası (README "İçerik kuralları" + KELIME_RAPORU):
+ * İçerik politikası (README "İçerik kuralları" + CLAUDE.md):
  * - ANA kelimeler yalnızca INFO'da doğrulanmış anlamı olanlardan seçilir
  *   (seviye sonu öğrenme özeti + coverage testleri korunur).
  * - BONUS kelimeler önce INFO'lu/oyunda-var olanlardan; Wiktionary aday

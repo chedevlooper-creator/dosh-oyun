@@ -62,7 +62,7 @@ for (const w of bonusMissing.sort()) {
  * `node scripts/analyze-coverage.mjs --md` → docs/eksik-kelimeler.md
  * Ana dil konuşurlarının doldurması için tablo üretir; doldurulan
  * satırlar js/data/info.js'e taşınır. Uydurma anlam yazılmaz
- * (KELIME_RAPORU politikası). */
+ * (içerik politikası: CLAUDE.md + README "İçerik kuralları"). */
 if (process.argv.includes("--md")) {
   const { writeFileSync, mkdirSync } = await import("node:fs");
   const row = (w) => `| ${w} | | | |`;

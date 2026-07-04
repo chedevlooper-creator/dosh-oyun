@@ -88,7 +88,7 @@ Ayarlar → 🐞). Alan adı değişirse `index.html` head'indeki mutlak URL'ler
 - 📱 **PWA**: manifest + service worker + ikonlar; kurulabilir, çevrimdışı oynanır
 - ✅ **Kelime denetimi**: 11 Rusça/geçersiz ızgara kelimesi gerçek Çeçenceyle
   değiştirildi, 17 bozuk bonus silindi, 16 yanlış anlam düzeltildi
-  (ayrıntı: `KELIME_RAPORU.md`)
+  (politika: aşağıdaki "İçerik kuralları" ve `CLAUDE.md`)
 
 ## Dosyalar
 

@@ -24,7 +24,7 @@ CI (`.github/workflows/ci.yml`) runs lint → unit → e2e → build on PRs to m
 
 ## Content policy (hard rule)
 
-**Never fabricate Chechen.** Puzzle words must come from the Wiktionary Chechen lemma category (see `_wordlist_full.txt`, `docs/yeni-kelimeler-2026.md`); word meanings (glosses in `js/data/info.js`) must come from native speakers — the "tahmini" column in candidate reports is NOT a valid gloss source. UI strings in ce are composed only from words already attested in the codebase. `docs/eksik-kelimeler.md` is the community contribution table for missing glosses. Coverage tests enforce floors (≥30% main-word, ≥15% total INFO coverage) — adding uncovered words can break them.
+**Never fabricate Chechen.** Puzzle words must come from the Wiktionary Chechen lemma category (candidate list: `docs/yeni-kelimeler-2026.md`; current in-game vocabulary: `node scripts/analyze-coverage.mjs`); word meanings (glosses in `js/data/info.js`) must come from native speakers — the "tahmini" column in candidate reports is NOT a valid gloss source. UI strings in ce are composed only from words already attested in the codebase. `docs/eksik-kelimeler.md` is the community contribution table for missing glosses. Coverage tests enforce floors (≥30% main-word, ≥15% total INFO coverage) — adding uncovered words can break them.
 
 Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ чӀ юь яь) count as ONE letter. All word handling must go through `js/engine/grapheme.js` (`norm`, `splitG`, `dispG`); `norm` maps palochka variants and I/i to `Ӏ`, `dispG` renders uppercase with palochka→I.
 

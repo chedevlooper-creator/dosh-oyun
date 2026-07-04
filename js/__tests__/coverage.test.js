@@ -12,8 +12,8 @@ const LEVELS = await loadAllLevels();
  *
  * This is a content-coverage test, not a correctness test. Missing INFO
  * entries are reported (and asserted above a floor) but never silently
- * filled — glosses must come from a native speaker, per the KELIME_RAPORU
- * audit policy.
+ * filled — glosses must come from a native speaker (content policy:
+ * CLAUDE.md + README "İçerik kuralları").
  */
 
 function allLevelWords() {
@@ -48,8 +48,8 @@ describe("INFO coverage", () => {
   it("main grid INFO coverage is at least 30% (regression guard)", () => {
     // Soft floor: 30% of main words covered. The 2026 baseline before
     // this expansion was 116/372 ≈ 31%. We do NOT assert 100% because
-    // many pack-4 words are flagged in KELIME_RAPORU §4 as needing
-    // native-speaker confirmation; fabricated glosses are forbidden.
+    // many words still await native-speaker confirmation (contribution
+    // table: docs/eksik-kelimeler.md); fabricated glosses are forbidden.
     const ratio = 1 - missingMain.length / main.size;
     expect(ratio, `Missing ${missingMain.length} main words; sample: ${missingMain.slice(0, 5).join(", ")}`).toBeGreaterThanOrEqual(0.3);
   });
@@ -85,7 +85,7 @@ describe("INFO coverage", () => {
   it("surfaces the uncovered list (informational)", () => {
     // This test never fails; it just prints so a developer can see the gap.
     if (missingAny.length > 0) {
-      console.warn(`[INFO coverage] ${missingAny.length} words without an entry. See KELIME_RAPORU §4 for the native-speaker list. Sample: ${missingAny.slice(0, 5).join(", ")}`);
+      console.warn(`[INFO coverage] ${missingAny.length} words without an entry. See docs/eksik-kelimeler.md for the contribution table. Sample: ${missingAny.slice(0, 5).join(", ")}`);
     }
     expect(missingAny).toBeDefined();
   });
