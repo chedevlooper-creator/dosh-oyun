@@ -30,9 +30,7 @@ export default defineConfig({
         editor: "./editor.html",
       },
       output: {
-        manualChunks: {
-          three: ["three.min.js"],
-        },
+        manualChunks: undefined,
       },
     },
   },
@@ -47,23 +45,37 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
+      workbox: {
+        // bg-*.jpg'ler yalnızca eski Safari fallback'i — precache'e WebP'ler girsin
+        globPatterns: ['**/*.{js,css,html,png,webp,woff2,webmanifest}'],
+      },
       manifest: {
         name: 'Дош — Нохчийн дош',
         short_name: 'Дош',
         description: 'Chechen word puzzle game',
-        theme_color: '#ffffff',
+        lang: 'ce',
+        dir: 'ltr',
+        start_url: '/',
+        display: 'standalone',
+        orientation: 'portrait',
+        theme_color: '#0e2a3f',
+        background_color: '#0e2a3f',
+        // "any" ve "maskable" ayrı girişler olmalı: maskable kırpması
+        // normal ikonu bozmasın (Lighthouse/Play önerisi)
         icons: [
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+        shortcuts: [
           {
-            src: 'icon-192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            name: 'Денна дош',
+            short_name: 'Денна',
+            description: 'Daily puzzle',
+            url: '/?daily=1',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }],
           },
-          {
-            src: 'icon-512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+        ],
       }
     })
   ],

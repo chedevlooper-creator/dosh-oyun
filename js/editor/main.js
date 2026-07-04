@@ -2,11 +2,11 @@
 /* Oyuna entegre versiyon — ../../css/editor.css ile kullanılır */
 
 import { norm, splitG, dispG, DSET } from "../engine/grapheme.js";
-import { LEVELS } from "../data/levels.js";
+import { loadAllLevels } from "../data/level-loader.js";
 
 /* ================= STATE ================= */
 
-let state = {
+const state = {
   id: 0, pack: 0, rows: 4, cols: 4,
   grid: [],        // grid[r][c] = normalized grapheme string or ""
   words: [],       // { word, row, col, dir }[]
@@ -156,7 +156,8 @@ gridTable.addEventListener("click", (e) => {
 
 /* ================= LEVEL LOADER (from game data) ================= */
 
-$("btn-load-level").addEventListener("click", () => {
+$("btn-load-level").addEventListener("click", async () => {
+  const LEVELS = await loadAllLevels();
   const id = prompt(`Level ID girin (0-${LEVELS.length - 1}):`, "0");
   if (id === null) return;
   const n = parseInt(id);
@@ -264,8 +265,8 @@ function renderExtra() {
 function renderPool() {
   const counts = {};
   for (let r = 0; r < state.rows; r++)
-    for (let c = 0; c < state.cols; c++)
-      if (state.grid[r][c]) counts[state.grid[r][c]] = (counts[state.grid[r][c]] || 0) + 1;
+    {for (let c = 0; c < state.cols; c++)
+      {if (state.grid[r][c]) counts[state.grid[r][c]] = (counts[state.grid[r][c]] || 0) + 1;}}
   for (const ch of state.extraLetters) counts[ch] = (counts[ch] || 0) + 1;
 
   const pd = $("pool-display"); pd.innerHTML = "";
@@ -297,7 +298,7 @@ function findCellConflicts(r, c) {
     const dr = w.dir === "down" ? 1 : 0, dc = w.dir === "across" ? 1 : 0;
     for (let i = 0; i < gs.length; i++) {
       if (w.row + i * dr === r && w.col + i * dc === c && norm(gs[i]) !== ch)
-        out.push({ word: w.word, expected: gs[i] });
+        {out.push({ word: w.word, expected: gs[i] });}
     }
   }
   return out;
@@ -377,8 +378,8 @@ function exportLevel() {
 
   const counts = {};
   for (let r = 0; r < state.rows; r++)
-    for (let c = 0; c < state.cols; c++)
-      if (state.grid[r][c]) counts[state.grid[r][c]] = (counts[state.grid[r][c]] || 0) + 1;
+    {for (let c = 0; c < state.cols; c++)
+      {if (state.grid[r][c]) counts[state.grid[r][c]] = (counts[state.grid[r][c]] || 0) + 1;}}
   for (const ch of state.extraLetters) counts[ch] = (counts[ch] || 0) + 1;
 
   const pool = [];
@@ -426,7 +427,7 @@ $("import-file").addEventListener("change", (e) => {
 $("btn-resize").addEventListener("click", () => {
   const rows = +$("grid-rows").value || 4, cols = +$("grid-cols").value || 4;
   const ng = Array.from({ length: rows }, (_, r) =>
-    Array.from({ length: cols }, (_, c) => (state.grid[r] && state.grid[r][c]) || ""));
+    Array.from({ length: cols }, (_c, c) => (state.grid[r] && state.grid[r][c]) || ""));
   state.rows = rows; state.cols = cols; state.grid = ng;
   exitWordDef(); updateAll();
 });
@@ -461,4 +462,4 @@ document.addEventListener("keydown", (e) => {
 initGrid(4, 4);
 $("grid-rows").value = 4; $("grid-cols").value = 4;
 updateAll();
-console.log("🏗️ Дош Editor (oyun içi) hazır! /editor");
+console.warn("🏗️ Дош Editor (oyun içi) hazır! /editor");

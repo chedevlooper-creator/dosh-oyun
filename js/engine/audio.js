@@ -1,3 +1,4 @@
+// @ts-check
 import { S } from "./store.js";
 
 /* ================= SES (WebAudio sentez) ================= */
@@ -11,7 +12,7 @@ export function tone(f, dur=0.12, type="sine", vol=0.16, when=0){
     o.type = type; o.frequency.value = f;
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
     o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
-  }catch(e){}
+  }catch{}
 }
 export const SFX = {
   pick(i){ tone(430 + i*55, .09, "sine", .14); },
@@ -82,10 +83,9 @@ export const MUSIC = (() => {
     start(){
       if(running || !S.settings.music) return;
       try{ const ctx = ensure(); running = true; next = ctx.currentTime + 0.1; step = 0;
-        timer = setInterval(schedule, 800); schedule(); }catch(e){}
+        timer = setInterval(schedule, 800); schedule(); }catch{}
     },
     stop(){ running = false; clearInterval(timer); },
     toggle(on){ S.settings.music = on; on ? this.start() : this.stop(); }
   };
 })();
-

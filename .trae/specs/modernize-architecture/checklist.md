@@ -1,7 +1,0 @@
-- [x] `package.json` oluşturuldu ve Vite bağımlılıkları eklendi.
-- [x] `npm run dev` ve `npm run build` komutları başarıyla çalışıyor.
-- [x] `index.html` içerisinde inline CSS (`<style>`) bulunmuyor, harici CSS dosyaları kullanılıyor.
-- [x] `index.html` içerisinde inline JS (`<script>`) kodu bulunmuyor, sadece ES6 modülü importu var.
-- [x] Grapheme işlevleri (`norm`, `splitG` vb.) başarıyla çalışıyor ve export/import ile taşınabiliyor.
-- [x] Oyun sorunsuz bir şekilde başlatılıyor (home, map, game akışı bozulmadan çalışıyor).
-- [x] Geliştirici konsolunda modül eksikliğinden veya scope kaynaklı hata mesajları bulunmuyor.

@@ -5,14 +5,23 @@ Words-of-Wonders tarzı Çeçence kelime oyunu. Flutter gerekmez — saf HTML5/J
 
 ## Çalıştırma / Kurulum
 
+```bash
+npm install
+npm run dev        # geliştirme sunucusu (http://localhost:8765)
+npm run build      # üretim build'i → dist/
+npm run verify     # lint + birim testler + build
+npm run test:e2e   # Playwright smoke (gerçek tarayıcı akışı)
+```
+
 | Platform | Nasıl |
 |---|---|
-| PC (çevrimdışı) | `index.html`'e çift tıkla |
-| Web'de yayın | Klasörü Netlify / GitHub Pages / itch.io'ya yükle |
+| Web'de yayın | Vercel'e bağlı (`vercel.json`); `dist/` herhangi bir statik hosta da yüklenebilir |
 | Android / iOS | Yayınlanan adresi aç → tarayıcı menüsünden **"Ana ekrana ekle"** — tam ekran, çevrimdışı çalışan uygulama olur (PWA) |
 | Mağaza (APK/IPA) | Klasörü [Capacitor](https://capacitorjs.com) ile sarmalayın: `npx cap add android` |
 
-Yerelde sunucu ile: `python -m http.server 8765 --directory dosh-oyun`
+Hata takibi için `.env` içinde `VITE_SENTRY_DSN` ayarlayın (kullanıcı izni:
+Ayarlar → 🐞). Alan adı değişirse `index.html` head'indeki mutlak URL'leri ve
+`public/robots.txt` + `public/sitemap.xml` içini güncelleyin.
 
 ## v7'de yeni (gerçek fotoğraf arka planlar)
 
@@ -79,23 +88,22 @@ Yerelde sunucu ile: `python -m http.server 8765 --directory dosh-oyun`
 - 📱 **PWA**: manifest + service worker + ikonlar; kurulabilir, çevrimdışı oynanır
 - ✅ **Kelime denetimi**: 11 Rusça/geçersiz ızgara kelimesi gerçek Çeçenceyle
   değiştirildi, 17 bozuk bonus silindi, 16 yanlış anlam düzeltildi
-  (ayrıntı: `KELIME_RAPORU.md`)
+  (politika: aşağıdaki "İçerik kuralları" ve `CLAUDE.md`)
 
 ## Dosyalar
 
 ```
-index.html            oyunun tamamı (veri gömülü)
-three.min.js          3D motor (r128, MIT)
-fx.js                 bloom post-processing (Three.js examples, MIT)
-font-cyr/lat.woff2    Russo One fontu (OFL)
-manifest.webmanifest  PWA manifest
-sw.js                 çevrimdışı önbellek (service worker)
-icon-192/512.png      uygulama ikonları
-KELIME_RAPORU.md      kelime denetimi raporu
+index.html      giriş noktası (SEO/OG meta)
+js/             ES modülleri: engine/ screens/ fx/ utils/ data/
+js/data/levels/ seviye paketleri (pack-N.json, lazy yüklenir)
+css/            katmanlı stiller (variables → themes → layout → components)
+public/         runtime asset'leri (bg fotoğrafları, ikonlar, robots, sitemap)
+e2e/            Playwright smoke testleri
+scripts/        içerik araçları (coverage analizi, görsel optimizasyonu)
 ```
 
-**Güncelleme yayınlarken** `sw.js` içindeki `CACHE = "dosh-v3"` sürümünü artırın
-(`dosh-v4` …) — kullanıcılar yeni sürümü hemen alır.
+Service worker sürümlemesi otomatiktir (`vite-plugin-pwa` autoUpdate) —
+her build'de precache manifest'i yenilenir, elle sürüm artırmak gerekmez.
 
 ## Oyun ekonomisi (orijinalle birebir)
 

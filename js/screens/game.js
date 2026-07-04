@@ -1,14 +1,19 @@
+// @ts-check
 /* ================= OYUN MOTORU ================= */
 
-import { S, commitG, addFoundWord, setG } from "../engine/store.js";
-import { LEVELS } from "../data/levels.js";
+import { S, addFoundWord, setG } from "../engine/store.js";
+import { getLevel } from "../data/level-loader.js";
+import { LAST_LEVEL_ID } from "../data/level-index.js";
+import { recordDailyWin, dailyShareText } from "../engine/daily.js";
 import { INFO } from "../data/info.js";
 import { CFG, starsFor } from "../data/config.js";
 import { norm, splitG, dispG } from "../engine/grapheme.js";
-import { $, show, openPanel, closePanel, updateCoins, toast } from "../utils/dom.js";
-import { vibrate, flyCoins } from "../utils/helpers.js";
+import { show, updateCoins, toast, vibrate, flyCoins } from "../utils/helpers.js";
+import { onResize } from "../utils/resize.js";
+import { openPanel, closePanel } from "./panel.js";
+import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
-import { confetti } from "../fx/confetti.js";
+import { confetti } from "../fx/particles.js";
 
 /* ================= OYUN DURUMU ================= */
 
@@ -43,6 +48,9 @@ import { confetti } from "../fx/confetti.js";
  * @property {Object[]} sel
  * @property {boolean} targeting
  * @property {boolean} done
+ * @property {boolean} [daily]
+ * @property {number} [wrongRow] - üst üste yanlış sayısı (takılma yardımcısı)
+ * @property {boolean} [rescued] - bu seviyede bedava kurtarma harfi verildi mi
  */
 
 /**
@@ -79,10 +87,14 @@ let dragging = false;
 /**
  * Seviyeyi başlat
  * @param {number} id - Seviye ID
+ * @param {{ daily?: boolean }} [opts] - daily: günlük bulmaca modu (yıldız/harita ilerlemesi yazmaz)
  */
-function startLevel(id) {
-  const lv = LEVELS.find(l => l.id === id);
-  if (!lv) return;
+async function startLevel(id, opts = {}) {
+  const lv = await getLevel(id).catch((e) => {
+    console.warn("[game] seviye yüklenemedi:", e);
+    return null;
+  });
+  if (!lv) { toast("ТӀегӀа ца йеллало 😕"); return; }
 
   const words = lv.words.map(w => ({
     ...w,
@@ -114,15 +126,17 @@ function startLevel(id) {
     foundBonus: new Set(),
     mistakes: 0, hints: 0, streak: 0, earned: 0,
     sel: [], targeting: false, done: false,
+    daily: !!opts.daily,
   };
   setG(G); // store'a da bildir (atomik persist)
 
   document.getElementById("lvl-num").textContent = id + 1;
   document.getElementById("bonus-count").textContent = "0";
+  updateWordProgress();
   const strip = document.getElementById("info-strip");
   strip.className = "";
   strip.innerHTML = "";
-  updateCoins(S);
+  updateCoins();
   show("scr-game");
   buildWheel(lv.letters.slice());
   requestAnimationFrame(() => buildGrid());
@@ -135,6 +149,8 @@ function buildGrid() {
   const wrap = document.getElementById("grid-wrap");
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
+  grid.setAttribute("role", "grid");
+  grid.setAttribute("aria-label", t("game.gridLabel"));
 
   let maxR = 0, maxC = 0;
   for (const c of G.cells.values()) { maxR = Math.max(maxR, c.r); maxC = Math.max(maxC, c.c); }
@@ -159,18 +175,29 @@ function buildGrid() {
     el.style.left = (cell.c * (size + gap)) + "px";
     el.style.top = (cell.r * (size + gap)) + "px";
     el.style.fontSize = (cell.ch.length > 1 ? size * 0.42 : size * 0.52) + "px";
-    el.setAttribute("role", "button");
+    el.setAttribute("role", "gridcell");
     el.setAttribute("tabindex", "0");
-    el.setAttribute("aria-label", "Hücre");
+    el.dataset.row = cell.r;
+    el.dataset.col = cell.c;
+    el.setAttribute("aria-label", t("game.cellPos", cell.r + 1, cell.c + 1));
     el.addEventListener("click", () => onCellTap(cell));
-    el.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onCellTap(cell);
-      }
-    });
+    el.addEventListener("keydown", (e) => onCellKey(e, cell));
     cell.el = el;
     grid.appendChild(el);
+  }
+}
+
+/* Klavye gezinmesi: ok tuşları komşu hücreye, Enter/Space hedefi seçer. */
+function onCellKey(e, cell) {
+  const map = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
+  if (e.key in map) {
+    e.preventDefault();
+    const [dr, dc] = map[e.key];
+    const target = G.cells.get(`${cell.r + dr},${cell.c + dc}`);
+    if (target && target.el) target.el.focus();
+  } else if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    onCellTap(cell);
   }
 }
 
@@ -186,7 +213,9 @@ function fillCell(cell, hint = false) {
   if (!cell.el) return;
   cell.el.textContent = dispG(cell.ch);
   cell.el.classList.add("fill");
-  if (hint) cell.el.classList.add("hintfill");
+  if (hint) cell.el.classList.add("hintfill");    // doldurulmuş hücrenin aria-label'ını harfle güncelle (ekran okuyucu)
+  cell.el.setAttribute("aria-label",
+    t("game.cellFilled", cell.r + 1, cell.c + 1, dispG(cell.ch)));
 }
 
 /* ================= ÇARK ================= */
@@ -212,6 +241,13 @@ function buildWheel(letters) {
   const shs = Math.round(Math.max(44, Math.min(64, D * 0.17)));
   sh.style.width = sh.style.height = shs + "px";
 
+  // wheel'in viewport koordinatlarını bir kez oku; tüm balonlar için
+  // cx/cy/r'yi buradan türet. Sonradan her pointermove'da getBoundingClientRect
+  // çağırmaya gerek kalmaz.
+  const wheelRect = wheel.getBoundingClientRect();
+  const wox = wheelRect.left;
+  const woy = wheelRect.top;
+  const rad = bs / 2 + 6;
   bubbles = letters.map((L, i) => {
     const ang = -Math.PI / 2 + i * (2 * Math.PI / n);
     const x = D / 2 + R * Math.cos(ang);
@@ -226,7 +262,7 @@ function buildWheel(letters) {
     el.textContent = dispG(L);
     el.setAttribute("role", "button");
     el.setAttribute("tabindex", "0");
-    el.setAttribute("aria-label", "Harf " + dispG(L));
+    el.setAttribute("aria-label", t("game.letterLabel", dispG(L)));
     el.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -238,7 +274,11 @@ function buildWheel(letters) {
       }
     });
     wheel.appendChild(el);
-    return { el, letter: norm(L), x, y, idx: i };
+    return {
+      el, letter: norm(L), x, y, idx: i,
+      // viewport-space cache: getBoundingClientRect yerine doğrudan bunları oku
+      cx: wox + x, cy: woy + y, r: rad,
+    };
   });
 }
 
@@ -267,9 +307,7 @@ function shuffleWheel() {
 
 function bubbleAt(x, y) {
   for (const b of bubbles) {
-    const r = b.el.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2, rad = r.width / 2 + 6;
-    if ((x - cx) ** 2 + (y - cy) ** 2 <= rad * rad) return b;
+    if ((x - b.cx) ** 2 + (y - b.cy) ** 2 <= b.r * b.r) return b;
   }
   return null;
 }
@@ -289,10 +327,12 @@ function renderSel() {
   if (!G.sel.length) { pv.innerHTML = ""; return; }
   pv.innerHTML = `<div class="cap">${G.sel.map(b => `<span>${dispG(b.letter)}</span>`).join("")}</div>`;
   const svg = document.querySelector("#wheel svg polyline");
+  if (!svg) return;
+  // wheel rect'i bir kez oku; balon merkezlerini cached cx/cy'den türet
+  // (pointermove başına 14 getBoundingClientRect çağrısı → 1'e düşer)
   const wr = document.getElementById("wheel").getBoundingClientRect();
   svg.setAttribute("points", G.sel.map(b => {
-    const r = b.el.getBoundingClientRect();
-    return (r.left + r.width / 2 - wr.left) + "," + (r.top + r.height / 2 - wr.top);
+    return (b.cx - wr.left) + "," + (b.cy - wr.top);
   }).join(" "));
 }
 
@@ -303,7 +343,7 @@ function setupWheelListeners() {
     const b = bubbleAt(e.clientX, e.clientY);
     if (!b) return;
     dragging = true;
-    try { wheel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    try { wheel.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     G.sel = [];
     bubbles.forEach(x => x.el.classList.remove("sel"));
     selAdd(b);
@@ -352,21 +392,22 @@ function submitSel() {
 
   if (G.words.some(w => w.solved && w.norm === word) || G.foundBonus.has(word)) {
     clear("dup");
-    toast("ХӀара дош карийна!");
+    toast(t("game.found"));
     return;
   }
 
   if (G.bonusSet.has(word)) {
     clear("ok");
+    G.wrongRow = 0;
     G.foundBonus.add(word);
     document.getElementById("bonus-count").textContent = G.foundBonus.size;
     // atomik bonus merge
     addFoundWord(word, { isBonus: true, coins: CFG.bonusWordCoins });
     G.earned += CFG.bonusWordCoins;
-    updateCoins(S);
+    updateCoins();
     SFX.bonus();
     flyCoins(document.getElementById("bonus-chest"), 3);
-    toast("💎 Карина бонус  +" + CFG.bonusWordCoins + " 🪙", "gold");
+    toast(t("game.bonusMsg", CFG.bonusWordCoins), "gold");
     return;
   }
 
@@ -376,7 +417,34 @@ function submitSel() {
   clear("bad");
   SFX.bad();
   vibrate([40, 50, 40]);
-  toast("Дош нийса дац!", "bad");
+  toast(t("game.wrong"), "bad");
+  onWrongGuess();
+}
+
+/* ---------- TAKILMA YARDIMCISI ----------
+ * Üst üste yanlışta oyuncuyu ipucuna yönlendir; parası da yoksa
+ * seviyede bir kez bedava harf ver (softlock önleme). */
+function onWrongGuess() {
+  G.wrongRow = (G.wrongRow || 0) + 1;
+  if (G.wrongRow === 4) {
+    const hb = document.getElementById("hint-letter");
+    if (hb) {
+      hb.classList.add("pulse-ring");
+      setTimeout(() => hb.classList.remove("pulse-ring"), 4200);
+    }
+    toast(t("game.hintPrompt"));
+  }
+  if (G.wrongRow >= 6 && !G.rescued && S.coins < CFG.hintCost) {
+    G.rescued = true;
+    const u = unfilled();
+    if (u.length) {
+      fillCell(u[(Math.random() * u.length) | 0], true);
+      SFX.hint();
+      toast(t("game.hintGift"), "gold");
+      checkAutoSolve();
+      checkDone();
+    }
+  }
 }
 
 /**
@@ -387,6 +455,8 @@ function submitSel() {
 function solveWord(w, byHint) {
   if (!G) return;
   w.solved = true;
+  G.wrongRow = 0;
+  updateWordProgress();
   if (!byHint) {
     vibrate(25);
     const gw = document.getElementById("grid-wrap");
@@ -420,24 +490,36 @@ function solveWord(w, byHint) {
     G.earned += coins + combo;
     SFX.solve();
     flyCoins(document.getElementById("grid"), 4);
-    if (combo) setTimeout(() => { toast("🔥 x" + G.streak + "  +" + combo + " 🪙", "gold"); SFX.coin(); }, 500);
+    if (combo) setTimeout(() => { toast(t("game.combo", G.streak, combo), "gold"); SFX.coin(); }, 500);
   }
 
-  const info = INFO[w.norm];
-  if (info) {
-    const strip = document.getElementById("info-strip");
-    const ce = info.ce ?? info;
-    const tr = info.tr ?? "";
-    strip.innerHTML = `
-      <div class="info-word">${dispG(w.norm)}</div>
-      <div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>
-      <div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>`;
-    strip.className = "on";
-  }
+  showWordInfo(w);
 
-  updateCoins(S);
+  updateCoins();
   checkAutoSolve();
   if (G.words.every(x => x.solved)) setTimeout(levelComplete, w.cells.length * 70 + 600);
+}
+
+/** Seviye içi ilerleme: çözülen/toplam kelime (üst barda, seviye numarasının yanında) */
+function updateWordProgress() {
+  const el = document.getElementById("lvl-progress");
+  if (!el || !G) return;
+  const solved = G.words.filter((w) => w.solved).length;
+  el.textContent = solved + "/" + G.words.length;
+}
+
+/** Kelimenin anlamını bilgi şeridinde göster (çözüm anında + dolu hücreye dokununca) */
+function showWordInfo(w) {
+  const strip = document.getElementById("info-strip");
+  if (!strip) return;
+  const info = INFO[w.norm];
+  const ce = info ? (info.ce ?? "") : "";
+  const tr = info ? (info.tr ?? "") : "";
+  strip.innerHTML = `
+    <div class="info-word">${dispG(w.norm)}</div>
+    ${ce ? `<div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
+    ${tr ? `<div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}`;
+  strip.className = "on";
 }
 
 function checkAutoSolve() {
@@ -455,12 +537,12 @@ function unfilled() {
 }
 
 function spend(cost) {
-  if (S.coins < cost) { toast(cost + " 🪙 оьшу", "bad"); SFX.bad(); return false; }
+  if (S.coins < cost) { toast(t("game.needCoins", cost), "bad"); SFX.bad(); return false; }
   S.coins -= cost;             // proxy otomatik save
   S.stats.coinsSpent += cost;
   S.stats.hints++;
   if (G) G.hints++;
-  updateCoins(S);
+  updateCoins();
   return true;
 }
 
@@ -478,16 +560,23 @@ function hintLetter() {
 function hintTarget() {
   if (!G || G.done) return;
   if (!unfilled().length) return;
-  if (S.coins < CFG.targetHintCost) { toast(CFG.targetHintCost + " 🪙 оьшу", "bad"); SFX.bad(); return; }
+  if (S.coins < CFG.targetHintCost) { toast(t("game.needCoins", CFG.targetHintCost), "bad"); SFX.bad(); return; }
   G.targeting = !G.targeting;
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.toggle("target", G.targeting);
   }
-  if (G.targeting) toast("Яьшка харжа 🎯");
+  if (G.targeting) toast(t("game.targetMsg"));
 }
 
 function onCellTap(cell) {
-  if (!G || !G.targeting || cell.filled) return;
+  if (!G) return;
+  // hedefleme kapalıyken dolu hücreye dokunuş: kelimenin anlamını hatırlat
+  if (!G.targeting && cell.filled) {
+    const w = G.words.find((x) => x.solved && x.cells.includes(cell));
+    if (w) { showWordInfo(w); SFX.pick(0); }
+    return;
+  }
+  if (!G.targeting || cell.filled) return;
   G.targeting = false;
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.remove("target");
@@ -521,14 +610,33 @@ function checkDone() {
 function showBonusChest() {
   if (!G) return;
   const list = [...G.foundBonus].map(dispG).join(", ") || "—";
-  toast("💎 " + list);
+  toast(t("game.bonusChest", list));
 }
 
 /* ---------- SEVİYE SONU ---------- */
 
+/* Öğrenme özeti: seviyenin ana kelimeleri + INFO'daki anlamları.
+ * Oyunu "çöz-geç"ten "çöz-öğren" döngüsüne çeviren kart. */
+function wordsRecapHTML() {
+  const items = G.words.map(w => {
+    const info = INFO[w.norm];
+    const ce = info && info.ce ? info.ce : "";
+    const tr = info && info.tr ? info.tr : "";
+    const gloss = (ce || tr)
+      ? `${ce ? `<span class="lang">чеч.</span> ${dispG(ce)}` : ""}${tr ? ` <span class="lang">тр.</span> ${dispG(tr)}` : ""}`
+      : `<span class="recap-miss">—</span>`;
+    return `<div class="recap-item"><b>${dispG(w.norm)}</b><span class="recap-gloss">${gloss}</span></div>`;
+  }).join("");
+  return `<div class="panel-section">
+    <div class="panel-section-title">Дешнаш 📖</div>
+    <div class="recap-list">${items}</div>
+  </div>`;
+}
+
 function levelComplete() {
   if (!G || G.done) return;
   G.done = true;
+  if (G.daily) { dailyComplete(); return; }
   const st = starsFor(G.mistakes, G.hints);
   const prev = S.stars[G.lv.id] || 0;
   S.stars[G.lv.id] = Math.max(prev, st); // proxy otomatik save
@@ -537,17 +645,18 @@ function levelComplete() {
   SFX.win();
   vibrate([50, 60, 50, 60, 120]);
 
-  const isLast = G.lv.id >= LEVELS[LEVELS.length - 1].id;
+  const isLast = G.lv.id >= LAST_LEVEL_ID;
   openPanel(`
-    <h2>Декъал! 🎉</h2>
+    <h2>${t("end.title")}</h2>
     <div class="stars-row" id="stars-row"><span>⭐</span><span>⭐</span><span>⭐</span></div>
-    <div class="reward-line"><span>ТӀегӀа</span><b>${G.lv.id + 1}</b></div>
-    <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
-    <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
-    <div class="reward-line"><span>Карина сом</span><b id="lc-coins">+0 🪙</b></div>
+    <div class="reward-line"><span>${t("end.level")}</span><b>${G.lv.id + 1}</b></div>
+    <div class="reward-line"><span>${t("end.words")}</span><b>${G.words.length}</b></div>
+    <div class="reward-line"><span>${t("end.bonus")}</span><b>${G.foundBonus.size}</b></div>
+    <div class="reward-line"><span>${t("end.earned")}</span><b id="lc-coins">+0 🪙</b></div>
+    ${wordsRecapHTML()}
     <div class="btnrow">
-      <button class="btn small ghost" id="lc-map">Карта</button>
-      ${isLast ? "" : `<button class="btn small" id="lc-next">Кхин дӀа ▶</button>`}
+      <button class="btn small ghost" id="lc-map">${t("end.map")}</button>
+      ${isLast ? "" : `<button class="btn small" id="lc-next">${t("end.next")}</button>`}
     </div>`);
 
   const row = document.getElementById("stars-row").children;
@@ -557,8 +666,8 @@ function levelComplete() {
   const cEl = document.getElementById("lc-coins");
   if (cEl) {
     const total = G.earned, t0 = performance.now();
-    const tick = (t) => {
-      const k = Math.min(1, (t - t0) / 900);
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / 900);
       cEl.textContent = "+" + Math.round(total * (1 - Math.pow(1 - k, 3))) + " 🪙";
       if (k < 1) requestAnimationFrame(tick);
     };
@@ -567,6 +676,53 @@ function levelComplete() {
   document.getElementById("lc-map").onclick = () => { closePanel(); goToMap(); };
   const nx = document.getElementById("lc-next");
   if (nx) nx.onclick = () => { closePanel(); startLevel(G.lv.id + 1); };
+}
+
+/* ---------- GÜNLÜK BULMACA SONU ----------
+ * Yıldız/harita ilerlemesi yazılmaz; streak güncellenir, ödül coin'i
+ * burada eklenir (recordDailyWin sadece hesaplar). */
+function dailyComplete() {
+  const res = recordDailyWin();
+  if (!res.already && res.reward > 0) {
+    S.coins += res.reward;
+    S.stats.coinsEarned = (S.stats.coinsEarned || 0) + res.reward;
+  }
+  confetti(140);
+  SFX.win();
+  vibrate([50, 60, 50, 60, 120]);
+
+  openPanel(`
+    <h2>Декъал! 🎉</h2>
+    <div class="daily-flame">🔥 ${res.streak}</div>
+    <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
+    <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
+    <div class="reward-line"><span>Карина сом</span><b>+${G.earned + res.reward} 🪙</b></div>
+    ${wordsRecapHTML()}
+    <div class="btnrow">
+      <button class="btn small ghost" id="lc-share" aria-label="ДӀахьажо 📤">📤</button>
+      <button class="btn small" id="lc-home">Юха</button>
+    </div>`);
+  updateCoins();
+  document.getElementById("lc-home").onclick = () => {
+    closePanel();
+    import("./home.js").then(m => { m.renderHome(); show("scr-home"); });
+  };
+  document.getElementById("lc-share").onclick = async () => {
+    const text = dailyShareText({
+      cells: G.cells.values(),
+      streak: res.streak,
+      bonus: G.foundBonus.size,
+      mistakes: G.mistakes,
+      url: location.protocol.startsWith("http") ? location.origin : "",
+    });
+    try {
+      if (navigator.share) { await navigator.share({ text }); return; }
+      await navigator.clipboard.writeText(text);
+      toast("✓ 📋");
+    } catch (e) {
+      if (e && e.name !== "AbortError") console.warn("[daily] paylaşım:", e);
+    }
+  };
 }
 
 /** Map'e git (dinamik import ile sirküler bağımlılığı kır) */
@@ -581,7 +737,12 @@ function initGameScreens() {
     import("./home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
   };
 
-  document.getElementById("game-back").onclick = goToMap;
+  // günlük bulmacadan çıkış haritaya değil ana ekrana döner
+  document.getElementById("game-back").onclick = () => {
+    if (G && G.daily) {
+      import("./home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
+    } else goToMap();
+  };
   document.getElementById("game-settings").onclick = () => {
     import("./settings.js").then(({ openSettings }) => openSettings());
   };
@@ -596,8 +757,8 @@ function initGameScreens() {
 }
 
 // Yeniden boyutlandırmada grid'i yeniden inşa et
-addEventListener("resize", () => {
-  if (G && document.getElementById("scr-game").classList.contains("on")) {
+onResize(() => {
+  if (G && document.getElementById("scr-game")?.classList.contains("on")) {
     const filled = [...G.cells.values()].filter(c => c.filled);
     buildGrid();
     filled.forEach(c => { c.filled = false; fillCell(c, c.hint); });

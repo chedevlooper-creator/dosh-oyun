@@ -1,4 +1,6 @@
+// @ts-check
 import { $ } from "../utils/helpers.js";
+import { t } from "../utils/i18n.js";
 
 /* ================= PANEL (modal) ================= */
 let lastFocus = null;
@@ -8,7 +10,7 @@ export function openPanel(html){
   // Her panele köşe kapatma butonu
   const x = document.createElement("button");
   x.className = "panel-x";
-  x.setAttribute("aria-label", "ДӀачӀагӀа");
+  x.setAttribute("aria-label", t("panel.close"));
   x.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg>`;
   x.onclick = closePanel;
   $("panel").prepend(x);
@@ -30,7 +32,7 @@ export function closePanel(){
   $("veil").removeAttribute("aria-modal");
   $("veil").removeAttribute("aria-labelledby");
   if(lastFocus && lastFocus.focus){
-    try{ lastFocus.focus({ preventScroll:true }); }catch(e){}
+    try{ lastFocus.focus({ preventScroll:true }); }catch{}
   }
 }
 $("veil").addEventListener("click", e=>{ if(e.target===$("veil")) closePanel(); });
@@ -45,4 +47,3 @@ addEventListener("keydown", e=>{
   if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
   else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
 });
-

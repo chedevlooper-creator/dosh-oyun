@@ -1,3 +1,4 @@
+// @ts-check
 /* ================= KELİME AÇIKLAMALARI =================
  * Her kayıt: { ce: "Çeçence kısa açıklama", tr: "Türkçe kısa açıklama" }
  * Telaffuz/IPA köşeli parantezle isteğe bağlıdır; burada sadelik için yazılmadı.

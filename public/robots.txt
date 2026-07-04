@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /editor
+Disallow: /editor.html
+
+Sitemap: https://dosh-oyun.vercel.app/sitemap.xml

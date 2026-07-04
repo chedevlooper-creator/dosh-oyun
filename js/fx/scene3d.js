@@ -1,12 +1,25 @@
+// @ts-check
 import { S } from "../engine/store.js";
-import { $ } from "../utils/helpers.js";
+import { $, prefersReducedMotion } from "../utils/helpers.js";
+import { onResize } from "../utils/resize.js";
+/* ESM three: r128 (592KB) çıkarıldı, modern tree-shakeable three kullanılıyor.
+ * Post-processing bileşenleri three/addons'tan ESM olarak alınır.
+ * Kullanıcının `npm install three` çalıştırması gerekir. */
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 /* ================= 3D SAHNE (Three.js — Kafkas dağları) ================= */
 export const GL = (() => {
   const PHOTO_MODE = true; // gerçek fotoğraf arka plan: 3D yalnızca partikül + kartal katmanı çizer
-  let renderer, scene, camera, terrain, stars, snow, clouds = [], sun, dirLight, ambLight, hemiLight;
+  let renderer, scene, camera, terrain, stars, snow, sun, dirLight, ambLight, hemiLight;
+  const clouds = [];
   let composer = null, bloomPass = null, motes = null, farRidge = null;
-  let towerWindows = [], eagle = null, wingL = null, wingR = null, stoneMats = [];
+  const towerWindows = [];
+  let eagle = null, wingL = null, wingR = null;
+  const stoneMats = [];
   let px = 0, py = 0, tpx = 0, tpy = 0, ok = false;
   let camY = 9, camYT = 9, lookY = 12, lookYT = 12; // ekrana göre kamera hedefleri
   const PAL3D = {
@@ -76,7 +89,7 @@ export const GL = (() => {
     if(typeof THREE === "undefined") return;
     try{
       renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias:true, alpha:PHOTO_MODE });
-    }catch(e){ return; }
+    }catch{ return; }
     ok = true;
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2.5)); // 4K/retina keskinliği
     renderer.toneMapping = THREE.ACESFilmicToneMapping;      // sinematik ton eşleme
@@ -158,10 +171,10 @@ export const GL = (() => {
     function findPeak(x0, x1, z0, z1){
       let best = {x:x0, z:z0, y:-99};
       for(let x = x0; x <= x1; x += 1.5)
-        for(let z = z0; z <= z1; z += 1.5){
+        {for(let z = z0; z <= z1; z += 1.5){
           const y = groundY(x, z);
           if(y > best.y) best = {x, z, y};
-        }
+        }}
       return best;
     }
     // taş örgü dokusu (prosedürel duvar taşları)
@@ -291,15 +304,17 @@ export const GL = (() => {
     }
     // bloom (ışıma) — fx.js yüklüyse (fotoğraf modunda kapalı: şeffaflık bozulur)
     try{
-      if(!PHOTO_MODE && THREE.EffectComposer && THREE.UnrealBloomPass){
-        composer = new THREE.EffectComposer(renderer);
-        composer.addPass(new THREE.RenderPass(scene, camera));
-        bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.65, 0.82);
+      if(!PHOTO_MODE && EffectComposer && UnrealBloomPass){
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.65, 0.82);
         composer.addPass(bloomPass);
+        // OutputPass tonemap & renk düzeltmesi son aşamada uygular
+        try { composer.addPass(new OutputPass()); } catch { /* Output yoksa da olur */ }
       }
-    }catch(e){ composer = null; }
+    }catch{ composer = null; }
     resize(); retheme();
-    addEventListener("resize", resize);
+    onResize(resize);
     addEventListener("pointermove", e => { tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5; }, { passive:true });
     document.body.classList.add("gl-on");
     let last = 0, paused = false;
@@ -309,12 +324,20 @@ export const GL = (() => {
       requestAnimationFrame(anim);
       if(paused || t - last < 33) return; last = t; // ~30fps yeterli, pil dostu
       const s = t/1000;
-      px += (tpx-px)*0.04; py += (tpy-py)*0.04;
-      camY += (camYT-camY)*0.03; lookY += (lookYT-lookY)*0.03;
-      camera.position.x = px*3 + Math.sin(s*0.10)*1.1;
-      camera.position.y = camY + py*1.6 + Math.sin(s*0.13)*0.4;
+      const rm = prefersReducedMotion();
+      if(rm){
+        // azaltılmış hareket: kamera sabit, parallax kapalı, snow/eagle hâlâ yavaşça hareket eder
+        px = 0; py = 0; camY = camYT; lookY = lookYT;
+      } else {
+        px += (tpx-px)*0.04; py += (tpy-py)*0.04;
+        camY += (camYT-camY)*0.03; lookY += (lookYT-lookY)*0.03;
+      }
+      camera.position.x = rm ? 0 : (px*3 + Math.sin(s*0.10)*1.1);
+      camera.position.y = rm ? camY : (camY + py*1.6 + Math.sin(s*0.13)*0.4);
       camera.lookAt(0, lookY, -60);
-      for(const c of clouds){ c.position.x += c.userData.v; if(c.position.x > 110) c.position.x = -110; }
+      if(!rm){
+        for(const c of clouds){ c.position.x += c.userData.v; if(c.position.x > 110) c.position.x = -110; }
+      }
       if(snow.material.opacity > 0.01){
         const p = snow.geometry.attributes.position;
         for(let i=0;i<p.count;i++){
