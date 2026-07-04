@@ -1,3 +1,4 @@
+// @ts-check
 /* ================= KALICI KAYIT (localStorage) ================= */
 import { snapshot, hydrate } from "./store.js";
 import { toast } from "../utils/helpers.js";
@@ -34,5 +35,5 @@ export function save(){
 }
 
 export function clearAll(){
-  try{ localStorage.removeItem(KEY); }catch(e){}
+  try{ localStorage.removeItem(KEY); }catch{}
 }
