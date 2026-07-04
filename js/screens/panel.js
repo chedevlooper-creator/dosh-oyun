@@ -1,3 +1,4 @@
+// @ts-check
 import { $ } from "../utils/helpers.js";
 
 /* ================= PANEL (modal) ================= */
@@ -30,7 +31,7 @@ export function closePanel(){
   $("veil").removeAttribute("aria-modal");
   $("veil").removeAttribute("aria-labelledby");
   if(lastFocus && lastFocus.focus){
-    try{ lastFocus.focus({ preventScroll:true }); }catch(e){}
+    try{ lastFocus.focus({ preventScroll:true }); }catch{}
   }
 }
 $("veil").addEventListener("click", e=>{ if(e.target===$("veil")) closePanel(); });
@@ -45,4 +46,3 @@ addEventListener("keydown", e=>{
   if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
   else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
 });
-
