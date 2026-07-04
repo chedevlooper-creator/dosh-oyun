@@ -1,7 +1,9 @@
 // @ts-check
 import { LEVELS } from "../data/levels.js";
+import { packFor } from "../data/packs.js";
 import { S } from "../engine/store.js";
 import { updateCoins, $, show, toast } from "../utils/helpers.js";
+import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
 import { startLevel } from "./game.js";
 import { renderHome } from "./home.js";
@@ -14,15 +16,27 @@ export function firstUnsolved(){
 export function openMap(){
   updateCoins();
   const cur = firstUnsolved();
+  const lang = S.settings.lang || "ce";
   const wrap = $("map-scroll"); wrap.innerHTML = "";
   let grid = null, lastPack = null, ni = 0;
   for(const lv of LEVELS){
     const pack = lv.pack || Math.floor(lv.id/25)+1;
     if(pack !== lastPack){
       lastPack = pack;
+      const meta = packFor(pack);
+      const head = document.createElement("div"); head.className="pack-head";
       const lab = document.createElement("div"); lab.className="pack-label";
-      lab.textContent = "ДАКЪА " + pack;
-      wrap.appendChild(lab);
+      lab.textContent = (t("map.pack") || "ДАКЪА") + " " + pack;
+      head.appendChild(lab);
+      if (meta) {
+        const title = document.createElement("div"); title.className = "pack-title";
+        title.textContent = (meta.title && meta.title[lang]) || meta.title?.ce || "";
+        head.appendChild(title);
+        const intro = document.createElement("div"); intro.className = "pack-intro";
+        intro.textContent = (meta.intro && meta.intro[lang]) || meta.intro?.ce || "";
+        head.appendChild(intro);
+      }
+      wrap.appendChild(head);
       grid = document.createElement("div"); grid.className="map-grid"; wrap.appendChild(grid);
     }
     const n = document.createElement("button"); n.className = "node in";
