@@ -10,19 +10,19 @@ import { GL } from "../fx/scene3d.js";
 /* ================= AYARLAR ================= */
 export function openSettings(){
   openPanel(`
-    <h2>Нисдарш ⚙️</h2>
+    <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg> Нисдарш</h2>
     <div class="opt-row"><span>Кеп</span>
       <div class="theme-dots">${THEMES.map(t=>
         `<button class="tdot ${S.settings.theme===t.id?"on":""}" data-t="${t.id}" title="${t.name}" aria-label="${t.name}" aria-pressed="${S.settings.theme===t.id}" style="background:${t.dot}"></button>`).join("")}
       </div></div>
-    <div class="opt-row"><span>Аз 🔔</span>
-      <button class="toggle ${S.settings.sound?"on":""}" id="snd-toggle"></button></div>
-    <div class="opt-row"><span>Мукъам 🎵</span>
-      <button class="toggle ${S.settings.music?"on":""}" id="mus-toggle"></button></div>
+    <div class="opt-row"><span class="opt-label"><svg class="o-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg> Аз</span>
+      <button class="toggle ${S.settings.sound?"on":""}" id="snd-toggle" role="switch" aria-checked="${S.settings.sound}" aria-label="Аз"></button></div>
+    <div class="opt-row"><span class="opt-label"><svg class="o-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-note"/></svg> Мукъам</span>
+      <button class="toggle ${S.settings.music?"on":""}" id="mus-toggle" role="switch" aria-checked="${S.settings.music}" aria-label="Мукъам"></button></div>
     <div class="opt-row"><span>Хьехам</span>
       <button class="btn small ghost" id="set-tut">Ловзар</button></div>
     <div class="opt-row" style="border:none"><span>Юхадаккха</span>
-      <button class="btn small ghost" id="set-reset" style="color:var(--danger)">⟲</button></div>
+      <button class="btn small ghost danger" id="set-reset" aria-label="Юхадаккха"><svg class="o-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-reset"/></svg></button></div>
     <div class="btnrow"><button class="btn small" id="set-close">Юха</button></div>`);
   document.querySelectorAll(".tdot").forEach(d=>d.onclick=()=>{
     S.settings.theme = d.dataset.t;
@@ -35,11 +35,13 @@ export function openSettings(){
   $("snd-toggle").onclick = function(){
     S.settings.sound = !S.settings.sound;
     this.classList.toggle("on", S.settings.sound);
+    this.setAttribute("aria-checked", S.settings.sound);
     if(S.settings.sound) SFX.coin();
   };
   $("mus-toggle").onclick = function(){
     MUSIC.toggle(!S.settings.music);
     this.classList.toggle("on", S.settings.music);
+    this.setAttribute("aria-checked", S.settings.music);
   };
   $("set-tut").onclick = ()=>{ closePanel(); tutorial(); };
   $("set-reset").onclick = ()=>{

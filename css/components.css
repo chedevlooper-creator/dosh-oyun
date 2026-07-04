@@ -53,6 +53,7 @@ button:active{transform:scale(.95)}
 .node.done .st{color:#7c4d00}
 .node.cur{outline:3px solid var(--gold);animation:curPulse 1.6s infinite}
 .node.lock{opacity:.4;font-size:15px}
+.node .lock-ic{width:20px;height:20px;color:var(--ink2)}
 .node .state{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
 .node.cur .state{color:var(--gold)}
 .node.lock .state{color:#e5eef7}
@@ -116,9 +117,11 @@ button:active{transform:scale(.95)}
   display:flex;align-items:center;justify-content:center;font-weight:800;
   box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s}
 .bub.sel{background:var(--sel);color:var(--sel-ink);transform:scale(1.14)}
-#shuffle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;
-  border-radius:50%;background:rgba(247,241,222,.08);border:1px solid rgba(242,181,61,.3);
-  color:rgba(242,181,61,.8);display:flex;align-items:center;justify-content:center;opacity:.9}
+#shuffle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;z-index:2;
+  border-radius:50%;background:rgba(247,241,222,.10);border:1.5px solid rgba(242,181,61,.45);
+  color:rgba(242,181,61,.9);display:flex;align-items:center;justify-content:center;opacity:.95;
+  box-shadow:0 2px 10px rgba(0,0,0,.35);transition:background .15s,border-color .15s}
+#shuffle:hover{background:rgba(247,241,222,.16);border-color:var(--gold)}
 #shuffle:active{transform:translate(-50%,-50%) rotate(180deg) scale(.94)}
 
 /* ---------- OVERLAYS ---------- */
@@ -285,6 +288,19 @@ button:active{transform:scale(.95)}
 /* --- panel başlığı: vurgu çizgisi --- */
 .panel h2::after{content:"";display:block;width:46px;height:4px;border-radius:99px;margin:10px auto 0;
   background:linear-gradient(90deg,var(--gold2),var(--gold))}
+/* Panel başlık ve satır ikonları */
+.panel h2 .h-ic{width:22px;height:22px;color:var(--gold);vertical-align:-3px;margin-right:4px}
+.opt-label{display:inline-flex;align-items:center;gap:8px}
+.o-ic{width:18px;height:18px;color:var(--gold);flex:0 0 auto}
+.btn.danger{color:var(--danger)}
+.btn.danger .o-ic{color:var(--danger)}
+/* Panel köşe kapatma butonu */
+.panel-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;color:var(--ink2);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);transition:color .15s,background .15s}
+.panel-x:hover{color:var(--ink);background:rgba(255,255,255,.13)}
+.panel-x svg{width:16px;height:16px}
+.panel{position:relative}
 /* --- ekran geçişi: 3D derinlik --- */
 /* --- kademeli giriş (stagger) --- */
 @media (max-width:400px){ .icon-btn{min-width:64px} .icon-btn .lb{font-size:9.5px} }

@@ -41,25 +41,31 @@ function scheduleSave(){
 }
 
 /* ---------- Proxy ---------- */
+/* Proxy'lenmiş nesneler veri üzerine işaret yazmadan WeakMap ile izlenir
+   (aksi halde __proxy işareti localStorage'a sızıp sözlükte sahte kayıt yaratır) */
+const _nestedProxies = new WeakMap();
 function makeProxy(target, scope){
   return new Proxy(target, {
     get(obj, key){
       const v = obj[key];
-      if(v && typeof v === "object" && !v.__proxy && !Array.isArray(v) && !(v instanceof Map) && !(v instanceof Set)){
-        v.__proxy = true;
-        return new Proxy(v, {
-          set(nested, k, val){
-            const before = nested[k];
-            nested[k] = val;
-            if(scope === "S"){ scheduleSave(); if(k === "theme") notifyTheme(); }
-            return true;
-          },
-          deleteProperty(nested, k){
-            delete nested[k];
-            if(scope === "S") scheduleSave();
-            return true;
-          }
-        });
+      if(v && typeof v === "object" && !Array.isArray(v) && !(v instanceof Map) && !(v instanceof Set)){
+        let p = _nestedProxies.get(v);
+        if(!p){
+          p = new Proxy(v, {
+            set(nested, k, val){
+              nested[k] = val;
+              if(scope === "S"){ scheduleSave(); if(k === "theme") notifyTheme(); }
+              return true;
+            },
+            deleteProperty(nested, k){
+              delete nested[k];
+              if(scope === "S") scheduleSave();
+              return true;
+            }
+          });
+          _nestedProxies.set(v, p);
+        }
+        return p;
       }
       return v;
     },
@@ -146,6 +152,10 @@ export function hydrate(persisted){
     if(typeof _S.stats[k] !== "number") _S.stats[k] = 0;
   }
   if(typeof _S.settings.theme !== "string") _S.settings.theme = "kavkaz";
+  // Eski sürümün sızdırdığı __proxy işaretlerini kayıttan temizle
+  for(const o of [_S, _S.stars, _S.dict, _S.settings, _S.stats]){
+    if(o && typeof o === "object") delete o.__proxy;
+  }
 }
 
 /* snapshot - save()'e verilecek kopya */

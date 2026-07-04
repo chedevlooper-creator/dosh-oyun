@@ -23,7 +23,7 @@ export function openDict(){
     }).join("");
   };
   openPanel(`
-    <h2>Дошам 📖</h2>
+    <h2><svg class="h-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg> Дошам</h2>
     <p class="panel-subtitle">Кхочушдина дешнаш а цар маьӀнаш а хӀокху чу кхолла.</p>
     <input class="dict-search" id="dict-q" placeholder="Лаха…" aria-label="Лаха дош">
     <div id="dict-list">${render("")}</div>

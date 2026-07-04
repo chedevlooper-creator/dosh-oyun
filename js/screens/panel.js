@@ -5,6 +5,13 @@ let lastFocus = null;
 export function openPanel(html){
   lastFocus = document.activeElement;
   $("panel").innerHTML = html;
+  // Her panele köşe kapatma butonu
+  const x = document.createElement("button");
+  x.className = "panel-x";
+  x.setAttribute("aria-label", "ДӀачӀагӀа");
+  x.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg>`;
+  x.onclick = closePanel;
+  $("panel").prepend(x);
   $("veil").classList.add("on");
   $("veil").setAttribute("aria-hidden", "false");
   $("veil").setAttribute("aria-modal", "true");
@@ -13,7 +20,7 @@ export function openPanel(html){
     if(!h.id) h.id = "panel-h";
     $("veil").setAttribute("aria-labelledby", h.id);
   }
-  const f = $("panel").querySelector("button, input, [tabindex]");
+  const f = $("panel").querySelector("button:not(.panel-x), input, [tabindex]");
   if(f) f.focus({ preventScroll:true });
   else $("panel").focus({ preventScroll:true });
 }
