@@ -50,6 +50,17 @@ button:active:not(#shuffle){transform:scale(.95)}
 .backup-btns .btn.small{padding:8px 14px}
 /* sözlükte anlamı eksik kelime: katkı daveti */
 .dict-miss a{color:var(--accent);font-size:13px;text-decoration:none;border-bottom:1px dashed var(--accent)}
+/* geri bildirim paneli */
+.fb-types{display:flex;gap:10px;justify-content:center;margin-bottom:12px}
+.fb-type{opacity:.6}
+.fb-type.on{opacity:1;outline:2px solid var(--gold);outline-offset:2px}
+.fb-text{width:100%;border-radius:14px;border:none;background:rgba(255,255,255,.1);color:var(--ink);
+  padding:12px 14px;font:inherit;font-size:15px;margin-top:10px;resize:vertical}
+.fb-text:focus{outline:2px solid var(--gold)}
+/* sözlük öğesinde kelimeye özel geri bildirim */
+.dict-item{position:relative}
+.dict-fb{position:absolute;top:8px;inset-inline-end:10px;font-size:14px;opacity:.5;background:none;padding:4px}
+.dict-fb:hover,.dict-fb:focus-visible{opacity:1}
 .coins-chip{display:inline-flex;align-items:center;gap:7px;background:var(--card);
   border-radius:999px;padding:8px 16px;font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .coins-chip .c{color:var(--gold)}

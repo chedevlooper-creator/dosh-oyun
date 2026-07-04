@@ -82,6 +82,23 @@ test("ayarlar açılır, tema değişir, kapanır", async ({ page }) => {
   await expect(page.locator("#veil")).not.toHaveClass(/on/);
 });
 
+test("geri bildirim paneli: tür/kelime/mesaj bağlantılara işlenir", async ({ page }) => {
+  await page.click("#btn-settings");
+  await page.click("#set-feedback");
+  await expect(page.locator("#fb-word")).toBeVisible();
+
+  await page.locator('.fb-type[data-t="fix"]').click();
+  await page.fill("#fb-word", "болх");
+  await page.fill("#fb-text", "test mesajı");
+
+  const gh = await page.locator("#fb-github").getAttribute("href");
+  expect(gh).toContain("labels=feedback,word-fix");
+  expect(gh).toContain(encodeURIComponent("Нисдар: болх"));
+  const mail = await page.locator("#fb-mail").getAttribute("href");
+  expect(mail).toContain("mailto:");
+  expect(mail).toContain(encodeURIComponent("test mesajı"));
+});
+
 test("sözlük paneli boş durumu gösterir", async ({ page }) => {
   await page.click("#btn-dict");
   await expect(page.locator("#panel h2")).toContainText("Дошам");

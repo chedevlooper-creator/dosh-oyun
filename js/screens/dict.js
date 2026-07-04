@@ -4,6 +4,7 @@ import { norm, dispG } from "../engine/grapheme.js";
 import { INFO } from "../data/info.js";
 import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";
+import { openFeedback } from "./feedback.js";
 
 /* ================= SÖZLÜK ================= */
 
@@ -28,6 +29,7 @@ export function openDict(){
         ? `<div class="d dict-miss"><a href="${contribURL(w)}" target="_blank" rel="noopener">✍️ МаьӀна…</a></div>`
         : "";
       return `<div class="dict-item">
+        <button class="dict-fb" data-w="${w}" aria-label="✍️ ${dispG(w)}">✍️</button>
         <div class="w">${dispG(w)}</div>
         ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
         ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
@@ -42,6 +44,11 @@ export function openDict(){
     <div id="dict-list">${render("")}</div>
     <div class="btnrow"><button class="btn small" id="dc-close">Юха</button></div>`);
   $("dict-q").addEventListener("input", e=>{ $("dict-list").innerHTML = render(e.target.value); });
+  // kelimeye özel geri bildirim (delegasyon: liste aramada yeniden çizilir)
+  $("dict-list").addEventListener("click", e=>{
+    const b = /** @type {HTMLElement} */(e.target).closest?.(".dict-fb");
+    if(b) openFeedback({ word: b.dataset.w, type: "fix" });
+  });
   $("dc-close").onclick = closePanel;
 }
 
