@@ -6,6 +6,13 @@ import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";
 
 /* ================= SÖZLÜK ================= */
+
+/** Anlamı eksik kelime için önceden doldurulmuş GitHub issue bağlantısı */
+function contribURL(w){
+  const title = encodeURIComponent(`МаьӀна: ${w}`);
+  const body = encodeURIComponent(`Дош: ${w}\n\nчеч. (нохчийн маьӀна):\n\ntr (Türkçe anlam):\n\nKaynak (Wiktionary vb.):`);
+  return `https://github.com/chedevlooper-creator/dosh-oyun/issues/new?title=${title}&body=${body}&labels=word-gloss`;
+}
 export function openDict(){
   const words = Object.keys(S.dict).sort();
   const render = q => {
@@ -16,10 +23,15 @@ export function openDict(){
       const info = INFO[w];
       const ce = info ? (info.ce ?? "") : "";
       const tr = info ? (info.tr ?? "") : "";
+      // anlamı henüz girilmemiş kelime: topluluk katkısına davet et
+      const miss = !ce && !tr
+        ? `<div class="d dict-miss"><a href="${contribURL(w)}" target="_blank" rel="noopener">✍️ МаьӀна…</a></div>`
+        : "";
       return `<div class="dict-item">
         <div class="w">${dispG(w)}</div>
         ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
         ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
+        ${miss}
       </div>`;
     }).join("");
   };

@@ -57,3 +57,41 @@ console.log(`\nEksik bonus kelimeler (${bonusMissing.length}):`);
 for (const w of bonusMissing.sort()) {
   console.log(`  "${w}": { ce: "", tr: "" },`);
 }
+
+/* ---------- Topluluk katkı dosyası (--md) ----------
+ * `node scripts/analyze-coverage.mjs --md` → docs/eksik-kelimeler.md
+ * Ana dil konuşurlarının doldurması için tablo üretir; doldurulan
+ * satırlar js/data/info.js'e taşınır. Uydurma anlam yazılmaz
+ * (KELIME_RAPORU politikası). */
+if (process.argv.includes("--md")) {
+  const { writeFileSync, mkdirSync } = await import("node:fs");
+  const row = (w) => `| ${w} | | | |`;
+  const md = `# Дош — Eksik kelime anlamları / Недостающие значения слов
+
+Bu tablodaki kelimeler oyunda geçiyor ama sözlük açıklaması (gloss) henüz yok.
+Ana dili Çeçence olan katkıcılar: **чеч.** ve **tr** sütunlarını doldurup
+kaynağı (Wiktionary bağlantısı vb.) ekleyin. Doldurulan satırlar
+\`js/data/info.js\` dosyasına taşınır. Lütfen emin olmadığınız anlamı yazmayın —
+doğrulanamayan satır boş kalsın.
+
+Katkı için: satırı doldurup PR açın ya da
+[yeni issue](https://github.com/chedevlooper-creator/dosh-oyun/issues/new?labels=word-gloss) oluşturun.
+
+## Ana kelimeler (${missing.length})
+
+| Дош | чеч. (маьӀна) | tr (anlam) | Kaynak |
+|---|---|---|---|
+${missing.sort().map(row).join("\n")}
+
+## Bonus kelimeler (${bonusMissing.length})
+
+| Дош | чеч. (маьӀна) | tr (anlam) | Kaynak |
+|---|---|---|---|
+${bonusMissing.sort().map(row).join("\n")}
+
+_Üretildi: \`node scripts/analyze-coverage.mjs --md\` · ${new Date().toISOString().slice(0, 10)}_
+`;
+  mkdirSync(new URL("../docs/", import.meta.url), { recursive: true });
+  writeFileSync(new URL("../docs/eksik-kelimeler.md", import.meta.url), md);
+  console.log(`\ndocs/eksik-kelimeler.md yazıldı (${missing.length} ana + ${bonusMissing.length} bonus).`);
+}

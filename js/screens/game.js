@@ -563,6 +563,24 @@ function showBonusChest() {
 
 /* ---------- SEVİYE SONU ---------- */
 
+/* Öğrenme özeti: seviyenin ana kelimeleri + INFO'daki anlamları.
+ * Oyunu "çöz-geç"ten "çöz-öğren" döngüsüne çeviren kart. */
+function wordsRecapHTML() {
+  const items = G.words.map(w => {
+    const info = INFO[w.norm];
+    const ce = info && info.ce ? info.ce : "";
+    const tr = info && info.tr ? info.tr : "";
+    const gloss = (ce || tr)
+      ? `${ce ? `<span class="lang">чеч.</span> ${dispG(ce)}` : ""}${tr ? ` <span class="lang">тр.</span> ${dispG(tr)}` : ""}`
+      : `<span class="recap-miss">—</span>`;
+    return `<div class="recap-item"><b>${dispG(w.norm)}</b><span class="recap-gloss">${gloss}</span></div>`;
+  }).join("");
+  return `<div class="panel-section">
+    <div class="panel-section-title">Дешнаш 📖</div>
+    <div class="recap-list">${items}</div>
+  </div>`;
+}
+
 function levelComplete() {
   if (!G || G.done) return;
   G.done = true;
@@ -583,6 +601,7 @@ function levelComplete() {
     <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
     <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
     <div class="reward-line"><span>Карина сом</span><b id="lc-coins">+0 🪙</b></div>
+    ${wordsRecapHTML()}
     <div class="btnrow">
       <button class="btn small ghost" id="lc-map">Карта</button>
       ${isLast ? "" : `<button class="btn small" id="lc-next">Кхин дӀа ▶</button>`}
@@ -626,6 +645,7 @@ function dailyComplete() {
     <div class="reward-line"><span>Кхочушдина дешнаш</span><b>${G.words.length}</b></div>
     <div class="reward-line"><span>Бонус дешнаш 💎</span><b>${G.foundBonus.size}</b></div>
     <div class="reward-line"><span>Карина сом</span><b>+${G.earned + res.reward} 🪙</b></div>
+    ${wordsRecapHTML()}
     <div class="btnrow">
       <button class="btn small ghost" id="lc-share" aria-label="ДӀахьажо 📤">📤</button>
       <button class="btn small" id="lc-home">Юха</button>
