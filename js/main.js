@@ -7,6 +7,7 @@ import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { load } from "./engine/save.js";
 import { G, setOnThemeChange, S } from "./engine/store.js";
 import { buildGrid, fillCell, initGameScreens } from "./screens/game.js";
+import { getDir } from "./utils/i18n.js";
 
 "use strict";
 
@@ -32,8 +33,13 @@ function loadGL() {
 
 /* ================= STATE YÜKLE ================= */
 load();
-// documentElement.lang'i kayıtlı dile senkronize et (varsayılan ce kalır)
-try { if (S && S.settings && typeof S.settings.lang === "string") document.documentElement.lang = S.settings.lang; } catch {}
+// documentElement.lang ve dir'i kayıtlı dile senkronize et (varsayılan ce, ltr)
+try {
+  if (S && S.settings && typeof S.settings.lang === "string") {
+    document.documentElement.lang = S.settings.lang;
+    document.documentElement.dir = getDir();
+  }
+} catch {}
 
 /* ================= TEMA → 3D SAHNE BAĞLANTISI ================= */
 // Tema değiştiğinde sahne yüklüyse retheme çağır, değilse yükleme tetikle

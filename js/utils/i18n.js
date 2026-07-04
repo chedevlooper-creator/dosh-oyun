@@ -3,6 +3,20 @@
 
 import { S, commitSettings } from "../engine/store.js";
 
+/** Dil kodu → yön eşlemesi */
+export const DIR_MAP = {
+  ce: "ltr",
+  ru: "ltr",
+  tr: "ltr",
+  // Gelecekte RTL diller: ar: "rtl", fa: "rtl", he: "rtl", ku: "rtl", ur: "rtl"
+};
+
+/** Mevcut dilin yönünü döndürür */
+export function getDir() {
+  const lang = S.settings.lang || "ce";
+  return DIR_MAP[lang] || "ltr";
+}
+
 const translations = {
   ce: {
     // Ana Ekran
@@ -173,18 +187,18 @@ export function t(key, ...args) {
 
 export function getLanguages() {
   return [
-    { code: "ce", name: "Нохчийн" },
-    { code: "tr", name: "Türkçe" },
-    { code: "ru", name: "Русский" }
+    { code: "ce", name: "Нохчийн", dir: "ltr" },
+    { code: "tr", name: "Türkçe", dir: "ltr" },
+    { code: "ru", name: "Русский", dir: "ltr" },
   ];
 }
 
 export function setLanguage(code) {
   if (translations[code]) {
     commitSettings({ lang: code });
-    // documentElement.lang'i güncelle, sonra sayfayı yenile ki statik string'ler t() üzerinden tekrar render edilsin.
     if (typeof document !== "undefined") {
       document.documentElement.lang = code;
+      document.documentElement.dir = DIR_MAP[code] || "ltr";
     }
     location.reload();
   }
