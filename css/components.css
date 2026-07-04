@@ -43,6 +43,8 @@ button:active:not(#shuffle){transform:scale(.95)}
 .recap-item b{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-size:15px;color:var(--gold);letter-spacing:.05em;white-space:nowrap}
 .recap-gloss{font-size:13px;line-height:1.35;color:var(--ink)}
 .recap-miss{color:var(--ink2)}
+/* seviye içi kelime ilerlemesi (ТӀЕГӀА N · 1/3) */
+.lvl-progress{display:block;font-size:11px;color:var(--ink2);font-weight:700;letter-spacing:.06em;margin-top:1px}
 /* ayarlar: yedekleme butonları */
 .backup-btns{display:flex;gap:8px}
 .backup-btns .btn.small{padding:8px 14px}

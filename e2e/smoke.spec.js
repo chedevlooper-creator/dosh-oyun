@@ -53,6 +53,12 @@ test("harita → seviye 1 → iki kelime → seviye sonu paneli", async ({ page 
 
   await playWord(page, ["д", "о", "ш"]);
   await expect(page.locator(".cell.fill")).toHaveCount(3);
+  await expect(page.locator("#lvl-progress")).toHaveText("1/2");
+
+  // dolu hücreye dokun → anlam şeridi kelimeyi gösterir
+  await page.locator(".cell.fill").first().click();
+  await expect(page.locator("#info-strip")).toHaveClass(/on/);
+  await expect(page.locator("#info-strip .info-word")).toContainText("ДОШ");
 
   await playWord(page, ["д", "о"]);
   // seviye sonu: kutlama paneli + öğrenme özeti

@@ -48,6 +48,8 @@ import { confetti } from "../fx/particles.js";
  * @property {boolean} targeting
  * @property {boolean} done
  * @property {boolean} [daily]
+ * @property {number} [wrongRow] - üst üste yanlış sayısı (takılma yardımcısı)
+ * @property {boolean} [rescued] - bu seviyede bedava kurtarma harfi verildi mi
  */
 
 /**
@@ -129,6 +131,7 @@ async function startLevel(id, opts = {}) {
 
   document.getElementById("lvl-num").textContent = id + 1;
   document.getElementById("bonus-count").textContent = "0";
+  updateWordProgress();
   const strip = document.getElementById("info-strip");
   strip.className = "";
   strip.innerHTML = "";
@@ -395,6 +398,7 @@ function submitSel() {
 
   if (G.bonusSet.has(word)) {
     clear("ok");
+    G.wrongRow = 0;
     G.foundBonus.add(word);
     document.getElementById("bonus-count").textContent = G.foundBonus.size;
     // atomik bonus merge
@@ -414,6 +418,33 @@ function submitSel() {
   SFX.bad();
   vibrate([40, 50, 40]);
   toast("Дош нийса дац!", "bad");
+  onWrongGuess();
+}
+
+/* ---------- TAKILMA YARDIMCISI ----------
+ * Üst üste yanlışta oyuncuyu ipucuna yönlendir; parası da yoksa
+ * seviyede bir kez bedava harf ver (softlock önleme). */
+function onWrongGuess() {
+  G.wrongRow = (G.wrongRow || 0) + 1;
+  if (G.wrongRow === 4) {
+    const hb = document.getElementById("hint-letter");
+    if (hb) {
+      hb.classList.add("pulse-ring");
+      setTimeout(() => hb.classList.remove("pulse-ring"), 4200);
+    }
+    toast("Хьехам 💡");
+  }
+  if (G.wrongRow >= 6 && !G.rescued && S.coins < CFG.hintCost) {
+    G.rescued = true;
+    const u = unfilled();
+    if (u.length) {
+      fillCell(u[(Math.random() * u.length) | 0], true);
+      SFX.hint();
+      toast("Хьехам 🎁", "gold");
+      checkAutoSolve();
+      checkDone();
+    }
+  }
 }
 
 /**
@@ -424,6 +455,8 @@ function submitSel() {
 function solveWord(w, byHint) {
   if (!G) return;
   w.solved = true;
+  G.wrongRow = 0;
+  updateWordProgress();
   if (!byHint) {
     vibrate(25);
     const gw = document.getElementById("grid-wrap");
@@ -460,21 +493,33 @@ function solveWord(w, byHint) {
     if (combo) setTimeout(() => { toast("🔥 x" + G.streak + "  +" + combo + " 🪙", "gold"); SFX.coin(); }, 500);
   }
 
-  const info = INFO[w.norm];
-  if (info) {
-    const strip = document.getElementById("info-strip");
-    const ce = info.ce ?? info;
-    const tr = info.tr ?? "";
-    strip.innerHTML = `
-      <div class="info-word">${dispG(w.norm)}</div>
-      <div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>
-      <div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>`;
-    strip.className = "on";
-  }
+  showWordInfo(w);
 
   updateCoins();
   checkAutoSolve();
   if (G.words.every(x => x.solved)) setTimeout(levelComplete, w.cells.length * 70 + 600);
+}
+
+/** Seviye içi ilerleme: çözülen/toplam kelime (üst barda, seviye numarasının yanında) */
+function updateWordProgress() {
+  const el = document.getElementById("lvl-progress");
+  if (!el || !G) return;
+  const solved = G.words.filter((w) => w.solved).length;
+  el.textContent = solved + "/" + G.words.length;
+}
+
+/** Kelimenin anlamını bilgi şeridinde göster (çözüm anında + dolu hücreye dokununca) */
+function showWordInfo(w) {
+  const strip = document.getElementById("info-strip");
+  if (!strip) return;
+  const info = INFO[w.norm];
+  const ce = info ? (info.ce ?? "") : "";
+  const tr = info ? (info.tr ?? "") : "";
+  strip.innerHTML = `
+    <div class="info-word">${dispG(w.norm)}</div>
+    ${ce ? `<div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
+    ${tr ? `<div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}`;
+  strip.className = "on";
 }
 
 function checkAutoSolve() {
@@ -524,7 +569,14 @@ function hintTarget() {
 }
 
 function onCellTap(cell) {
-  if (!G || !G.targeting || cell.filled) return;
+  if (!G) return;
+  // hedefleme kapalıyken dolu hücreye dokunuş: kelimenin anlamını hatırlat
+  if (!G.targeting && cell.filled) {
+    const w = G.words.find((x) => x.solved && x.cells.includes(cell));
+    if (w) { showWordInfo(w); SFX.pick(0); }
+    return;
+  }
+  if (!G.targeting || cell.filled) return;
   G.targeting = false;
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.remove("target");
