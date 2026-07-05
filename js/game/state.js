@@ -40,6 +40,7 @@ import { splitG } from "../engine/grapheme.js";
  * @property {boolean} [daily]
  * @property {number} [wrongRow] - üst üste yanlış sayısı (takılma yardımcısı)
  * @property {boolean} [rescued] - bu seviyede bedava kurtarma harfi verildi mi
+ * @property {boolean} [timeAttack] - Zamana Karşı modu aktif mi
  */
 
 /**
@@ -101,7 +102,7 @@ export function setDragging(v) { dragging = !!v; }
  * Yeni seviye için G state'ini sıfırlar ve inşa eder. Store'a da bildirir
  * (atomik persist).
  * @param {LevelData} lv
- * @param {{ daily?: boolean }} [opts]
+ * @param {{ daily?: boolean, timeAttack?: boolean }} [opts]
  */
 export function initState(lv, opts = {}) {
   const words = lv.words.map((w) => ({
@@ -132,7 +133,9 @@ export function initState(lv, opts = {}) {
     }
   }
 
-  const bonusSet = new Set((lv.bonus || []).map((b) => splitG(b).join("")));
+  const bonusSet = opts.timeAttack
+    ? new Set()
+    : new Set((lv.bonus || []).map((b) => splitG(b).join("")));
 
   _G = {
     lv, words, cells, bonusSet,
@@ -140,6 +143,7 @@ export function initState(lv, opts = {}) {
     mistakes: 0, hints: 0, streak: 0, earned: 0,
     sel: [], targeting: false, done: false,
     daily: !!opts.daily,
+    timeAttack: !!opts.timeAttack,
   };
   setG(_G);
   return _G;

@@ -24,8 +24,8 @@ body{
   filter:blur(1px);animation:sunPulse 6s ease-in-out infinite}
 #fx{position:fixed;inset:0;z-index:50;pointer-events:none}
 main{position:relative;z-index:10;height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column}
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .35s,transform .35s}
-.screen.on{opacity:1;pointer-events:auto;transform:none}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none}
+.screen.on{opacity:1;pointer-events:auto}
 #photo{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0a1420}
 #photo .ph{position:absolute;inset:-7%;background-size:cover;background-position:center;
   opacity:0;transition:opacity 1.4s ease;will-change:transform,opacity}

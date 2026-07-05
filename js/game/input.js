@@ -33,7 +33,7 @@ export function bubbleAt(x, y) {
 export function setupWheelListeners(cbs) {
   const wheel = document.getElementById("wheel");
 
-  wheel.addEventListener("pointerdown", (e) => {
+  const onPointerDown = (e) => {
     const G = getState();
     if (!G || G.done) return;
     const b = bubbleAt(e.clientX, e.clientY);
@@ -44,9 +44,9 @@ export function setupWheelListeners(cbs) {
     const bubbles = getBubbles();
     bubbles.forEach((x) => x.el.classList.remove("sel"));
     cbs.onSelectAdd(b);
-  });
+  };
 
-  wheel.addEventListener("pointermove", (e) => {
+  const onPointerMove = (e) => {
     if (!isDragging()) return;
     const G = getState();
     if (!G) return;
@@ -55,13 +55,24 @@ export function setupWheelListeners(cbs) {
     const i = G.sel.indexOf(b);
     if (i === -1) cbs.onSelectAdd(b);
     else if (i === G.sel.length - 2) cbs.onPopLast();
-  }, { passive: true });
+  };
 
-  addEventListener("pointerup", () => {
+  const onPointerUp = () => {
     if (!isDragging()) return;
     setDragging(false);
     cbs.onSubmit();
-  });
+  };
+
+  wheel.addEventListener("pointerdown", onPointerDown);
+  wheel.addEventListener("pointermove", onPointerMove, { passive: true });
+  addEventListener("pointerup", onPointerUp);
+
+  // Bir sonraki seviyeye geçerken listener'ları temizlemek için
+  return () => {
+    wheel.removeEventListener("pointerdown", onPointerDown);
+    wheel.removeEventListener("pointermove", onPointerMove);
+    removeEventListener("pointerup", onPointerUp);
+  };
 }
 
 /**

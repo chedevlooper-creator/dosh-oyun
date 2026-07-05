@@ -117,7 +117,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .gtop{display:flex;align-items:center;gap:8px;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top))}
 .gtop .lvl{flex:1;text-align:center;font-weight:800;font-size:18px}
 .gtop .lvl small{display:block;font-weight:500;font-size:11px;color:var(--ink2);letter-spacing:.12em}
-.rbtn{width:42px;height:42px;border-radius:13px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.rbtn{width:44px;height:44px;border-radius:13px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
 .rbtn .ri{width:20px;height:20px;color:var(--ink)}
 /* Fazla dikey boşluk grid ve çark arasında paylaşılır (uzun ekranlarda denge) */
 #grid-wrap{flex:3 1 0;max-height:48vh;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
@@ -206,7 +206,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .panel .btnrow{display:flex;gap:10px;margin-top:20px;justify-content:center}
 .opt-row{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.08);font-size:16px}
 .theme-dots{display:flex;gap:8px;flex-wrap:wrap}
-.tdot{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.tdot{width:44px;height:44px;border-radius:50%;border:2.5px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .tdot.on{border-color:#fff;transform:scale(1.12)}
 .toggle{width:54px;height:30px;border-radius:999px;background:rgba(255,255,255,.18);position:relative;transition:background .2s}
 .toggle::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:inset-inline-start .2s}
@@ -350,7 +350,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .btn.danger{color:var(--danger)}
 .btn.danger .o-ic{color:var(--danger)}
 /* Panel köşe kapatma butonu */
-.panel-x{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border-radius:12px;
+.panel-x{position:absolute;top:14px;inset-inline-end:14px;width:44px;height:44px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;color:var(--ink2);
   background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);transition:color .15s,background .15s}
 .panel-x:hover{color:var(--ink);background:rgba(255,255,255,.13)}

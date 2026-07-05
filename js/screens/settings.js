@@ -65,7 +65,7 @@ export function openSettings(){
     }).catch(() => {});
     document.querySelectorAll(".tdot").forEach(x=>{
       x.classList.toggle("on",x===d);
-      x.setAttribute("aria-pressed", x===d);
+      x.setAttribute("aria-pressed", String(x===d));
     });
   });
   $("snd-toggle").onclick = function(){

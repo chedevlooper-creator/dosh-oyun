@@ -21,6 +21,7 @@ export function show(scr){
 let toastTimer = 0;
 export function toast(msg, cls=""){
   const t = $("toast"); t.textContent = msg; t.className = "on "+cls;
+  t.role = cls.includes("bad") ? "alert" : "status";
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.className="", 1800);
 }
 

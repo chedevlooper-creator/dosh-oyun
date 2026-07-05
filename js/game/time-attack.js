@@ -10,11 +10,9 @@
 
 import { S } from "../engine/store.js";
 import { CFG } from "../data/config.js";
-import { splitG } from "../engine/grapheme.js";
 import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
 import { show, updateCoins, toast, flyCoins } from "../utils/helpers.js";
-import { setG } from "../engine/store.js";
 
 const TIME_LIMIT_MS = 60_000;
 const POOL_PACKS = [1, 2, 3];
@@ -227,68 +225,40 @@ async function loadNextTA(levelId) {
   const lv = await getLevel(levelId).catch(() => null);
   if (!lv || !ta) return;
 
-  const words = lv.words.map((w) => ({
-    ...w,
-    g: splitG(w.word),
-    norm: splitG(w.word).join(""),
-    solved: false,
-  }));
-
-  let minR = 1e9, minC = 1e9;
-  for (const w of words) {
-    minR = Math.min(minR, w.row);
-    minC = Math.min(minC, w.col);
-  }
-  const cells = new Map();
-  for (const w of words) {
-    w.cells = [];
-    for (let i = 0; i < w.g.length; i++) {
-      const r = w.row - minR + (w.dir === "down" ? i : 0);
-      const c = w.col - minC + (w.dir === "across" ? i : 0);
-      const key = r + "," + c;
-      if (!cells.has(key)) cells.set(key, { r, c, ch: w.g[i], filled: false, hint: false, el: null });
-      w.cells.push(cells.get(key));
-    }
-  }
-
-  const G = {
-    lv, words, cells,
-    bonusSet: new Set(),
-    foundBonus: new Set(),
-    mistakes: 0, hints: 0, streak: 0, earned: 0,
-    sel: [], targeting: false, done: false,
-    timeAttack: true,
-  };
-  setG(G);
+  const { initState, getState } = await import("./state.js");
+  initState(lv, { timeAttack: true });
 
   document.getElementById("lvl-num").textContent = (ta.levelIndex + 1) + "/" + ta.pool.length;
   document.getElementById("bonus-count").textContent = "0";
   show("scr-game");
 
-  // wheel + grid
-  const { buildWheel, buildGrid, attachCellHandlers, onBubbleKey } = await import("../game/render.js");
-  const { submitSel, selAdd } = await import("../game/index.js");
-  const { showWordInfo } = await import("../game/reward.js");
+  const G = getState();
+  if (!G) return;
 
-  buildWheel(lv.letters.slice(), (e, el) => onBubbleKey(e, el, selAdd, submitSel));
+  // wheel + grid
+  const { buildWheel, buildGrid, attachCellHandlers, onBubbleKey, fillCell } = await import("./render.js");
+  const { submitSel, selAdd } = await import("./index.js");
+  const { showWordInfo } = await import("./reward.js");
+
+  buildWheel(lv.letters.slice(), (e, el) => onBubbleKey(e, el, selAdd, () => submitSel()));
   requestAnimationFrame(() => {
     buildGrid();
-    for (const cell of G.cells.values()) {
+    const curG = getState();
+    if (!curG) return;
+    for (const cell of curG.cells.values()) {
       if (!cell.el) continue;
       attachCellHandlers(cell.el, cell, (c) => {
-        // onCellTap — bağımsız implementasyon
-        if (!G.targeting && c.filled) {
-          const w = G.words.find((x) => x.solved && x.cells.includes(c));
+        if (!curG.targeting && c.filled) {
+          const w = curG.words.find((x) => x.solved && x.cells.includes(c));
           if (w) { showWordInfo(w); SFX.pick(0); }
           return;
         }
-        if (!G.targeting) return;
-        G.targeting = false;
+        if (!curG.targeting) return;
+        curG.targeting = false;
         if (S.coins < CFG.targetHintCost) return;
         S.coins -= CFG.targetHintCost;
-        import("../game/render.js").then((m) => m.fillCell(c, true));
-        import("../engine/store.js").then(({ commitG }) => commitG({}));
-        if (typeof updateCoins === "function") updateCoins();
+        fillCell(c, true);
+        updateCoins();
       });
     }
   });

@@ -58,7 +58,7 @@ import { resetWrongRow } from "./state.js";
 /**
  * Seçili balonu sel listesine ekle.
  */
-function selAdd(b) {
+export function selAdd(b) {
   const G = getState();
   if (!G) return;
   G.sel.push(b);
@@ -78,7 +78,7 @@ function selPopLast() {
 }
 
 /** Tüm kelime çözüm mantığı (seçim → hedef eşleşme veya yanlış). */
-function submitSel() {
+export function submitSel() {
   const G = getState();
   if (!G) return;
   const word = G.sel.map((b) => b.letter).join("");
@@ -213,12 +213,15 @@ function checkDone() {
  * Seviyeyi başlat.
  * @param {number} id
  * @param {{ daily?: boolean }} [opts]
+ * @param {object} [lv] - Doğrudan level verisi (test play için)
  */
-export async function startLevel(id, opts = {}) {
-  const lv = await getLevel(id).catch((e) => {
-    console.warn("[game] seviye yüklenemedi:", e);
-    return null;
-  });
+export async function startLevel(id, opts = {}, lv) {
+  if (!lv) {
+    lv = await getLevel(id).catch((e) => {
+      console.warn("[game] seviye yüklenemedi:", e);
+      return null;
+    });
+  }
   if (!lv) { toast("ТӀегӀа ца йеллало 😕"); return; }
 
   initState(lv, opts);
