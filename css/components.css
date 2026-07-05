@@ -6,6 +6,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, .node:focus-visible,
 }
 button:active:not(#shuffle){transform:scale(.95)}
 
+/* Skip link: klavye kullanıcıları için ana içeriğe atlama */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 9999;
+  background: var(--gold);
+  color: #0e2a3f;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
 /* ---------- HOME ---------- */
 #scr-home{align-items:center;justify-content:center;gap:18px;padding:24px}
 .tower{width:min(17vw,76px);height:auto;
@@ -559,3 +580,64 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .icon-btn .lb{font-size:9.5px}
 }
 
+
+/* ---------- TIME ATTACK ---------- */
+.ta-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.55);
+  padding: 6px 12px;
+  border-radius: 999px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--gold);
+  z-index: 5;
+  pointer-events: none;
+}
+.ta-time {
+  position: relative;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold) var(--p, 100%), rgba(255,255,255,.15) var(--p, 100%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.ta-time::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  width: var(--p, 100%);
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.2s;
+}
+.ta-score { color: #fff; }
+
+.ta-lb {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ta-lb-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 60px 80px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.ta-lb-new {
+  background: rgba(242,181,61,.18);
+  border-left: 3px solid var(--gold);
+  padding-left: 6px;
+}
+.ta-lb-rank { color: var(--gold); font-weight: 700; }
+.ta-lb-score { font-weight: 700; }
+.ta-lb-words, .ta-lb-date { color: rgba(255,255,255,.7); font-size: 12px; }
