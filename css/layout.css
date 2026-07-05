@@ -46,3 +46,18 @@ main{perspective:1100px}
 .screen.st.on>*:nth-child(4){animation-delay:.22s}
 .screen.st.on>*:nth-child(5){animation-delay:.30s}
 .screen.st.on>*:nth-child(6){animation-delay:.38s}
+
+/* ================================================================
+   MOBİL PERFORMANS — dokunmatik cihazlarda ağır CSS efektlerini kaldır
+   ================================================================ */
+@media (pointer:coarse){
+  /* Ken Burns animasyonu mobil GPU'da gereksiz yük — statik fotoğraf yeterli */
+  #photo .ph.on{animation:none}
+  /* 3D CSS transformlar (translateZ/rotateX) gereksiz compositing layer oluşturur */
+  .screen{transform:translateY(26px)}
+  .screen.on{transform:none}
+  /* vinyet overlay kaldır */
+  body::after{display:none}
+  /* perspective bile 3D compositing layer oluşturabilir */
+  main{perspective:none}
+}

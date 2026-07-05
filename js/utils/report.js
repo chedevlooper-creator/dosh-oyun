@@ -94,7 +94,10 @@ async function _capture(err, context, where) {
 export function getConsent() { return userConsented(); }
 export function setConsent(on) {
   try {
-    if (on) localStorage.setItem("dosh-consent", "1");
+    if (on) {
+      localStorage.setItem("dosh-consent", "1");
+      if (DSN) ensureSentry(); // consent verilince Sentry lazy-load başlat
+    }
     else localStorage.removeItem("dosh-consent");
   } catch {}
 }
@@ -108,6 +111,6 @@ export function installGlobalHandler() {
   globalThis.addEventListener("error", (e) => reportError(e.error || e.message, { where: "window.error" }));
   globalThis.addEventListener("unhandledrejection", (e) => reportError(e.reason, { where: "unhandledrejection" }));
 
-  // Sentry arka planda yüklenir
-  if (DSN) ensureSentry();
+  // Sentry sadece kullanıcı izin verirse yüklenir (lazy)
+  // consent sonradan setConsent(true) ile verilirse ensureSentry tetiklenir
 }

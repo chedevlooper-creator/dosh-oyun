@@ -748,24 +748,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
    MOBİL PERFORMANS — dokunmatik cihazlarda ağır CSS efektlerini hafiflet
    ================================================================ */
 @media (pointer:coarse){
-  /* backdrop-filter mobil GPU'da çok pahalı -> blur'ları düşür/kaldır */
-  #wheel{backdrop-filter:blur(3px)}
-  .glass{backdrop-filter:blur(8px) saturate(1.2)}
-  .toolrow{backdrop-filter:blur(6px)}
-  #preview .cap{backdrop-filter:blur(4px)}
-  #toast{backdrop-filter:blur(6px)}
-  #veil{backdrop-filter:blur(2px)}
+  /* backdrop-filter mobil GPU'da çok pahalı -> mobile'da tamamen kaldır */
+  #wheel{backdrop-filter:none}
+  .glass{backdrop-filter:none}
+  .toolrow{backdrop-filter:none}
+  #preview .cap{backdrop-filter:none}
+  #toast{backdrop-filter:none}
+  #veil{backdrop-filter:none}
   .cell{backdrop-filter:none}
-  /* çoklu drop-shadow her frame'de gölge hesaplar -> tek drop-shadow yeter */
-  .bub{box-shadow:0 4px 10px rgba(0,0,0,.4),inset 0 -2px 5px rgba(150,124,70,.25),inset 0 1px 2px #fffdf4}
-  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55)) drop-shadow(0 8px 20px rgba(0,0,0,.35))}
-  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) drop-shadow(0 0 14px rgba(242,181,61,.3))}
-  .btn{box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 24px rgba(0,0,0,.25),0 0 14px rgba(242,181,61,.3)}
-  /* z-fighting: 3D rotate küçült */
+  /* ---------- P1: sonsuz animasyonları kaldır ---------- */
+  .logo{animation:float 4s ease-in-out infinite}
+  #btn-start{animation:none}
+  #wheel::before{animation:none;opacity:.15}
+  .hero::before{animation:none}
+  .tool .price{animation:none}
+  .tdot.on{animation:none}
+  .progressbar::after{animation:none}
+  .glow-sweep::before{animation:none}
+  .stars-row::before{animation:none}
+  .sun{animation:none}
+  /* ---------- P1: drop-shadow katmanlarını azalt ---------- */
+  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
+  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55))}
+  .btn{box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 24px rgba(0,0,0,.25)}
+  .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
+  .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 12px rgba(214,137,16,.35)}
+  /* 3D rotate küçült */
   #wheel{transform:rotateX(6deg)}
   .panel{transform:rotateX(6deg) scale(.88) translateY(20px)}
-  /* daha az katmanlı gölge */
-  #wheel::before{opacity:.2;animation-duration:20s}
   /* kartal wing çırpma -> yumuşak (smooth anim zaten) */
 }
 /* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */

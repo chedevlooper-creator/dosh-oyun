@@ -4,7 +4,7 @@
    ---------------------------------------------------------------
    S (kalici kayit) ve G (aktif oyun durumu) bu modulden okunur.
    Dogrudan atama (S.coins += 5) otomatik commit tetikler ve:
-     1. save()'i debounce eder (300ms)
+     1. save()'i debounce eder (1000ms — mobilde localStorage yazma sıklığını azalt)
      2. 3D sahnenin retheme()'ini tetikler (tema degisikliginde)
      3. bonus merge'i atomik yapar
    API: commitS(patch), commitG(patch), resetG(), resetS()
@@ -39,7 +39,7 @@ function scheduleSave(){
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(()=>{
     try{ save(); }catch(e){ console.error("[store] save failed:", e); }
-  }, 300);
+  }, 1000);
 }
 
 /* ---------- Proxy ---------- */

@@ -18,10 +18,12 @@ export function show(scr){
   $(scr).setAttribute("aria-hidden","false");
   $(scr).inert = false;
   // 3D sahnenin view()'ı lazy yüklü; dynamic import ile tetikle.
-  // Sahne yüklü değilse hata yutulur (kullanıcı deneyimi etkilenmez).
-  import("../fx/scene3d.js").then((m) => {
-    try { m.GL.view(scr); } catch {}
-  }).catch(() => {});
+  // 3D kapalıysa veya reduce-motion açıksa import'u atla (gereksiz chunk yükleme)
+  if (S.settings.scene3d !== false && !prefersReducedMotion()) {
+    import("../fx/scene3d.js").then((m) => {
+      try { m.GL.view(scr); } catch {}
+    }).catch(() => {});
+  }
 }
 let toastTimer = 0;
 export function toast(msg, cls=""){

@@ -318,7 +318,14 @@ export const GL = (() => {
     }catch{ composer = null; }
     resize(); retheme();
     onResize(resize);
-    addEventListener("pointermove", e => { tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5; }, { passive:true });
+    // pointermove throttle: anim loop zaten 30fps, 16ms throttle yeterli
+    let lastPM = 0;
+    addEventListener("pointermove", e => {
+      const now = performance.now();
+      if (now - lastPM < 16) return;
+      lastPM = now;
+      tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5;
+    }, { passive:true });
     document.body.classList.add("gl-on");
     let last = 0, paused = false;
     document.addEventListener("visibilitychange", ()=>{ paused = document.hidden; });
