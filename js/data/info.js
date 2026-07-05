@@ -181,6 +181,19 @@ export const INFO = {
   "лела":     { ce: "лела, леха",                    tr: "dolaşmak",               tags: ["action"] },
   "вер":       { ce: "вер, лар",                       tr: "yıl",                    tags: ["time"] },
   "ле":        { ce: "ле, ирс",                       tr: "dağ",                    tags: ["nature"] },
+  "апельсин":  { ce: "апельсин, маца",                 tr: "portakal",               tags: ["food"] },
+  "артист":    { ce: "артист, белха",                  tr: "sanatçı",                tags: ["abstract"] },
+  "кофе":      { ce: "кофе, хь",                      tr: "kahve",                  tags: ["food"] },
+  "книга":     { ce: "книга, де",                     tr: "kitap",                  tags: ["language"] },
+  "кино":      { ce: "кино, сурт",                    tr: "sinema",                 tags: ["abstract"] },
+  "бугӀа":     { ce: "бугӀа, эса",                    tr: "öküz",                   tags: ["animal"] },
+  "лаьхьа":    { ce: "лаьхьа, дин",                   tr: "yılan",                  tags: ["animal"] },
+  "уста":      { ce: "уста, белха",                   tr: "usta, usta",             tags: ["abstract"] },
+  "мостагӀ":   { ce: "мостагӀ, накъост",              tr: "düşman",                 tags: ["abstract"] },
+  "цӀе":       { ce: "цӀе, дош",                     tr: "isim, ad",               tags: ["language"] },
+  "жопа":      { ce: "жопа, кхета",                   tr: "şaka",                   tags: ["abstract"] },
+  "чӀирса":    { ce: "чӀирса, кх",                    tr: "yel, esinti",            tags: ["weather"] },
+  "аьхке":     { ce: "аьхке, м",                     tr: "yaz (mevsim)",           tags: ["time"] },
 };
 
 /* ================= ESKİ UYUMLULUK =================

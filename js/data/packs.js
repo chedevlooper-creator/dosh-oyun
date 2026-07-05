@@ -75,6 +75,17 @@ export const PACKS = [
     },
     theme: "forest",
   },
+  {
+    id: 7,
+    title: { ce: "КХО — Ойла", tr: "Düşün", ru: "Думай" },
+    subtitle: { ce: "Ойланаш, дошнаш, цӀераш", tr: "Düşünceler, sözler, isimler", ru: "Мысли, слова, имена" },
+    intro: {
+      ce: "Ойланийн дешнаш — оьрсийн а, мел а.",
+      tr: "Düşüncenin kelimelerini — sadece ve derin.",
+      ru: "Слова размышлений — ясные и глубокие.",
+    },
+    theme: "winter",
+  },
 ];
 
 export function packFor(packId) {
