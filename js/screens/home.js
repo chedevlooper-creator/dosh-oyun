@@ -13,6 +13,8 @@ import { openDict } from "./dict.js";
 import { confetti } from "../fx/particles.js";
 import { dailyLevelId, isDailyDone, currentStreak } from "../engine/daily.js";
 import { startLevel } from "./game.js";
+import { startTimeAttack } from "../game/time-attack.js";
+import { loadAllLevels } from "../data/level-loader.js";
 
 /* ================= ANA EKRAN ================= */
 export function renderHome(){
@@ -57,4 +59,8 @@ $("btn-daily").onclick = ()=>{
 $("btn-settings").onclick = ()=>openSettings();
 $("btn-stats").onclick = ()=>openStats();
 $("btn-dict").onclick = ()=>openDict();
+$("btn-timeattack").onclick = () => {
+  ac(); SFX.coin();
+  loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
+};
 
