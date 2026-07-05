@@ -641,3 +641,105 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
 .ta-lb-rank { color: var(--gold); font-weight: 700; }
 .ta-lb-score { font-weight: 700; }
 .ta-lb-words, .ta-lb-date { color: rgba(255,255,255,.7); font-size: 12px; }
+
+/* ---------- SÖZLÜK (Archive) ---------- */
+.dict-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 4px;
+  font-size: 13px;
+  color: rgba(255,255,255,.85);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  margin-bottom: 8px;
+}
+.dict-stats span b { color: var(--gold); font-weight: 700; }
+
+.dict-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.dict-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+}
+.dict-toggle input { accent-color: var(--gold); }
+
+.dict-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+.dict-tag-btn {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.7);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.dict-tag-btn.on {
+  background: var(--gold);
+  color: #0e2a3f;
+  font-weight: 600;
+}
+
+.dict-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+.dict-badge {
+  display: inline-block;
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  margin-left: 4px;
+}
+.dict-badge-found {
+  color: #5dff8c;
+  font-weight: 700;
+}
+
+.dict-ipa {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--gold);
+  margin-left: 6px;
+  font-style: italic;
+}
+
+.dict-tag {
+  display: inline-block;
+  font-size: 10px;
+  background: rgba(242,181,61,.15);
+  color: var(--gold);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.dict-ex {
+  font-style: italic;
+  color: rgba(255,255,255,.6);
+  font-size: 12px;
+  margin: 2px 0;
+  padding-left: 8px;
+  border-left: 2px solid rgba(242,181,61,.3);
+}
+
+.dict-miss a {
+  color: var(--gold);
+  text-decoration: underline;
+  font-size: 12px;
+}
