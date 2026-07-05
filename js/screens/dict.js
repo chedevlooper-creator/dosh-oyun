@@ -6,6 +6,7 @@ import { openPanel, closePanel } from "./panel.js";
 import { $ } from "../utils/helpers.js";
 import { openFeedback } from "./feedback.js";
 import { t } from "../utils/i18n.js";
+import { speak } from "../utils/tts.js";
 
 /* ================= SÖZLÜK ================= */
 
@@ -32,6 +33,7 @@ export function openDict(){
       return `<div class="dict-item">
         <button class="dict-fb" data-w="${w}" aria-label="✍️ ${dispG(w)}">✍️</button>
         <div class="w">${dispG(w)}</div>
+        <button class="dict-speak" data-w="${w}" aria-label="${t("tts.speakLabel")}">🔊</button>
         ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
         ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
         ${miss}
@@ -47,8 +49,11 @@ export function openDict(){
   $("dict-q").addEventListener("input", e=>{ $("dict-list").innerHTML = render(e.target.value); });
   // kelimeye özel geri bildirim (delegasyon: liste aramada yeniden çizilir)
   $("dict-list").addEventListener("click", e=>{
-    const b = /** @type {HTMLElement} */(e.target).closest?.(".dict-fb");
-    if(b) openFeedback({ word: b.dataset.w, type: "fix" });
+    const target = /** @type {HTMLElement} */(e.target);
+    const fb = target.closest?.(".dict-fb");
+    if (fb) { openFeedback({ word: fb.dataset.w, type: "fix" }); return; }
+    const sp = target.closest?.(".dict-speak");
+    if (sp) speak(sp.dataset.w, S.settings.lang);
   });
   $("dc-close").onclick = closePanel;
 }

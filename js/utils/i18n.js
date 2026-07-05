@@ -98,6 +98,17 @@ const translations = {
     "settings.resetMsg": "Массо а хаамаш дӀадаха?",
     "settings.resetNo": "ХӀан-хӀа",
     "settings.resetYes": "ХӀаъ, юхадаккха",
+    "settings.tts": "Дош дойзуш 🔊",
+    "settings.hc": "Юкъара хийцамаш 🔳",
+    "tts.speakLabel": "Дош дойзу",
+    "tts.browser": "Браузер",
+    "tts.audio": "Аудио",
+    "tts.off": "ДӀаса",
+    "ta.title": "Хандехьа меттах ⏱",
+    "ta.desc": "60 секунд. Мацан дешнаш лаха?",
+    "ta.end": "Декъал! {0} очко, {1} дош 🎉",
+    "ta.retry": "Цхьа хӀума",
+    "ta.home": "ТӀех",
     // Rehber (Tutorial)
     "tut.0.title": "Дош ойлане!",
     "tut.0.body": "Харфаш харжа, дешнаш лаха.",
@@ -203,6 +214,17 @@ const translations = {
     "tut.3.btn": "Начать игру!",
     "tut.skip": "Пропустить",
     "panel.close": "Закрыть",
+    "settings.tts": "Озвучка 🔊",
+    "settings.hc": "Высокий контраст 🔳",
+    "tts.speakLabel": "Озвучить",
+    "tts.browser": "Браузер",
+    "tts.audio": "Только аудио",
+    "tts.off": "Выкл",
+    "ta.title": "На время ⏱",
+    "ta.desc": "60 секунд. Сколько слов найдёте?",
+    "ta.end": "Готово! {0} очков, {1} слов 🎉",
+    "ta.retry": "Ещё раз",
+    "ta.home": "На главную",
   },
   tr: {
     // Türkçe örnek çeviriler (diaspora için)
@@ -278,6 +300,17 @@ const translations = {
     "settings.resetMsg": "Tüm ilerleme silinsin mi?",
     "settings.resetNo": "Hayır",
     "settings.resetYes": "Evet, sil",
+    "settings.tts": "Sesli okuma 🔊",
+    "settings.hc": "Yüksek kontrast 🔳",
+    "tts.speakLabel": "Sesli oku",
+    "tts.browser": "Tarayıcı",
+    "tts.audio": "Sadece ses",
+    "tts.off": "Kapalı",
+    "ta.title": "Zamana Karşı ⏱",
+    "ta.desc": "60 saniye. Kaç kelime bulabilirsin?",
+    "ta.end": "Bitti! {0} puan, {1} kelime 🎉",
+    "ta.retry": "Tekrar",
+    "ta.home": "Ana sayfa",
     "tut.0.title": "Dosh — başlayalım!",
     "tut.0.body": "Harfleri seç, kelimeleri bul.",
     "tut.0.btn": "Başla!",
@@ -324,11 +357,16 @@ export function getLanguages() {
 
 export function setLanguage(code) {
   if (translations[code]) {
+    const prev = S.settings.lang;
     commitSettings({ lang: code });
     if (typeof document !== "undefined") {
       document.documentElement.lang = code;
       document.documentElement.dir = DIR_MAP[code] || "ltr";
     }
+    // Analytics: dil değişimi
+    import("./analytics.js").then(({ track, EVENTS }) => {
+      if (prev !== code) track(EVENTS.LANG_CHANGE, { from: prev, to: code });
+    }).catch(() => { /* analytics yoksa sessizce geç */ });
     location.reload();
   }
 }
