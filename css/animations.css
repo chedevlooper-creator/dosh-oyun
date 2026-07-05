@@ -65,15 +65,6 @@
 /* Glow sweep: parlama dalgası */
 @keyframes glowSweep{0%{transform:translateX(-100%) skewX(-20deg)}100%{transform:translateX(200%) skewX(-20deg)}}
 
-/* Hareket azaltma tercihi: tüm animasyon/geçişleri sustur (WCAG 2.3.3) */
-@media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{
-    animation-duration:.001ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;
-  }
-}
-
 /* ---------- UYGULANABILIR YARDIMCI SINIFLAR ---------- */
 .press:active{animation:pressBounce .25s ease-out}
 .flash-glow{animation:flashGlow .6s ease-out}
@@ -83,3 +74,16 @@
 .glow-sweep{position:relative;overflow:hidden}
 .glow-sweep::before{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:glowSweep 2.5s ease-in-out infinite;pointer-events:none}
 .bounce-in{animation:bounceIn .45s cubic-bezier(.34,1.56,.64,1) backwards}
+
+
+/* Reduced motion: tüm animasyonları en aza indir veya kapat */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -5,7 +5,7 @@ import { t } from "../utils/i18n.js";
 /* ================= PANEL (modal) ================= */
 let lastFocus = null;
 export function openPanel(html){
-  lastFocus = document.activeElement;
+  if(!$("veil").classList.contains("on")) lastFocus = document.activeElement;
   $("panel").innerHTML = html;
   // Her panele köşe kapatma butonu
   const x = document.createElement("button");

@@ -6,15 +6,16 @@ import { onResize } from "../utils/resize.js";
 
 const fx = document.getElementById("fx");
 const fctx = fx ? fx.getContext("2d") : null;
-let parts = [];
+const parts = [];
 let raf = 0;
 let lastDrawn = 0;
 
 function fxSize() {
   if (!fx || !fctx) return;
-  fx.width = innerWidth * devicePixelRatio;
-  fx.height = innerHeight * devicePixelRatio;
-  fctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  const dpr = Math.min(devicePixelRatio, 2);
+  fx.width = innerWidth * dpr;
+  fx.height = innerHeight * dpr;
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 onResize(fxSize);
 
@@ -54,7 +55,11 @@ function ensureLoop() {
     if (t - last < 16) { raf = requestAnimationFrame(step); return; }
     last = t; lastDrawn = t;
     fctx.clearRect(0, 0, innerWidth, innerHeight);
-    parts = parts.filter(p => p.a > 0.02 && p.y < innerHeight + 30);
+    let wi = 0;
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i].a > 0.02 && parts[i].y < innerHeight + 30) parts[wi++] = parts[i];
+    }
+    parts.length = wi;
     for (const p of parts) {
       p.x += p.vx; p.y += p.vy; p.vy += p.g;
       p.rot += p.vr; p.a -= 0.004;

@@ -6,6 +6,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, .node:focus-visible,
 }
 button:active:not(#shuffle){transform:scale(.95)}
 
+/* Skip link: klavye kullanıcıları için ana içeriğe atlama */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 9999;
+  background: var(--gold);
+  color: #0e2a3f;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
 /* ---------- HOME ---------- */
 #scr-home{align-items:center;justify-content:center;gap:18px;padding:24px}
 .tower{width:min(17vw,76px);height:auto;
@@ -96,14 +117,14 @@ button:active:not(#shuffle){transform:scale(.95)}
 .gtop{display:flex;align-items:center;gap:8px;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top))}
 .gtop .lvl{flex:1;text-align:center;font-weight:800;font-size:18px}
 .gtop .lvl small{display:block;font-weight:500;font-size:11px;color:var(--ink2);letter-spacing:.12em}
-.rbtn{width:42px;height:42px;border-radius:13px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.rbtn{width:44px;height:44px;border-radius:13px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.22)}
 .rbtn .ri{width:20px;height:20px;color:var(--ink)}
 /* Fazla dikey boşluk grid ve çark arasında paylaşılır (uzun ekranlarda denge) */
 #grid-wrap{flex:3 1 0;max-height:48vh;display:flex;align-items:center;justify-content:center;padding:6px 12px;min-height:0}
 #grid{position:relative}
 .cell{position:absolute;border-radius:22%;background:var(--cell);border:1.5px solid var(--cell-b);
   display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--cell-ink);
-  transition:background .25s,transform .25s;backdrop-filter:blur(2px)}
+  transition:background .25s,transform .25s;backdrop-filter:blur(2px);will-change:transform}
 .cell.fill{background:var(--cell-fill);border-color:transparent;animation:pop .38s cubic-bezier(.34,1.56,.64,1)}
 .cell.hintfill{background:var(--cell-hint)}
 .cell.target{cursor:pointer;animation:targetBlink .8s infinite}
@@ -148,7 +169,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 #wheel svg polyline{fill:none;stroke:var(--gold);stroke-width:11;stroke-linecap:round;stroke-linejoin:round;opacity:.95;filter:drop-shadow(0 2px 5px rgba(0,0,0,.4))}
 .bub{position:absolute;border-radius:50%;background:var(--bubble);color:var(--bubble-ink);
   display:flex;align-items:center;justify-content:center;font-weight:800;
-  box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s}
+  box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s;will-change:transform}
 .bub.sel{background:var(--sel);color:var(--sel-ink);transform:scale(1.14)}
 #shuffle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;z-index:2;
   border-radius:50%;background:rgba(247,241,222,.10);border:1.5px solid rgba(242,181,61,.45);
@@ -185,7 +206,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .panel .btnrow{display:flex;gap:10px;margin-top:20px;justify-content:center}
 .opt-row{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.08);font-size:16px}
 .theme-dots{display:flex;gap:8px;flex-wrap:wrap}
-.tdot{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.tdot{width:44px;height:44px;border-radius:50%;border:2.5px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .tdot.on{border-color:#fff;transform:scale(1.12)}
 .toggle{width:54px;height:30px;border-radius:999px;background:rgba(255,255,255,.18);position:relative;transition:background .2s}
 .toggle::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:inset-inline-start .2s}
@@ -329,7 +350,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .btn.danger{color:var(--danger)}
 .btn.danger .o-ic{color:var(--danger)}
 /* Panel köşe kapatma butonu */
-.panel-x{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border-radius:12px;
+.panel-x{position:absolute;top:14px;inset-inline-end:14px;width:44px;height:44px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;color:var(--ink2);
   background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);transition:color .15s,background .15s}
 .panel-x:hover{color:var(--ink);background:rgba(255,255,255,.13)}
@@ -559,3 +580,209 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .icon-btn .lb{font-size:9.5px}
 }
 
+
+/* ---------- TIME ATTACK ---------- */
+.ta-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.55);
+  padding: 6px 12px;
+  border-radius: 999px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--gold);
+  z-index: 5;
+  pointer-events: none;
+}
+.ta-time {
+  position: relative;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold) var(--p, 100%), rgba(255,255,255,.15) var(--p, 100%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.ta-time::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  width: var(--p, 100%);
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.2s;
+}
+.ta-score { color: #fff; }
+
+.ta-lb {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ta-lb-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 60px 80px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.ta-lb-new {
+  background: rgba(242,181,61,.18);
+  border-left: 3px solid var(--gold);
+  padding-left: 6px;
+}
+.ta-lb-rank { color: var(--gold); font-weight: 700; }
+.ta-lb-score { font-weight: 700; }
+.ta-lb-words, .ta-lb-date { color: rgba(255,255,255,.7); font-size: 12px; }
+
+/* ---------- SÖZLÜK (Archive) ---------- */
+.dict-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 4px;
+  font-size: 13px;
+  color: rgba(255,255,255,.85);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  margin-bottom: 8px;
+}
+.dict-stats span b { color: var(--gold); font-weight: 700; }
+
+.dict-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.dict-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+}
+.dict-toggle input { accent-color: var(--gold); }
+
+.dict-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+.dict-tag-btn {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.7);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.dict-tag-btn.on {
+  background: var(--gold);
+  color: #0e2a3f;
+  font-weight: 600;
+}
+
+.dict-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+.dict-badge {
+  display: inline-block;
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  margin-left: 4px;
+}
+.dict-badge-found {
+  color: #5dff8c;
+  font-weight: 700;
+}
+
+.dict-ipa {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--gold);
+  margin-left: 6px;
+  font-style: italic;
+}
+
+.dict-tag {
+  display: inline-block;
+  font-size: 10px;
+  background: rgba(242,181,61,.15);
+  color: var(--gold);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.dict-ex {
+  font-style: italic;
+  color: rgba(255,255,255,.6);
+  font-size: 12px;
+  margin: 2px 0;
+  padding-left: 8px;
+  border-left: 2px solid rgba(242,181,61,.3);
+}
+
+.dict-miss a {
+  color: var(--gold);
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+/* ================================================================
+   MOBİL PERFORMANS — dokunmatik cihazlarda ağır CSS efektlerini hafiflet
+   ================================================================ */
+@media (pointer:coarse){
+  /* backdrop-filter mobil GPU'da çok pahalı -> mobile'da tamamen kaldır */
+  #wheel{backdrop-filter:none}
+  .glass{backdrop-filter:none}
+  .toolrow{backdrop-filter:none}
+  #preview .cap{backdrop-filter:none}
+  #toast{backdrop-filter:none}
+  #veil{backdrop-filter:none}
+  .cell{backdrop-filter:none}
+  /* ---------- P1: sonsuz animasyonları kaldır ---------- */
+  .logo{animation:float 4s ease-in-out infinite}
+  #btn-start{animation:none}
+  #wheel::before{animation:none;opacity:.15}
+  .hero::before{animation:none}
+  .tool .price{animation:none}
+  .tdot.on{animation:none}
+  .progressbar::after{animation:none}
+  .glow-sweep::before{animation:none}
+  .stars-row::before{animation:none}
+  .sun{animation:none}
+  /* ---------- P1: drop-shadow katmanlarını azalt ---------- */
+  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
+  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55))}
+  .btn{box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 24px rgba(0,0,0,.25)}
+  .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
+  .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 12px rgba(214,137,16,.35)}
+  /* 3D rotate küçült */
+  #wheel{transform:rotateX(6deg)}
+  .panel{transform:rotateX(6deg) scale(.88) translateY(20px)}
+  /* kartal wing çırpma -> yumuşak (smooth anim zaten) */
+}
+/* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */
+@media (pointer:coarse) and (max-width:480px){
+  .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
+  .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 14px rgba(214,137,16,.4),inset 0 -2px 5px rgba(140,90,0,.35)}
+  #wheel svg polyline{stroke-width:8;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3))}
+  .tool{min-height:68px}
+  #preview .cap{padding:7px 14px;font-size:18px}
+}

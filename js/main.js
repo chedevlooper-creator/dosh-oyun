@@ -2,15 +2,12 @@
 import { applyTheme } from "./engine/theme.js";
 import { renderHome } from "./screens/home.js";
 import { show, $, initSplashParticles, hapticTap, prefersReducedMotion } from "./utils/helpers.js";
-import { onResize } from "./utils/resize.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { load } from "./engine/save.js";
-import { G, setOnThemeChange, S } from "./engine/store.js";
-import { buildGrid, fillCell, initGameScreens, startLevel } from "./screens/game.js";
+import { setOnThemeChange, S } from "./engine/store.js";
+import { initGameScreens, startLevel } from "./screens/game.js";
 import { getDir } from "./utils/i18n.js";
 import { installGlobalHandler } from "./utils/report.js";
-
-installGlobalHandler();
 
 "use strict";
 
@@ -72,6 +69,20 @@ if (urlParams.get("daily") === "1") {
   }).catch(() => {});
 }
 
+// Editor test play: /?playtest=1
+if (urlParams.get("playtest") === "1") {
+  try {
+    const raw = localStorage.getItem("editor-test-level");
+    if (raw) {
+      const lv = JSON.parse(raw);
+      localStorage.removeItem("editor-test-level");
+      // Disable 3D for test play to avoid unnecessary load
+      S.settings.scene3d = false;
+      setTimeout(() => startLevel(lv.id || 0, {}, lv), 100);
+    }
+  } catch (e) { console.warn("[playtest]", e); }
+}
+
 // 3D sahne: scene3d setting false ise hiç yükleme; OS "hareket azalt"
 // diyorsa da atla (statik fotoğraf arka plan yeterli) — aksi halde idle'da başlat
 if (S.settings.scene3d !== false && !prefersReducedMotion()) {
@@ -109,11 +120,4 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   registerSW({ immediate: true });
 }
 
-// Grid'i yeniden boyutlandırmada yeniden inşa et
-onResize(() => {
-  if (G && $("scr-game") && $("scr-game").classList.contains("on")) {
-    const filled = [...G.cells.values()].filter(c => c.filled);
-    buildGrid();
-    filled.forEach(c => { c.filled = false; fillCell(c, c.hint); });
-  }
-});
+// Grid resize: game/index.js'deki tek handler kullanılıyor

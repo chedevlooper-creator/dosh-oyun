@@ -99,8 +99,103 @@ test("geri bildirim paneli: tür/kelime/mesaj bağlantılara işlenir", async ({
   expect(mail).toContain(encodeURIComponent("test mesajı"));
 });
 
-test("sözlük paneli boş durumu gösterir", async ({ page }) => {
+test("sözlük paneli tüm kelimeleri gösterir", async ({ page }) => {
   await page.click("#btn-dict");
   await expect(page.locator("#panel h2")).toContainText("Дошам");
-  await expect(page.locator(".empty-state")).toBeVisible();
+  // INFO verisi yüklü olduğu için boş durum gösterilmez
+  await expect(page.locator("#panel .dict-item").first()).toBeVisible({ timeout: 5000 });
+});
+
+/* ================= ADIM 7: GENİŞLETİLMİŞ E2E TESTS ================= */
+
+test.describe("time attack", () => {
+  test("başlatılır ve zaman çubuğu görünür", async ({ page }) => {
+    await page.click("#btn-timeattack");
+    await expect(page.locator("#scr-game")).toHaveClass(/on/);
+    await expect(page.locator("#ta-bar")).toBeVisible();
+    // TA'de lvl-progress gösterilmez; lvl-num seviye sayacını gösterir
+    await expect(page.locator("#lvl-num")).not.toBeEmpty();
+  });
+});
+
+test.describe("hints", () => {
+  test("harf ipucu bir hücreyi doldurur", async ({ page }) => {
+    await page.click("#btn-start");
+    await page.locator(".node.cur").click();
+    await expect(page.locator("#scr-game")).toHaveClass(/on/);
+    await page.click("#hint-letter");
+    await expect(page.locator(".cell.fill").first()).toBeVisible();
+    await expect(page.locator(".cell.hintfill").first()).toBeVisible();
+  });
+
+  test("hedef ipucu tıklanan hücreyi doldurur", async ({ page }) => {
+    await page.click("#btn-start");
+    await page.locator(".node.cur").click();
+    await page.click("#hint-target");
+    await expect(page.locator(".cell.target").first()).toBeVisible();
+    await page.locator(".cell.target").first().click();
+    await expect(page.locator(".cell.fill.hintfill").first()).toBeVisible();
+  });
+
+  test("sihirli değnek 3 hücre doldurur", async ({ page }) => {
+    await page.click("#btn-start");
+    await page.locator(".node.cur").click();
+    await page.click("#hint-wand");
+    await expect(page.locator(".cell.fill")).toHaveCount(3);
+    await expect(page.locator(".cell.hintfill")).toHaveCount(3);
+  });
+});
+
+test.describe("bonus kelime", () => {
+  test("bonus kelime bulunur ve sayaç güncellenir", async ({ page }) => {
+    await page.click("#btn-start");
+    await page.locator(".node.cur").click();
+    await expect(page.locator("#scr-game")).toHaveClass(/on/);
+    // Level 0 bonus: шод — select ш, о, д
+    for (const ch of ["ш", "о", "д"]) {
+      await page.locator(".bub:not(.sel)", { hasText: new RegExp(`^${ch}$`, "iu") }).first().focus();
+      await page.locator(".bub:not(.sel)", { hasText: new RegExp(`^${ch}$`, "iu") }).first().press("Enter");
+    }
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#bonus-count")).toHaveText("1");
+    await expect(page.locator("#toast")).toContainText("Карина бонус");
+  });
+});
+
+test.describe("dil değiştirme", () => {
+  test("dil seçeneği kaydedilir ve sayfa yüklendiğinde okunur", async ({ page }) => {
+    // beforeEach'deki addInitScript lang'i "ce" yapar.
+    // Bu test için ikinci bir initScript ekleyip öncekinin
+    // etkisini geçersiz kılıyoruz (FIFO sırasıyla çalışırlar).
+    await page.addInitScript(([k]) => {
+      const raw = localStorage.getItem(k);
+      if (raw) {
+        const data = JSON.parse(raw);
+        data.settings.lang = "ru";
+        localStorage.setItem(k, JSON.stringify(data));
+      }
+    }, [SAVE_KEY]);
+    await page.goto("/");
+    await page.locator("#splash").click({ force: true }).catch(() => {});
+    const lang = await page.locator("html").getAttribute("lang");
+    expect(lang).toBe("ru");
+  });
+});
+
+test.describe("yıldız", () => {
+  test("seviye 0 hatasız tamamlanınca 3 yıldız", async ({ page }) => {
+    await page.click("#btn-start");
+    await page.locator(".node.cur").click();
+    await expect(page.locator("#scr-game")).toHaveClass(/on/);
+
+    // Kelime 1: дош
+    await playWord(page, ["д", "о", "ш"]);
+    await expect(page.locator("#lvl-progress")).toHaveText("1/2");
+    // Kelime 2: до
+    await playWord(page, ["д", "о"]);
+    // Kutlama paneli + 3 yıldız
+    await expect(page.locator("#panel h2")).toContainText("Декъал");
+    await expect(page.locator("#stars-row")).toBeVisible();
+    await expect(page.locator("#stars-row .lit")).toHaveCount(3);
+  });
 });

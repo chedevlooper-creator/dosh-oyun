@@ -22,3 +22,21 @@ body.theme-winter{
   --card:rgba(30,52,76,.78); --card2:rgba(20,38,58,.9);
   --accent:#7ad0ff; --accent2:#3fa8e0; --gold:#ffd76e;
 }
+
+/* High contrast mode (a11y): body.hc class'ı ile etkinleştirilir */
+body.hc {
+  --gold: #ffd700;
+  --gold-soft: #fff0a0;
+  --ink-1: #ffffff;
+  --ink-2: #f0f0f0;
+  --danger: #ff6666;
+  filter: contrast(1.2);
+}
+body.hc button:focus-visible,
+body.hc a:focus-visible,
+body.hc input:focus-visible,
+body.hc .node:focus-visible,
+body.hc .bub:focus-visible {
+  outline-width: 3px;
+  outline-offset: 3px;
+}

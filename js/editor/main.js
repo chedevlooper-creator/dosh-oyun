@@ -4,6 +4,38 @@
 import { norm, splitG, dispG, DSET } from "../engine/grapheme.js";
 import { loadAllLevels } from "../data/level-loader.js";
 
+/* ================= UNDO / REDO ================= */
+
+const MAX_HISTORY = 50;
+const history = [];
+let historyIndex = -1;
+let _hisDirty = false;
+
+function saveState() {
+  history.splice(historyIndex + 1);
+  const snap = JSON.parse(JSON.stringify(state));
+  history.push(snap);
+  if (history.length > MAX_HISTORY) history.shift();
+  historyIndex = history.length - 1;
+  _hisDirty = false;
+}
+
+function undo() {
+  if (historyIndex <= 0) return;
+  historyIndex--;
+  Object.assign(state, JSON.parse(JSON.stringify(history[historyIndex])));
+  updateAll();
+}
+
+function redo() {
+  if (historyIndex >= history.length - 1) return;
+  historyIndex++;
+  Object.assign(state, JSON.parse(JSON.stringify(history[historyIndex])));
+  updateAll();
+}
+
+function hisTouch() { _hisDirty = true; }
+
 /* ================= STATE ================= */
 
 const state = {
@@ -54,12 +86,12 @@ function renderGrid() {
         input.value = dispG(state.grid[r][c]);
         td.className = state.grid[r][c] ? "filled" : "";
         if (findCellConflicts(r, c).length) td.classList.add("conflict");
-        updateAll();
+        hisTouch(); updateAll();
       });
       input.addEventListener("keydown", (e) => {
         if ((e.key === "Backspace" || e.key === "Delete") && !input.value.length) {
           e.preventDefault();
-          state.grid[r][c] = ""; updateAll();
+          state.grid[r][c] = ""; hisTouch(); updateAll();
           moveTo(r, c - 1);
         }
         if (["ArrowRight","ArrowLeft","ArrowDown","ArrowUp","Enter","Tab"].includes(e.key)) {
@@ -150,7 +182,7 @@ gridTable.addEventListener("click", (e) => {
 
   state.words.push({ word, row: sr, col: sc, dir });
   exitWordDef();
-  updateAll();
+  hisTouch(); updateAll();
   valMsg.textContent = `✅ "${dispG(word)}" eklendi`; valMsg.className = "ok";
 });
 
@@ -200,7 +232,7 @@ function importLevelData(lv) {
   $("lvl-pack").value = state.pack;
   $("grid-rows").value = state.rows;
   $("grid-cols").value = state.cols;
-  updateAll();
+  hisTouch(); updateAll();
 }
 
 /* ================= BONUS ================= */
@@ -211,7 +243,7 @@ $("btn-add-bonus").addEventListener("click", () => {
   if (state.bonus.includes(v)) { valMsg.textContent = "Zaten var!"; valMsg.className = "err"; return; }
   state.bonus.push(v);
   $("bonus-input").value = "";
-  updateAll();
+  hisTouch(); updateAll();
 });
 $("bonus-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btn-add-bonus").click(); });
 
@@ -223,7 +255,7 @@ $("btn-add-extra").addEventListener("click", () => {
     if (p.length === 1 || (p.length === 2 && DSET.has(p))) state.extraLetters.push(p);
   }
   $("extra-input").value = "";
-  updateAll();
+  hisTouch(); updateAll();
 });
 $("extra-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btn-add-extra").click(); });
 
@@ -235,7 +267,7 @@ function renderWords() {
   state.words.forEach((w, i) => {
     const li = document.createElement("li");
     li.innerHTML = `<span class="word-text">${dispG(w.word)}</span> <span class="word-pos">(${w.row},${w.col})</span> <span class="word-dir">${w.dir === "across" ? "→" : "↓"}</span> <span class="del-btn" data-i="${i}">✕</span>`;
-    li.querySelector(".del-btn").onclick = () => { state.words.splice(i,1); updateAll(); };
+    li.querySelector(".del-btn").onclick = () => { hisTouch(); state.words.splice(i,1); updateAll(); };
     list.appendChild(li);
   });
 }
@@ -246,7 +278,7 @@ function renderBonus() {
   state.bonus.forEach((b, i) => {
     const li = document.createElement("li");
     li.innerHTML = `<span class="bonus-word">${dispG(b)}</span> <span class="del-btn" data-i="${i}">✕</span>`;
-    li.querySelector(".del-btn").onclick = () => { state.bonus.splice(i,1); updateAll(); };
+    li.querySelector(".del-btn").onclick = () => { hisTouch(); state.bonus.splice(i,1); updateAll(); };
     list.appendChild(li);
   });
 }
@@ -257,7 +289,7 @@ function renderExtra() {
   state.extraLetters.forEach((e, i) => {
     const li = document.createElement("li");
     li.innerHTML = `<span class="extra-word">${dispG(e)}</span> <span class="del-btn" data-i="${i}">✕</span>`;
-    li.querySelector(".del-btn").onclick = () => { state.extraLetters.splice(i,1); updateAll(); };
+    li.querySelector(".del-btn").onclick = () => { hisTouch(); state.extraLetters.splice(i,1); updateAll(); };
     list.appendChild(li);
   });
 }
@@ -368,6 +400,7 @@ function updateAll() {
   renderWordMarkers();
   $("lvl-id").value = state.id;
   $("lvl-pack").value = state.pack;
+  if (_hisDirty) saveState();
 }
 
 /* ================= EXPORT / IMPORT ================= */
@@ -422,6 +455,31 @@ $("import-file").addEventListener("change", (e) => {
   e.target.value = "";
 });
 
+/* ================= TEST PLAY ================= */
+
+$("btn-playtest").addEventListener("click", () => {
+  const r = validate();
+  if (!r.ok) { valMsg.textContent = "❌ Düzeltilmesi gereken hatalar var. Doğrula butonuna tıkla."; valMsg.className = "err"; return; }
+  const counts = {};
+  for (let r2 = 0; r2 < state.rows; r2++)
+    {for (let c2 = 0; c2 < state.cols; c2++)
+      {if (state.grid[r2][c2]) counts[state.grid[r2][c2]] = (counts[state.grid[r2][c2]] || 0) + 1;}}
+  for (const ch of state.extraLetters) counts[ch] = (counts[ch] || 0) + 1;
+  const pool = [];
+  for (const [ch, n] of Object.entries(counts)) for (let i = 0; i < n; i++) pool.push(ch);
+  const level = {
+    id: state.id,
+    letters: pool,
+    words: state.words.map(w => ({ word: w.word, row: w.row, col: w.col, dir: w.dir })),
+    bonus: state.bonus.length ? [...state.bonus] : [],
+  };
+  if (state.pack > 0) level.pack = state.pack;
+  try { localStorage.setItem("editor-test-level", JSON.stringify(level)); }
+  catch (e) { valMsg.textContent = "❌ Kaydetme hatası: " + e.message; valMsg.className = "err"; return; }
+  valMsg.textContent = "▶ Oyun sekmesinde test seviyesi açılıyor..."; valMsg.className = "ok";
+  window.open("/?playtest=1", "_blank");
+});
+
 /* ================= UI CONTROLS ================= */
 
 $("btn-resize").addEventListener("click", () => {
@@ -429,7 +487,7 @@ $("btn-resize").addEventListener("click", () => {
   const ng = Array.from({ length: rows }, (_, r) =>
     Array.from({ length: cols }, (_c, c) => (state.grid[r] && state.grid[r][c]) || ""));
   state.rows = rows; state.cols = cols; state.grid = ng;
-  exitWordDef(); updateAll();
+  exitWordDef(); hisTouch(); updateAll();
 });
 
 $("btn-clear").addEventListener("click", () => {
@@ -437,7 +495,7 @@ $("btn-clear").addEventListener("click", () => {
   state.words = []; state.bonus = []; state.extraLetters = [];
   exitWordDef();
   initGrid(state.rows, state.cols);
-  updateAll();
+  hisTouch(); updateAll();
   valMsg.textContent = "Temizlendi"; valMsg.className = "";
 });
 
@@ -454,6 +512,9 @@ valMsg.addEventListener("dblclick", () => {
 // Keyboard shortcuts
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && e.key === "E") { e.preventDefault(); exportLevel(); }
+  if (e.ctrlKey && !e.shiftKey && e.key === "z") { e.preventDefault(); undo(); }
+  if (e.ctrlKey && e.shiftKey && e.key === "Z") { e.preventDefault(); redo(); }
+  if (e.ctrlKey && !e.shiftKey && e.key === "y") { e.preventDefault(); redo(); }
   if (e.key === "Escape" && state.wordDefMode) exitWordDef();
 });
 

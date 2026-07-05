@@ -5,11 +5,6 @@ import { CFG } from "../data/config.js";
 import { updateCoins, toast, today, $ } from "../utils/helpers.js";
 import { t } from "../utils/i18n.js";
 import { ac, SFX } from "../engine/audio.js";
-import { tutorial } from "./tutorial.js";
-import { openMap } from "./map.js";
-import { openSettings } from "./settings.js";
-import { openStats } from "./stats.js";
-import { openDict } from "./dict.js";
 import { confetti } from "../fx/particles.js";
 import { dailyLevelId, isDailyDone, currentStreak } from "../engine/daily.js";
 import { startLevel } from "./game.js";
@@ -39,9 +34,13 @@ export function renderHome(){
   const streak = currentStreak();
   $("daily-streak").textContent = dDone ? "✓" + (streak > 1 ? " 🔥" + streak : "") : (streak > 0 ? "🔥" + streak : "");
 }
-$("btn-start").onclick = ()=>{ ac(); SFX.coin();
-  if(!S.tut){ tutorial(); return; }
-  openMap(); };
+$("btn-start").onclick = () => { ac(); SFX.coin();
+  if (!S.tut) {
+    import("./tutorial.js").then(({ tutorial }) => tutorial());
+    return;
+  }
+  import("./map.js").then(({ openMap }) => openMap());
+};
 $("btn-gift").onclick = ()=>{
   if(S.lastGift === today()){ toast("Кхана юха вола 🌙"); return; }
   S.lastGift = today(); S.coins += CFG.dailyGiftCoins; S.stats.coinsEarned += CFG.dailyGiftCoins;
@@ -54,7 +53,16 @@ $("btn-daily").onclick = ()=>{
   if(isDailyDone()){ toast("Кхана юха вола 🌙"); return; }
   startLevel(dailyLevelId(), { daily: true });
 };
-$("btn-settings").onclick = ()=>openSettings();
-$("btn-stats").onclick = ()=>openStats();
-$("btn-dict").onclick = ()=>openDict();
+$("btn-settings").onclick = () => import("./settings.js").then(({ openSettings }) => openSettings());
+$("btn-stats").onclick = () => import("./stats.js").then(({ openStats }) => openStats());
+$("btn-dict").onclick = () => import("./dict.js").then(({ openDict }) => openDict());
+$("btn-timeattack").onclick = () => {
+  ac(); SFX.coin();
+  Promise.all([
+    import("../data/level-loader.js"),
+    import("../game/time-attack.js"),
+  ]).then(([{ loadAllLevels }, { startTimeAttack }]) =>
+    loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0))
+  );
+};
 

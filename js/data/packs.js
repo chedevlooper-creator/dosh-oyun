@@ -64,6 +64,28 @@ export const PACKS = [
     },
     theme: "night",
   },
+  {
+    id: 6,
+    title: { ce: "КХЕТА — Кхиам", tr: "İlerleme", ru: "Прогресс" },
+    subtitle: { ce: "Дешнаш, кхиам, маршо", tr: "Sözler, ilerleme, özgürlük", ru: "Слова, рост, свобода" },
+    intro: {
+      ce: "Кхин дешнаш — кхин кхиам, кхин некъ.",
+      tr: "Daha çok kelime, daha çok ilerleme, yeni yollar.",
+      ru: "Больше слов, больше прогресса, новые пути.",
+    },
+    theme: "forest",
+  },
+  {
+    id: 7,
+    title: { ce: "КХО — Ойла", tr: "Düşün", ru: "Думай" },
+    subtitle: { ce: "Ойланаш, дошнаш, цӀераш", tr: "Düşünceler, sözler, isimler", ru: "Мысли, слова, имена" },
+    intro: {
+      ce: "Ойланийн дешнаш — оьрсийн а, мел а.",
+      tr: "Düşüncenin kelimelerini — sadece ve derin.",
+      ru: "Слова размышлений — ясные и глубокие.",
+    },
+    theme: "winter",
+  },
 ];
 
 export function packFor(packId) {

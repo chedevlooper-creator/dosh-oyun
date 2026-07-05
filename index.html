@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="css/components.css">
 </head>
 <body class="theme-kavkaz">
+<a href="#scr-home" class="skip-link">Skip to main content</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -167,6 +168,7 @@
       <button class="icon-btn glass" id="btn-gift" title="+100"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gift"/></svg></span><span class="lb">Денна</span></button>
       <button class="icon-btn glass" id="btn-dict"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg></span><span class="lb">Дошам</span></button>
       <button class="icon-btn glass" id="btn-stats"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chart"/></svg></span><span class="lb">Статистика</span></button>
+      <button class="icon-btn glass" id="btn-timeattack" aria-label="Zamana Karşı"><span class="ic" aria-hidden="true">⏱</span><span class="lb">⏱ 60s</span></button>
       <button class="icon-btn glass" id="btn-settings"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg></span><span class="lb">Нисдарш</span></button>
     </div>
   </section>
@@ -211,8 +213,8 @@
 </main>
 
 <div id="veil" role="dialog" aria-hidden="true"><div class="panel glass" id="panel" tabindex="-1"></div></div>
-<div id="toast"></div>
-<div id="banner"></div>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="banner" role="status" aria-live="polite"></div>
 <div id="splash">
   <svg class="tower" viewBox="0 0 64 88" aria-hidden="true">
     <rect x="24" y="2"  width="16" height="4"  rx="1.4" fill="#f2b53d"/>

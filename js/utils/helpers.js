@@ -3,8 +3,13 @@ import { S } from "../engine/store.js";
 
 /* ================= YARDIMCILAR ================= */
 export const $ = id => document.getElementById(id);
+let _screens = null;
+function _getScreens() {
+  if (!_screens) _screens = Array.from(document.querySelectorAll(".screen"));
+  return _screens;
+}
 export function show(scr){
-  document.querySelectorAll(".screen").forEach(s=>{
+  _getScreens().forEach(s=>{
     s.classList.remove("on");
     s.setAttribute("aria-hidden","true");
     s.inert = true;
@@ -13,14 +18,17 @@ export function show(scr){
   $(scr).setAttribute("aria-hidden","false");
   $(scr).inert = false;
   // 3D sahnenin view()'ı lazy yüklü; dynamic import ile tetikle.
-  // Sahne yüklü değilse hata yutulur (kullanıcı deneyimi etkilenmez).
-  import("../fx/scene3d.js").then((m) => {
-    try { m.GL.view(scr); } catch {}
-  }).catch(() => {});
+  // 3D kapalıysa veya reduce-motion açıksa import'u atla (gereksiz chunk yükleme)
+  if (S.settings.scene3d !== false && !prefersReducedMotion()) {
+    import("../fx/scene3d.js").then((m) => {
+      try { m.GL.view(scr); } catch {}
+    }).catch(() => {});
+  }
 }
 let toastTimer = 0;
 export function toast(msg, cls=""){
   const t = $("toast"); t.textContent = msg; t.className = "on "+cls;
+  t.role = cls.includes("bad") ? "alert" : "status";
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.className="", 1800);
 }
 

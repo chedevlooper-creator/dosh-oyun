@@ -1,0 +1,83 @@
+name: Content Pipeline (Wiktionary)
+
+on:
+  schedule:
+    # Her Pazartesi 03:00 UTC — Pazar gecesi kuyruğa düşer, Pazartesi sabahı hazır
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (no real fetch)"
+        required: false
+        default: "true"
+
+jobs:
+  fetch:
+    name: Fetch → Validate → Emit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Fetch from Wiktionary
+        id: fetch
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "DRY_RUN=true" >> $GITHUB_OUTPUT
+            node scripts/fetch-wiktionary.mjs --dry-run
+          else
+            echo "DRY_RUN=false" >> $GITHUB_OUTPUT
+            node scripts/fetch-wiktionary.mjs
+          fi
+
+      - name: Validate
+        if: steps.fetch.outputs.DRY_RUN == 'false'
+        run: node scripts/validate-lemmas.mjs
+
+      - name: Emit daily word
+        if: steps.fetch.outputs.DRY_RUN == 'false'
+        run: node scripts/emit-daily-word.mjs
+
+      - name: Open native-speaker review issues
+        if: steps.fetch.outputs.DRY_RUN == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! command -v gh &> /dev/null; then
+            echo "gh CLI bulunamadı, step atlanıyor"
+            exit 0
+          fi
+          node scripts/open-review-issues.mjs --limit 20
+
+      - name: Upload artifacts
+        if: steps.fetch.outputs.DRY_RUN == 'false' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-pipeline-${{ github.run_id }}
+          path: |
+            scripts/cache/*.json
+            js/data/next.json
+          retention-days: 7
+
+      - name: Auto-commit next.json
+        if: steps.fetch.outputs.DRY_RUN == 'false'
+        run: |
+          git config user.name "Dosh Content Bot"
+          git config user.email "chedevlooper-creator@users.noreply.github.com"
+          if git diff --quiet js/data/next.json; then
+            echo "next.json değişmedi, skip commit"
+          else
+            git add js/data/next.json scripts/cache/
+            git commit -m "content: wiktionary pipeline update $(date -u +%Y-%m-%d)"
+            git push
+          fi

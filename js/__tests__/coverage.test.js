@@ -41,8 +41,8 @@ describe("INFO coverage", () => {
   const missingMain = [...main].filter((w) => !infoKeys.has(w));
   const missingAny = [...all].filter((w) => !infoKeys.has(w));
 
-  it("has 126 levels in the source of truth", () => {
-    expect(LEVELS).toHaveLength(126);
+  it("has 176 levels (0-175)", () => {
+    expect(LEVELS).toHaveLength(176);
   });
 
   it("main grid INFO coverage is at least 30% (regression guard)", () => {
