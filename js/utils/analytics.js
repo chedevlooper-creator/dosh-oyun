@@ -12,8 +12,6 @@
  * Vercel Dashboard: Settings → Analytics → Enable
  * Sentry Dashboard: breadcrumbs ve custom data otomatik görünür. */
 
-import * as Sentry from "@sentry/browser";
-
 /** @typedef {string} EventName */
 /** @typedef {Record<string, any>} EventProps */
 
@@ -44,6 +42,33 @@ function ensureVercelLoaded() {
   // Burada ekstra yükleme gerekmiyor; sadece window.va var mı kontrolü.
 }
 
+let _Sentry = null;
+let _sentryLoad = null;
+
+async function _getSentry() {
+  if (_Sentry) return _Sentry;
+  if (_sentryLoad) return _sentryLoad;
+  _sentryLoad = import("@sentry/browser").then((m) => {
+    _Sentry = m;
+    return _Sentry;
+  }).catch(() => { _sentryLoad = null; return null; });
+  return _sentryLoad;
+}
+
+async function _breadcrumb(event, data) {
+  if (!event) return;
+  const Sentry = await _getSentry();
+  if (!Sentry || !Sentry.addBreadcrumb) return;
+  try {
+    Sentry.addBreadcrumb({
+      category: "ui",
+      message: event,
+      data,
+      level: "info",
+    });
+  } catch { /* sentry yoksa sessiz */ }
+}
+
 /**
  * Event yayınla. Vercel Analytics + Sentry breadcrumb.
  * @param {EventName} event
@@ -61,17 +86,8 @@ export function track(event, props = {}) {
     }
   } catch { /* Vercel analytics yoksa sessizce geç */ }
 
-  // Sentry breadcrumb (hata ayıklamada zaman çizgisi)
-  try {
-    if (Sentry && Sentry.addBreadcrumb) {
-      Sentry.addBreadcrumb({
-        category: "ui",
-        message: event,
-        data: safeProps,
-        level: "info",
-      });
-    }
-  } catch { /* Sentry init edilmediyse sessizce geç */ }
+  // Sentry breadcrumb (async — fire-and-forget)
+  _breadcrumb(event, safeProps);
 
   // Konsola debug amaçlı (production'da kapatılabilir, default: kapalı)
   if (globalThis.__ANALYTICS_DEBUG) {

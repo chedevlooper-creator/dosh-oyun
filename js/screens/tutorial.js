@@ -1,10 +1,15 @@
 // @ts-check
 import { S } from "../engine/store.js";
 import { closePanel, openPanel } from "./panel.js";
-import { openMap } from "./map.js";
 import { SFX } from "../engine/audio.js";
 import { $ } from "../utils/helpers.js";
 import { t } from "../utils/i18n.js";
+
+async function _goMap() {
+  closePanel(); S.tut = true;
+  const { openMap } = await import("./map.js");
+  openMap();
+}
 
 /* ================= REHBER (tutorial) ================= */
 export function tutorial(){
@@ -16,13 +21,13 @@ export function tutorial(){
   ];
   let i = 0;
   const step = ()=>{
-    if(i>=steps.length){ closePanel(); S.tut = true; openMap(); return; }
+    if(i>=steps.length){ _goMap(); return; }
     const [tk, bk, btnk] = steps[i];
     openPanel(`<h2>${t(tk)}</h2><p class="center" style="font-size:17px;line-height:1.55">${t(bk)}</p>
       <div class="btnrow"><button class="btn small" id="tut-next">${t(btnk)}</button>
       <button class="btn small ghost" id="tut-skip">${t("tut.skip")}</button></div>`);
     $("tut-next").onclick = ()=>{ SFX.coin(); i++; step(); };
-    $("tut-skip").onclick = ()=>{ closePanel(); S.tut=true; openMap(); };
+    $("tut-skip").onclick = _goMap;
   };
   step();
 }

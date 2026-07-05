@@ -11,10 +11,11 @@ export const PACK_RANGES = [
   {"pack":3,"from":51,"to":75},
   {"pack":4,"from":76,"to":100},
   {"pack":5,"from":101,"to":125},
+  {"pack":6,"from":126,"to":150},
 ];
 
-export const LEVEL_COUNT = 126;
-export const LAST_LEVEL_ID = 125;
+export const LEVEL_COUNT = 151;
+export const LAST_LEVEL_ID = 150;
 
 /** @param {number} id @returns {number|null} */
 export function packOfLevel(id) {

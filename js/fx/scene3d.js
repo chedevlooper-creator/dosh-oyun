@@ -91,7 +91,7 @@ export const GL = (() => {
       renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias:true, alpha:PHOTO_MODE });
     }catch{ return; }
     ok = true;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2.5)); // 4K/retina keskinliği
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); // 4K/retina keskinliği, mobilde pil dostu
     renderer.toneMapping = THREE.ACESFilmicToneMapping;      // sinematik ton eşleme
     renderer.toneMappingExposure = 1.05;
     scene = new THREE.Scene();
@@ -102,9 +102,10 @@ export const GL = (() => {
     dirLight = new THREE.DirectionalLight(0xfff2d0, 0.95);
     dirLight.position.set(35, 60, -40); scene.add(dirLight);
     if(!PHOTO_MODE) buildTerrain();
-    // yıldızlar
+    // yıldızlar — dokunmatik cihazlarda daha az partikül (bellek + pil)
     {
-      const n = 900, arr = new Float32Array(n*3);
+      const isTouch = matchMedia("(pointer:coarse)").matches;
+      const n = isTouch ? 400 : 900, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){
         const a = Math.random()*Math.PI*2, r = 150 + Math.random()*140, y = 20 + Math.random()*160;
         arr[i*3] = Math.cos(a)*r; arr[i*3+1] = y; arr[i*3+2] = Math.sin(a)*r - 60;
@@ -113,9 +114,10 @@ export const GL = (() => {
       stars = new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:1.3, transparent:true, opacity:0, sizeAttenuation:false }));
       scene.add(stars);
     }
-    // kar
+    // kar — dokunmatikte yarıya
     {
-      const n = 700, arr = new Float32Array(n*3);
+      const isTouch = matchMedia("(pointer:coarse)").matches;
+      const n = isTouch ? 300 : 700, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){ arr[i*3]=(Math.random()-0.5)*120; arr[i*3+1]=Math.random()*55; arr[i*3+2]=(Math.random()-0.5)*90 - 20; }
       const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(arr,3));
       snow = new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:0.5, transparent:true, opacity:0,
@@ -152,9 +154,10 @@ export const GL = (() => {
       farRidge = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0x3d5a80, fog:true }));
       scene.add(farRidge);
     }
-    // ateş böceği / yaprak / toz parçacıkları (temaya göre)
+    // ateş böceği / yaprak / toz parçacıkları (temaya göre) — dokunmatikte azalt
     {
-      const n = 130, arr = new Float32Array(n*3);
+      const isTouch = matchMedia("(pointer:coarse)").matches;
+      const n = isTouch ? 50 : 130, arr = new Float32Array(n*3);
       for(let i=0;i<n;i++){ arr[i*3]=(Math.random()-0.5)*90; arr[i*3+1]=Math.random()*26+1; arr[i*3+2]=(Math.random()-0.5)*60 - 5; }
       const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(arr,3));
       motes = new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:0.7, transparent:true, opacity:0,
@@ -339,13 +342,16 @@ export const GL = (() => {
         for(const c of clouds){ c.position.x += c.userData.v; if(c.position.x > 110) c.position.x = -110; }
       }
       if(snow.material.opacity > 0.01){
-        const p = snow.geometry.attributes.position;
-        for(let i=0;i<p.count;i++){
-          let y = p.getY(i) - 0.045;
+        const arr = snow.geometry.attributes.position.array;
+        const n = snow.geometry.attributes.position.count;
+        for(let i=0;i<n;i++){
+          const i3 = i*3;
+          let y = arr[i3+1] - 0.045;
           if(y < 0) y = 55;
-          p.setY(i, y); p.setX(i, p.getX(i) + Math.sin(s + i)*0.006);
+          arr[i3+1] = y;
+          arr[i3] += Math.sin(s + i)*0.006;
         }
-        p.needsUpdate = true;
+        snow.geometry.attributes.position.needsUpdate = true;
       }
       stars.rotation.y = s*0.004;
       // kartal: geniş daireler çizer, kanat çırpar
@@ -357,14 +363,17 @@ export const GL = (() => {
         wingL.rotation.z =  flap; wingR.rotation.z = -flap;
       }
       if(motes.material.opacity > 0.01){
-        const p = motes.geometry.attributes.position, sp = motes.userData.speed;
-        for(let i=0;i<p.count;i++){
-          p.setX(i, p.getX(i) + Math.sin(s*0.7 + i*1.7)*sp*3);
-          let y = p.getY(i) + Math.cos(s*0.5 + i*2.3)*sp*2 - (sp > 0.01 ? sp : 0); // yapraklar süzülür
+        const arr = motes.geometry.attributes.position.array;
+        const n = motes.geometry.attributes.position.count;
+        const sp = motes.userData.speed;
+        for(let i=0;i<n;i++){
+          const i3 = i*3;
+          arr[i3] += Math.sin(s*0.7 + i*1.7)*sp*3;
+          let y = arr[i3+1] + Math.cos(s*0.5 + i*2.3)*sp*2 - (sp > 0.01 ? sp : 0);
           if(y < 0) y = 26;
-          p.setY(i, y);
+          arr[i3+1] = y;
         }
-        p.needsUpdate = true;
+        motes.geometry.attributes.position.needsUpdate = true;
         motes.material.size = motes.userData.baseSize * (1 + Math.sin(s*2.1)*0.25); // ışık nabzı
       }
       if(composer) composer.render(); else renderer.render(scene, camera);

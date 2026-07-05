@@ -25,16 +25,18 @@ describe("analytics.track", () => {
     delete window.va;
   });
 
-  it("calls Sentry.addBreadcrumb with the event", () => {
+  it("calls Sentry.addBreadcrumb with the event", async () => {
     track("test_event", { foo: 1 });
-    expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-      expect.objectContaining({
-        category: "ui",
-        message: "test_event",
-        data: { foo: 1 },
-        level: "info",
-      }),
-    );
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: "ui",
+          message: "test_event",
+          data: { foo: 1 },
+          level: "info",
+        }),
+      );
+    });
   });
 
   it("calls window.va when Vercel Analytics is available", () => {
@@ -48,36 +50,51 @@ describe("analytics.track", () => {
     expect(() => track("test", {})).not.toThrow();
   });
 
-  it("skips empty event names", () => {
+  it("skips empty event names", async () => {
     track("", {});
     track(null);
-    expect(Sentry.addBreadcrumb).not.toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).not.toHaveBeenCalled();
+    });
   });
 
-  it("truncates long strings to 200 chars", () => {
+  it("truncates long strings to 200 chars", async () => {
     const long = "x".repeat(500);
     track("test", { long });
-    expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { long: "x".repeat(200) } }),
-    );
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { long: "x".repeat(200) } }),
+      );
+    });
   });
 
-  it("drops null and undefined props", () => {
+  it("drops null and undefined props", async () => {
     track("test", { a: 1, b: null, c: undefined, d: "ok" });
-    expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { a: 1, d: "ok" } }),
-    );
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { a: 1, d: "ok" } }),
+      );
+    });
   });
 
-  it("drops function values", () => {
+  it("drops function values", async () => {
     track("test", { a: 1, fn: () => "x" });
-    expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { a: 1 } }),
-    );
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { a: 1 } }),
+      );
+    });
   });
 
-  it("recursively sanitizes nested objects", () => {
+  it("recursively sanitizes nested objects", async () => {
     track("test", { outer: { inner: "x".repeat(500) } });
+    await vi.waitFor(() => {
+      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ outer: expect.any(Object) }),
+        }),
+      );
+    });
     const call = Sentry.addBreadcrumb.mock.calls[0][0];
     expect(call.data.outer.inner).toHaveLength(200);
   });

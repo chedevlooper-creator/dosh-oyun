@@ -88,7 +88,7 @@ export function attachCellHandlers(el, cell, onCellTap) {
 }
 
 /** Hücre için klavye handler — ok tuşları komşuya, Enter/Space hedefi seçer. */
-function onCellKey(e, cell, onCellTap) {
+export function onCellKey(e, cell, onCellTap) {
   const G = getState();
   if (!G) return;
   const map = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };

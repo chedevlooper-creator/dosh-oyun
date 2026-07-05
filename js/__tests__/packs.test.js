@@ -7,9 +7,9 @@ import { packOfLevel, LEVEL_COUNT, LAST_LEVEL_ID, PACK_RANGES } from "../data/le
 const LEVELS = await loadAllLevels();
 
 describe("PACKS metadata", () => {
-  it("has exactly 5 packs matching the 5 level packs", () => {
-    expect(PACKS).toHaveLength(5);
-    expect(PACKS.map((p) => p.id)).toEqual([1, 2, 3, 4, 5]);
+  it("has exactly 6 packs matching the 6 level packs", () => {
+    expect(PACKS).toHaveLength(6);
+    expect(PACKS.map((p) => p.id)).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
   it("every pack has a non-empty title and intro in ce, tr, and ru", () => {
@@ -30,8 +30,8 @@ describe("PACKS metadata", () => {
     }
   });
 
-  it("packFor(1..5) returns the matching pack", () => {
-    for (let i = 1; i <= 5; i++) {
+  it("packFor(1..6) returns the matching pack", () => {
+    for (let i = 1; i <= 6; i++) {
       const p = packFor(i);
       expect(p?.id).toBe(i);
     }

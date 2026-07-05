@@ -124,7 +124,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 #grid{position:relative}
 .cell{position:absolute;border-radius:22%;background:var(--cell);border:1.5px solid var(--cell-b);
   display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--cell-ink);
-  transition:background .25s,transform .25s;backdrop-filter:blur(2px)}
+  transition:background .25s,transform .25s;backdrop-filter:blur(2px);will-change:transform}
 .cell.fill{background:var(--cell-fill);border-color:transparent;animation:pop .38s cubic-bezier(.34,1.56,.64,1)}
 .cell.hintfill{background:var(--cell-hint)}
 .cell.target{cursor:pointer;animation:targetBlink .8s infinite}
@@ -169,7 +169,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 #wheel svg polyline{fill:none;stroke:var(--gold);stroke-width:11;stroke-linecap:round;stroke-linejoin:round;opacity:.95;filter:drop-shadow(0 2px 5px rgba(0,0,0,.4))}
 .bub{position:absolute;border-radius:50%;background:var(--bubble);color:var(--bubble-ink);
   display:flex;align-items:center;justify-content:center;font-weight:800;
-  box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s}
+  box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s;will-change:transform}
 .bub.sel{background:var(--sel);color:var(--sel-ink);transform:scale(1.14)}
 #shuffle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;z-index:2;
   border-radius:50%;background:rgba(247,241,222,.10);border:1.5px solid rgba(242,181,61,.45);
@@ -742,4 +742,37 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   color: var(--gold);
   text-decoration: underline;
   font-size: 12px;
+}
+
+/* ================================================================
+   MOBİL PERFORMANS — dokunmatik cihazlarda ağır CSS efektlerini hafiflet
+   ================================================================ */
+@media (pointer:coarse){
+  /* backdrop-filter mobil GPU'da çok pahalı -> blur'ları düşür/kaldır */
+  #wheel{backdrop-filter:blur(3px)}
+  .glass{backdrop-filter:blur(8px) saturate(1.2)}
+  .toolrow{backdrop-filter:blur(6px)}
+  #preview .cap{backdrop-filter:blur(4px)}
+  #toast{backdrop-filter:blur(6px)}
+  #veil{backdrop-filter:blur(2px)}
+  .cell{backdrop-filter:none}
+  /* çoklu drop-shadow her frame'de gölge hesaplar -> tek drop-shadow yeter */
+  .bub{box-shadow:0 4px 10px rgba(0,0,0,.4),inset 0 -2px 5px rgba(150,124,70,.25),inset 0 1px 2px #fffdf4}
+  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55)) drop-shadow(0 8px 20px rgba(0,0,0,.35))}
+  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) drop-shadow(0 0 14px rgba(242,181,61,.3))}
+  .btn{box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 24px rgba(0,0,0,.25),0 0 14px rgba(242,181,61,.3)}
+  /* z-fighting: 3D rotate küçült */
+  #wheel{transform:rotateX(6deg)}
+  .panel{transform:rotateX(6deg) scale(.88) translateY(20px)}
+  /* daha az katmanlı gölge */
+  #wheel::before{opacity:.2;animation-duration:20s}
+  /* kartal wing çırpma -> yumuşak (smooth anim zaten) */
+}
+/* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */
+@media (pointer:coarse) and (max-width:480px){
+  .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
+  .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 14px rgba(214,137,16,.4),inset 0 -2px 5px rgba(140,90,0,.35)}
+  #wheel svg polyline{stroke-width:8;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3))}
+  .tool{min-height:68px}
+  #preview .cap{padding:7px 14px;font-size:18px}
 }

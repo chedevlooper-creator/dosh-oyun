@@ -26,11 +26,11 @@ function wordUsesOnlyPoolLetters(word, letterPool) {
 
 /* ================= Basic structure ================= */
 describe("LEVELS basic structure", () => {
-  it("has 126 levels (0-125)", () => {
-    expect(LEVELS).toHaveLength(126);
+  it("has 151 levels (0-150)", () => {
+    expect(LEVELS).toHaveLength(151);
   });
 
-  it("has consecutive IDs from 0 to 125", () => {
+  it("has consecutive IDs from 0 to 150", () => {
     for (let i = 0; i < LEVELS.length; i++) {
       expect(LEVELS[i].id).toBe(i);
     }
@@ -82,6 +82,18 @@ describe("LEVELS basic structure", () => {
   it("levels 76-100 are pack 4", () => {
     for (let i = 76; i <= 100; i++) {
       expect(LEVELS[i].pack).toBe(4);
+    }
+  });
+
+  it("levels 101-125 are pack 5", () => {
+    for (let i = 101; i <= 125; i++) {
+      expect(LEVELS[i].pack).toBe(5);
+    }
+  });
+
+  it("levels 126-150 are pack 6", () => {
+    for (let i = 126; i <= 150; i++) {
+      expect(LEVELS[i].pack).toBe(6);
     }
   });
 });

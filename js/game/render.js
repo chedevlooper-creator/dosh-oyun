@@ -8,6 +8,44 @@ import { dispG, norm } from "../engine/grapheme.js";
 import { SFX } from "../engine/audio.js";
 import { getState, getBubbles } from "./state.js";
 
+/* ---------- ÖNİZLEME (renderSel için önbellek) ---------- */
+let _capEl = null;
+let _capSpans = [];
+
+function _ensureCap() {
+  if (!_capEl) {
+    _capEl = document.createElement("div");
+    _capEl.className = "cap";
+  }
+  return _capEl;
+}
+
+function _updateCap(sel) {
+  const pv = document.getElementById("preview");
+  if (!sel.length) {
+    // Önbelleği temizle; pv.innerHTML = "" garanti boşaltır
+    _capEl = null;
+    _capSpans = [];
+    pv.innerHTML = "";
+    return;
+  }
+  if (!_capEl) _ensureCap();
+  // Mevcut span'leri güncelle veya yenilerini ekle
+  while (_capSpans.length < sel.length) {
+    const s = document.createElement("span");
+    _capSpans.push(s);
+    _capEl.appendChild(s);
+  }
+  for (let i = 0; i < sel.length; i++) {
+    _capSpans[i].textContent = dispG(sel[i].letter);
+  }
+  // Fazla span'leri gizle
+  for (let i = sel.length; i < _capSpans.length; i++) {
+    _capSpans[i].textContent = "";
+  }
+  if (!_capEl.parentNode) pv.appendChild(_capEl);
+}
+
 /* ---------- IZGARA ---------- */
 
 export function buildGrid() {
@@ -169,16 +207,11 @@ export function shuffleWheel() {
 export function renderSel() {
   const G = getState();
   if (!G) return;
-  const pv = document.getElementById("preview");
-  if (!G.sel.length) { pv.innerHTML = ""; return; }
-  pv.innerHTML = `<div class="cap">${G.sel.map((b) => `<span>${dispG(b.letter)}</span>`).join("")}</div>`;
+  _updateCap(G.sel);
   const svg = document.querySelector("#wheel svg polyline");
   if (!svg) return;
-  // wheel rect'i bir kez oku; balon merkezlerini cached cx/cy'den türet
-  const wr = document.getElementById("wheel").getBoundingClientRect();
-  svg.setAttribute("points", G.sel.map((b) => {
-    return (b.cx - wr.left) + "," + (b.cy - wr.top);
-  }).join(" "));
+  // Balon x/y çark-izafidir; SVG viewBox çark boyutuna eşit, doğrudan kullan
+  svg.setAttribute("points", G.sel.map((b) => b.x + "," + b.y).join(" "));
 }
 
 /** Seçimi temizle (görsel + state). */
@@ -186,8 +219,7 @@ export function clearSel(cls = "") {
   const G = getState();
   const _bubbles = getBubbles();
   if (!G) return () => {};
-  const pv = document.querySelector("#preview .cap");
-  if (pv && cls) pv.classList.add(cls);
+  if (_capEl && cls) _capEl.classList.add(cls);
   return () => {
     _bubbles.forEach((x) => x.el.classList.remove("sel"));
     G.sel = [];

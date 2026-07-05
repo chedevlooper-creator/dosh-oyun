@@ -3,8 +3,13 @@ import { S } from "../engine/store.js";
 
 /* ================= YARDIMCILAR ================= */
 export const $ = id => document.getElementById(id);
+let _screens = null;
+function _getScreens() {
+  if (!_screens) _screens = Array.from(document.querySelectorAll(".screen"));
+  return _screens;
+}
 export function show(scr){
-  document.querySelectorAll(".screen").forEach(s=>{
+  _getScreens().forEach(s=>{
     s.classList.remove("on");
     s.setAttribute("aria-hidden","true");
     s.inert = true;

@@ -9,8 +9,6 @@ import { initGameScreens, startLevel } from "./screens/game.js";
 import { getDir } from "./utils/i18n.js";
 import { installGlobalHandler } from "./utils/report.js";
 
-installGlobalHandler();
-
 "use strict";
 
 /* ================= 3D SAHNE (LAZY) =================

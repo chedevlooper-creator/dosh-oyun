@@ -7,7 +7,6 @@ import { toast, today } from "../utils/helpers.js";
 import { getConsent, setConsent } from "../utils/report.js";
 import { openFeedback } from "./feedback.js";
 import { SFX, MUSIC } from "../engine/audio.js";
-import { tutorial } from "./tutorial.js";
 import { $ } from "../utils/helpers.js";
 import { t, getLanguages, setLanguage } from "../utils/i18n.js";
 import { getPref, setPref as setTtsPref } from "../utils/tts.js";
@@ -79,7 +78,7 @@ export function openSettings(){
     this.classList.toggle("on", S.settings.music);
     this.setAttribute("aria-checked", S.settings.music);
   };
-  $("set-tut").onclick = ()=>{ closePanel(); tutorial(); };
+  $("set-tut").onclick = () => { closePanel(); import("./tutorial.js").then(({ tutorial }) => tutorial()); };
   $("set-feedback").onclick = ()=>openFeedback();
   $("rep-toggle").onclick = function(){
     const next = !getConsent();

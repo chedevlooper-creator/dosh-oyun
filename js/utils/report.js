@@ -9,10 +9,10 @@
  *
  * ?debug=1 modunda her zaman console'a yazar. */
 
-import * as Sentry from "@sentry/browser";
+let _Sentry = null;
+let _sentryLoad = null;
 
 const DSN = (typeof import.meta !== "undefined" && import.meta.env?.VITE_SENTRY_DSN) || "";
-let sentryReady = false;
 
 function userConsented() {
   try { return globalThis.localStorage?.getItem("dosh-consent") === "1"; } catch { return false; }
@@ -23,21 +23,37 @@ function debugOn() {
   catch { return false; }
 }
 
+async function _getSentry() {
+  if (_Sentry) return _Sentry;
+  if (_sentryLoad) return _sentryLoad;
+  _sentryLoad = import("@sentry/browser").then((m) => {
+    _Sentry = m;
+    try {
+      _Sentry.init({
+        dsn: DSN,
+        integrations: [],
+        defaultIntegrations: false,
+        tracesSampleRate: 0,
+        replaysSessionSampleRate: 0,
+        replaysOnErrorSampleRate: 0,
+        enabled: userConsented(),
+      });
+    } catch (e) {
+      console.warn("[report] Sentry init başarısız:", e);
+      _Sentry = null;
+    }
+    return _Sentry;
+  }).catch((e) => {
+    console.warn("[report] Sentry yüklenemedi:", e);
+    _sentryLoad = null;
+    return null;
+  });
+  return _sentryLoad;
+}
+
 function ensureSentry() {
-  if (sentryReady || !DSN) return;
-  sentryReady = true;
-  try {
-    Sentry.init({
-      dsn: DSN,
-      integrations: [],
-      tracesSampleRate: 0,
-      replaysSessionSampleRate: 0,
-      replaysOnErrorSampleRate: 0,
-      enabled: userConsented(),
-    });
-  } catch (e) {
-    console.warn("[report] Sentry init başarısız:", e);
-  }
+  if ((_Sentry || _sentryLoad) || !DSN) return;
+  _getSentry();
 }
 
 /**
@@ -46,8 +62,6 @@ function ensureSentry() {
  * @param {Record<string, any>} [context]
  */
 export function reportError(err, context) {
-  ensureSentry();
-
   const payload = {
     msg: (err && err.message) || String(err),
     stack: (err && err.stack) || null,
@@ -61,13 +75,19 @@ export function reportError(err, context) {
   }
 
   if (DSN && userConsented()) {
-    try {
-      Sentry.captureException(
-        err instanceof Error ? err : new Error(String(err)),
-        { tags: { where: payload.where }, extra: context || {} },
-      );
-    } catch { /* sessiz */ }
+    _capture(err, context, payload.where);
   }
+}
+
+async function _capture(err, context, where) {
+  const Sentry = await _getSentry();
+  if (!Sentry) return;
+  try {
+    Sentry.captureException(
+      err instanceof Error ? err : new Error(String(err)),
+      { tags: { where }, extra: context || {} },
+    );
+  } catch { /* sessiz */ }
 }
 
 /** Kullanıcının hata raporu iznini oku/yaz (ayarlar ekranı kullanır) */
@@ -83,15 +103,11 @@ export function setConsent(on) {
 export function installGlobalHandler() {
   if (typeof globalThis === "undefined") return;
 
-  if (DSN) {
-    // Sentry aktif: kendi global handler'larını kullanır (init otomatik
-    // window.onerror ve unhandledrejection'ı yakalar). Biz manuel
-    // listener eklemiyoruz ki çifte raporlama olmasın.
-    ensureSentry();
-    return;
-  }
-
-  // Sentry yok: manuel handler'larla yetin
+  // Her zaman manuel handler'ları senkron kur (Sentry arkada yüklenir,
+  // integrations: [] ile çifte raporlama olmaz)
   globalThis.addEventListener("error", (e) => reportError(e.error || e.message, { where: "window.error" }));
   globalThis.addEventListener("unhandledrejection", (e) => reportError(e.reason, { where: "unhandledrejection" }));
+
+  // Sentry arka planda yüklenir
+  if (DSN) ensureSentry();
 }

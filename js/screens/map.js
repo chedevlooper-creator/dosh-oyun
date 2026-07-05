@@ -5,8 +5,7 @@ import { S } from "../engine/store.js";
 import { updateCoins, $, show, toast } from "../utils/helpers.js";
 import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
-import { startLevel } from "./game.js";
-import { renderHome } from "./home.js";
+
 
 /* ================= HARİTA ================= */
 export function firstUnsolved(){
@@ -48,12 +47,12 @@ export function openMap(){
     else if(id === cur){ n.classList.add("cur"); n.innerHTML = `<div>${id+1}</div><div class="state">ХӀинца</div>`; }
     else if(locked){ n.classList.add("lock"); n.innerHTML = `<svg class="lock-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lock"/></svg><div class="state">ГӀайгӀа</div>`; n.title = "Хьалхара тӀегӀа чекхйаккха"; n.setAttribute("aria-disabled","true"); }
     else n.textContent = id+1;
-    if(!locked) n.onclick = ()=>{ SFX.coin(); startLevel(id); };
+    if(!locked) n.onclick = ()=>{ SFX.coin(); import("./game.js").then(m => m.startLevel(id)); };
     else n.onclick = ()=>toast("Хьалхара тӀегӀа чекхйаккха 🔒");
     grid.appendChild(n);
   }
   show("scr-map");
   const curNode = wrap.querySelector(".node.cur"); if(curNode) setTimeout(()=>curNode.scrollIntoView({block:"center",behavior:"smooth"}),80);
 }
-$("map-back").onclick = ()=>{ renderHome(); show("scr-home"); };
+$("map-back").onclick = ()=>{ import("./home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); }); };
 

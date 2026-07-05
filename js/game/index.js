@@ -34,7 +34,7 @@ import {
   buildGrid as _buildGrid, fillCell as _fillCell, buildWheel, shuffleWheel,
   renderSel, clearSel,
 } from "./render.js";
-import { setupWheelListeners as _setupWheelListeners, attachCellHandlers, onBubbleKey } from "./input.js";
+import { setupWheelListeners as _setupWheelListeners, onBubbleKey, onCellKey } from "./input.js";
 import {
   onWrongGuess, hintLetter, hintTarget, hintWand, onCellTap,
 } from "./hints.js";
@@ -244,12 +244,6 @@ export async function startLevel(id, opts = {}, lv) {
 
 export function buildGrid() {
   _buildGrid();
-  // Hücrelere handler tak (buildGrid içinde yaratılan elemanlar)
-  const G = getState();
-  if (!G) return;
-  for (const cell of G.cells.values()) {
-    if (cell.el) attachCellHandlers(cell.el, cell, onCellTapHandler);
-  }
 }
 
 export function fillCell(cell, hint) {
@@ -315,6 +309,28 @@ export function initGameScreens() {
   document.getElementById("hint-wand").onclick = () =>
     hintWand({ checkAutoSolve, checkDone });
   document.getElementById("bonus-chest").onclick = showBonusChest;
+
+  // Delegasyon: #grid tıklama — per-cell listener yerine tek dinleyici
+  document.getElementById("grid").addEventListener("click", (e) => {
+    const cellEl = e.target.closest(".cell");
+    if (!cellEl) return;
+    const G = getState();
+    if (!G) return;
+    const key = cellEl.dataset.row + "," + cellEl.dataset.col;
+    const cell = G.cells.get(key);
+    if (cell) onCellTapHandler(cell);
+  });
+
+  // Delegasyon: #grid klavye
+  document.getElementById("grid").addEventListener("keydown", (e) => {
+    const cellEl = e.target.closest(".cell");
+    if (!cellEl) return;
+    const G = getState();
+    if (!G) return;
+    const key = cellEl.dataset.row + "," + cellEl.dataset.col;
+    const cell = G.cells.get(key);
+    if (cell) onCellKey(e, cell, onCellTapHandler);
+  });
 
   setupWheelListenersImpl();
 }

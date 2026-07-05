@@ -64,6 +64,17 @@ export const PACKS = [
     },
     theme: "night",
   },
+  {
+    id: 6,
+    title: { ce: "КХЕТА — Кхиам", tr: "İlerleme", ru: "Прогресс" },
+    subtitle: { ce: "Дешнаш, кхиам, маршо", tr: "Sözler, ilerleme, özgürlük", ru: "Слова, рост, свобода" },
+    intro: {
+      ce: "Кхин дешнаш — кхин кхиам, кхин некъ.",
+      tr: "Daha çok kelime, daha çok ilerleme, yeni yollar.",
+      ru: "Больше слов, больше прогресса, новые пути.",
+    },
+    theme: "forest",
+  },
 ];
 
 export function packFor(packId) {
