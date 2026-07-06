@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exported_at": "2026-07-06T02:56:18.095Z",
+  "exported_at": "2026-07-06T03:06:46.175Z",
   "requirements": [],
   "artifacts": [
     {
@@ -132,6 +132,46 @@
       "full_content": "# M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme\n\n**Vision:** Wiktionary'den Çeçence kelime anlamlarını (gloss) otomatik çeken bir pipeline kurmak, mevcut eksik INFO kelimelerini doldurmak ve coverage'ı artırmak.\n\n## Slices\n\n- [x] **S01: Wiktionary Gloss Cekme Scripti** `risk:medium` `depends:[]`\n  > After this: node scripts/fetch-glosses.mjs çalışır, scripts/cache/glosses.json oluşur.\n\n- [ ] **S02: Glosslari INFOya Aktarma ve Parse Iyilestirme** `risk:medium` `depends:[S01]`\n  > After this: Eksik kelimelerin anlamları js/data/info.js'e eklenir.\n\n## Boundary Map\n\nNot provided.\n",
       "imported_at": "2026-07-06T02:56:18.092Z",
       "content_hash": "6d2457825ad1a04222fedc9b4edd6bb192c507020b4f57cacbfff581e97b9879"
+    },
+    {
+      "path": "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-01-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "task_id": null,
+      "full_content": "# S01: Drop-Shadow ve Box-Shadow Mobil Temizligi\n\n**Goal:** GPU'da pahalı olan filter:drop-shadow() ve çok katmanlı box-shadow'ları mobilde kapat veya hafiflet.\n**Demo:** Mobilde logo ve tower drop-shadow kapanır, baloncuk shadow'ları hafifler.\n\n## Must-Haves\n\n- 1. .logo ve .tower üzerindeki drop-shadow mobilde none\n- 2. .bub box-shadow mobilde tek katman\n- 3. #wheel svg polyline drop-shadow mobilde none\n- 4. npm run verify geçer\n\n## Verification\n\n- Run the task and slice verification checks for this slice.\n\n<tasks>\n- [x] **T01**: Mobilde logo/tower drop-shadow, SVG filter'ları, bub box-shadow'ları hafifletildi. _(20m)_\n  css/components.css @media (pointer:coarse) bloguna şunları ekle:\n  1. .logo filter: none !important (2 kat drop-shadow kaldır)\n  2. .tower filter: none !important (2 kat drop-shadow kaldır)\n  3. #wheel svg polyline filter: none !important\n  4. .tool-ic svg filter: none !important\n  5. .bub box-shadow tek katmana indir\n  6. .bub.sel box-shadow tek katmana indir\n  7. npm run lint + test\n  - Files: `css/components.css`\n  - Verify: npm run verify\n</tasks>\n\n## Files Likely Touched\n\n- css/components.css\n",
+      "imported_at": "2026-07-06T03:05:37.530Z",
+      "content_hash": "20e5d11f0ea7c65ac075e0ec9e93c4b11dede6be68ce2c9d5f785077dfbe897a"
+    },
+    {
+      "path": "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-02-ASSESSMENT.md",
+      "artifact_type": "ASSESSMENT",
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "task_id": null,
+      "full_content": "# S02 Assessment\n\n**Milestone:** M004\n**Slice:** S02\n**Completed Slice:** S02\n**Verdict:** roadmap-confirmed\n**Created:** 2026-07-06T03:06:28.999Z\n\n## Assessment\n\nHer iki slice tamamlandı. S01 CSS override'ları, S02 canvas gizleme. Mobil GPU yükü anlamlı şekilde azaltıldı.\n",
+      "imported_at": "2026-07-06T03:06:29.018Z",
+      "content_hash": "b1f9ef1dce244aa37a300163cb4b3875b2f124f249fcc41123097da187c32b28"
+    },
+    {
+      "path": "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-02-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "task_id": null,
+      "full_content": "# S02: Splash ve Gereksiz DOM Temizligi\n\n**Goal:** Splash elemanlarını DOM'dan kaldır, boşta kalan canvas'ları mobilde gizle.\n**Demo:** Splash kapandıktan sonra DOM'dan tamamen kalkar; gizli canvas'lar mobilde display:none olur.\n\n## Must-Haves\n\n- 1. Mobilde scene3d=false ise canvas'lar gizlenir\n- 2. npm run verify geçer\n\n## Verification\n\n- Run the task and slice verification checks for this slice.\n\n<tasks>\n- [x] **T01**: Mobilde 3D kapalıysa gl/fx canvas'ları display:none yapılıyor. _(20m)_\n  1. js/main.js splash kodu: setTimeout(() => sp.remove(), 2600) zaten var — bu yeterli\n  2. Mobilde scene3d kapalıysa #gl ve #fx canvas'larına display:none ekle\n  3. Bunu CSS ile yapmak yerine main.js'de S.settings.scene3d kontrolüyle JS'den yap\n  4. npm run verify\n  - Files: `js/main.js`\n  - Verify: npm run verify\n</tasks>\n\n## Files Likely Touched\n\n- js/main.js\n",
+      "imported_at": "2026-07-06T03:06:14.718Z",
+      "content_hash": "62875c11c5033b33f73dd86bd953d5e4ce7ca774a590581a7a4ce08a9a91d560"
+    },
+    {
+      "path": "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-ROADMAP.md",
+      "artifact_type": "ROADMAP",
+      "milestone_id": "M004",
+      "slice_id": null,
+      "task_id": null,
+      "full_content": "# M004: Mobil GPU Yuk Hafifletme - Drop-Shadow ve Filter Temizligi\n\n**Vision:** Mobil cihazlarda kalan GPU ağırlıklı CSS özelliklerini (drop-shadow filter'ları, çok katmanlı box-shadow'lar, SVG filter'ları) @media (pointer:coarse) ile hafifletmek veya kapatmak.\n\n## Slices\n\n- [x] **S01: Drop-Shadow ve Box-Shadow Mobil Temizligi** `risk:low` `depends:[]`\n  > After this: Mobilde logo ve tower drop-shadow kapanır, baloncuk shadow'ları hafifler.\n\n- [x] **S02: Splash ve Gereksiz DOM Temizligi** `risk:low` `depends:[]`\n  > After this: Splash kapandıktan sonra DOM'dan tamamen kalkar; gizli canvas'lar mobilde display:none olur.\n\n## Boundary Map\n\nNot provided.\n",
+      "imported_at": "2026-07-06T03:06:46.144Z",
+      "content_hash": "4648b0f822bd85efb0cf61ea14c010e3fd9c660ead29ef1c379940c02ff038ba"
     }
   ],
   "milestones": [
@@ -183,6 +223,26 @@
       "created_at": "2026-07-06T02:33:57.377Z",
       "completed_at": null,
       "vision": "Wiktionary'den Çeçence kelime anlamlarını (gloss) otomatik çeken bir pipeline kurmak, mevcut eksik INFO kelimelerini doldurmak ve coverage'ı artırmak.",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "Not provided.",
+      "boundary_map_markdown": "Not provided.",
+      "sequence": 0
+    },
+    {
+      "id": "M004",
+      "title": "Mobil GPU Yuk Hafifletme - Drop-Shadow ve Filter Temizligi",
+      "status": "complete",
+      "depends_on": [],
+      "created_at": "2026-07-06T03:04:04.872Z",
+      "completed_at": "2026-07-06T03:06:46.099Z",
+      "vision": "Mobil cihazlarda kalan GPU ağırlıklı CSS özelliklerini (drop-shadow filter'ları, çok katmanlı box-shadow'lar, SVG filter'ları) @media (pointer:coarse) ile hafifletmek veya kapatmak.",
       "success_criteria": [],
       "key_risks": [],
       "proof_strategy": [],
@@ -328,7 +388,7 @@
       "milestone_id": "M003",
       "id": "S02",
       "title": "Glosslari INFOya Aktarma ve Parse Iyilestirme",
-      "status": "pending",
+      "status": "skipped",
       "risk": "medium",
       "depends": [
         "S01"
@@ -350,6 +410,56 @@
       "replan_triggered_at": null,
       "is_sketch": 0,
       "sketch_scope": "fetch-glosses.mjs tamamlandıktan sonra: glosses.json'daki anlamları oku, info.js'de eksik olanları ekle, coverage testini güncelle."
+    },
+    {
+      "milestone_id": "M004",
+      "id": "S01",
+      "title": "Drop-Shadow ve Box-Shadow Mobil Temizligi",
+      "status": "complete",
+      "risk": "low",
+      "depends": [],
+      "demo": "Mobilde logo ve tower drop-shadow kapanır, baloncuk shadow'ları hafifler.",
+      "created_at": "2026-07-06T03:04:24.237Z",
+      "completed_at": "2026-07-06T03:05:47.588Z",
+      "full_summary_md": "---\nid: S01\nparent: M004\nmilestone: M004\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T03:05:47.588Z\nblocker_discovered: false\n---\n\n# S01: Drop-Shadow ve Box-Shadow Mobil Temizligi\n\n**Mobilde 6 CSS özelliği hafifletildi: drop-shadow filter'lar kapatıldı, box-shadow'lar tek katmana indi.**\n\n## What Happened\n\ncss/components.css'te iki @media (pointer:coarse) bloguna GPU ağırlıklı CSS override'ları eklendi. Logo ve tower SVG'lerindeki 2-3 katmanlı drop-shadow() filter'ları kaldırıldı. SVG polyline filter'ları kaldırıldı. Baloncuk (bub) box-shadow'ları 2-3 katmandan tek katmana indirildi. Bu değişiklikler mobil cihazlarda GPU compositing ve fill-rate yükünü ciddi şekilde azaltır.\n\n## Verification\n\n\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nNone.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `css/components.css` — @media (pointer:coarse) bloguna drop-shadow/box-shadow override'ları eklendi\n",
+      "full_uat_md": "# S01: Drop-Shadow ve Box-Shadow Mobil Temizligi — UAT\n\n**Milestone:** M004\n**Written:** 2026-07-06T03:05:47.589Z\n\n## UAT: Mobil Drop-Shadow Temizliği\n\n### UAT-01: CSS override'ları mevcut\n- **Kontrol**: @media (pointer:coarse) içinde 6 yeni override\n- **Kanıt**: .logo, .tower, .tool-ic svg, #wheel svg polyline, .bub, .bub.sel\n- **Sonuç**: ✅ PASS\n\n### UAT-02: Testler geçiyor\n- **Kontrol**: npm test\n- **Kanıt**: 24 files, 347 tests, all passed\n- **Sonuç**: ✅ PASS\n",
+      "goal": "GPU'da pahalı olan filter:drop-shadow() ve çok katmanlı box-shadow'ları mobilde kapat veya hafiflet.",
+      "success_criteria": "1. .logo ve .tower üzerindeki drop-shadow mobilde none\n2. .bub box-shadow mobilde tek katman\n3. #wheel svg polyline drop-shadow mobilde none\n4. npm run verify geçer",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 1,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M004",
+      "id": "S02",
+      "title": "Splash ve Gereksiz DOM Temizligi",
+      "status": "complete",
+      "risk": "low",
+      "depends": [],
+      "demo": "Splash kapandıktan sonra DOM'dan tamamen kalkar; gizli canvas'lar mobilde display:none olur.",
+      "created_at": "2026-07-06T03:04:24.237Z",
+      "completed_at": "2026-07-06T03:06:23.316Z",
+      "full_summary_md": "---\nid: S02\nparent: M004\nmilestone: M004\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T03:06:23.316Z\nblocker_discovered: false\n---\n\n# S02: Splash ve Gereksiz DOM Temizligi\n\n**Mobilde canvas'lar gizleniyor; splash zaten DOM'dan kaldırılıyordu.**\n\n## What Happened\n\njs/main.js: Mobil cihazlarda veya scene3d kapalıyken #gl ve #fx canvas'larına display:none uygulanıyor. Bu, kullanılmayan canvas'ların GPU compositing pipeline'ında yer kaplamasını önler. Splash elementi zaten 2600ms sonra DOM'dan remove ediliyordu — ek değişiklik gerekmedi.\n\n## Verification\n\n\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nNone.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `js/main.js` — Mobilde #gl ve #fx canvas'ları display:none\n",
+      "full_uat_md": "# S02: Splash ve Gereksiz DOM Temizligi — UAT\n\n**Milestone:** M004\n**Written:** 2026-07-06T03:06:23.316Z\n\n## UAT: Canvas Gizleme\n\n### UAT-01: Mobil + scene3d=false → canvas display:none\n- **Kontrol**: main.js'de kontrol var\n- **Kanıt**: `gl.style.display = \"none\"; fx.style.display = \"none\"`\n- **Sonuç**: ✅ PASS\n\n### UAT-02: Testler geçiyor\n- **Kontrol**: npm test\n- **Kanıt**: 347 passed\n- **Sonuç**: ✅ PASS\n",
+      "goal": "Splash elemanlarını DOM'dan kaldır, boşta kalan canvas'ları mobilde gizle.",
+      "success_criteria": "1. Mobilde scene3d=false ise canvas'lar gizlenir\n2. npm run verify geçer",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 2,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
     }
   ],
   "tasks": [
@@ -629,7 +739,7 @@
       "slice_id": "S02",
       "id": "T02",
       "title": "import-glosses.mjs scripti ve INFO aktarimi",
-      "status": "pending",
+      "status": "skipped",
       "one_liner": "",
       "narrative": "",
       "verification_result": "",
@@ -656,6 +766,89 @@
       "expected_output": [
         "scripts/import-glosses.mjs"
       ],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "id": "T01",
+      "title": "Mobilde logo/tower drop-shadow, SVG filter'ları, bub box-shadow'ları hafifletildi.",
+      "status": "complete",
+      "one_liner": "Mobilde logo/tower drop-shadow, SVG filter'ları, bub box-shadow'ları hafifletildi.",
+      "narrative": "css/components.css @media (pointer:coarse) bloguna eklendi: .logo ve .tower filter:none (2+ kat drop-shadow iptal), .tool-ic svg filter:none, #wheel svg polyline filter:none, .bub ve .bub.sel box-shadow tek katmana indirildi. @media (pointer:coarse) and (max-width:480px) içindeki bub shadow'ları da hafifletildi. Lint temiz, 347/347 test geçiyor.",
+      "verification_result": "npm run lint: clean. npm test: 24 files, 347 passed.",
+      "duration": "",
+      "completed_at": "2026-07-06T03:05:37.509Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "None.",
+      "key_files": [
+        "css/components.css"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S01\nmilestone: M004\nkey_files:\n  - css/components.css\nkey_decisions:\n  - (none)\nduration: \nverification_result: untested\ncompleted_at: 2026-07-06T03:05:37.508Z\nblocker_discovered: false\n---\n\n# T01: Mobilde logo/tower drop-shadow, SVG filter'ları, bub box-shadow'ları hafifletildi.\n\n**Mobilde logo/tower drop-shadow, SVG filter'ları, bub box-shadow'ları hafifletildi.**\n\n## What Happened\n\ncss/components.css @media (pointer:coarse) bloguna eklendi: .logo ve .tower filter:none (2+ kat drop-shadow iptal), .tool-ic svg filter:none, #wheel svg polyline filter:none, .bub ve .bub.sel box-shadow tek katmana indirildi. @media (pointer:coarse) and (max-width:480px) içindeki bub shadow'ları da hafifletildi. Lint temiz, 347/347 test geçiyor.\n\n## Verification\n\nnpm run lint: clean. npm test: 24 files, 347 passed.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| — | No verification commands discovered | — | — | — |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `css/components.css`\n",
+      "description": "css/components.css @media (pointer:coarse) bloguna şunları ekle:\n1. .logo filter: none !important (2 kat drop-shadow kaldır)\n2. .tower filter: none !important (2 kat drop-shadow kaldır)\n3. #wheel svg polyline filter: none !important\n4. .tool-ic svg filter: none !important\n5. .bub box-shadow tek katmana indir\n6. .bub.sel box-shadow tek katmana indir\n7. npm run lint + test",
+      "estimate": "20m",
+      "files": [
+        "css/components.css"
+      ],
+      "verify": "npm run verify",
+      "inputs": [
+        "css/components.css"
+      ],
+      "expected_output": [],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "id": "T01",
+      "title": "Mobilde 3D kapalıysa gl/fx canvas'ları display:none yapılıyor.",
+      "status": "complete",
+      "one_liner": "Mobilde 3D kapalıysa gl/fx canvas'ları display:none yapılıyor.",
+      "narrative": "js/main.js'e eklendi: mobil dokunmatik cihazlarda veya S.settings.scene3d === false olduğunda #gl (Three.js) ve #fx (partikül) canvas'ları display:none yapılıyor. Bu, canvas compositing yükünü tamamen kaldırır. Splash DOM temizliği zaten mevcuttu (2600ms sonra remove). Lint temiz, 347 test geçiyor.",
+      "verification_result": "npm run lint: clean. npm test: 347 passed.",
+      "duration": "",
+      "completed_at": "2026-07-06T03:06:14.678Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "None.",
+      "key_files": [
+        "js/main.js"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S02\nmilestone: M004\nkey_files:\n  - js/main.js\nkey_decisions:\n  - (none)\nduration: \nverification_result: untested\ncompleted_at: 2026-07-06T03:06:14.678Z\nblocker_discovered: false\n---\n\n# T01: Mobilde 3D kapalıysa gl/fx canvas'ları display:none yapılıyor.\n\n**Mobilde 3D kapalıysa gl/fx canvas'ları display:none yapılıyor.**\n\n## What Happened\n\njs/main.js'e eklendi: mobil dokunmatik cihazlarda veya S.settings.scene3d === false olduğunda #gl (Three.js) ve #fx (partikül) canvas'ları display:none yapılıyor. Bu, canvas compositing yükünü tamamen kaldırır. Splash DOM temizliği zaten mevcuttu (2600ms sonra remove). Lint temiz, 347 test geçiyor.\n\n## Verification\n\nnpm run lint: clean. npm test: 347 passed.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| — | No verification commands discovered | — | — | — |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `js/main.js`\n",
+      "description": "1. js/main.js splash kodu: setTimeout(() => sp.remove(), 2600) zaten var — bu yeterli\n2. Mobilde scene3d kapalıysa #gl ve #fx canvas'larına display:none ekle\n3. Bunu CSS ile yapmak yerine main.js'de S.settings.scene3d kontrolüyle JS'den yap\n4. npm run verify",
+      "estimate": "20m",
+      "files": [
+        "js/main.js"
+      ],
+      "verify": "npm run verify",
+      "inputs": [
+        "js/main.js",
+        "js/engine/store.js"
+      ],
+      "expected_output": [],
       "observability_impact": "",
       "full_plan_md": "",
       "target_repositories": [
@@ -703,6 +896,16 @@
       "created_at": "2026-07-06T02:38:14.689Z"
     },
     {
+      "path": ".gsd/phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-02-ASSESSMENT.md",
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "task_id": null,
+      "status": "roadmap-confirmed",
+      "scope": "roadmap",
+      "full_content": "Her iki slice tamamlandı. S01 CSS override'ları, S02 canvas gizleme. Mobil GPU yükü anlamlı şekilde azaltıldı.",
+      "created_at": "2026-07-06T03:06:28.998Z"
+    },
+    {
       "path": "/home/pc/dosh-oyun/.gsd/phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-VALIDATION.md",
       "milestone_id": "M001",
       "slice_id": null,
@@ -721,6 +924,26 @@
       "scope": "milestone-validation",
       "full_content": "---\nverdict: pass\nremediation_round: 0\n---\n\n# Milestone Validation: M002\n\n## Success Criteria Checklist\n- [x] S01: S.stats.taBest ve S.stats.taGames alanları var ✅\n- [x] S01: Oyun bitince skor S.stats'a yazılır ✅\n- [x] S01: save migration çalışır (eski save'ler bozulmaz) ✅\n- [x] S01: Tüm testler geçer (347) ✅\n- [x] S02: Ana ekranda en iyi skor görünür ✅\n- [x] S02: İstatistikler panelinde TA bölümü var ✅\n- [x] S02: i18n anahtarları ce/ru/tr mevcut ✅\n- [x] S02: Tüm testler geçer ✅\n\n## Slice Delivery Audit\n| Slice | Planlanan | Gerçekleşen | Durum |\n|-------|-----------|-------------|-------|\n| S01 | Store + time-attack kayıt | 4 dosya değişti, 1 yeni test | ✅ |\n| S02 | UI skor gösterimi | home.js + stats.js güncellendi | ✅ |\n\n## Cross-Slice Integration\nS01 store alanlarını tanımladı, S02 bu alanları UI'da okudu. Bağımlılık düzgün çalıştı.\n\n## Requirement Coverage\nTüm başarı kriterleri karşılandı.\n\n## Verification Class Compliance\n| Sınıf | Durum | Kanıt |\n|--------|-------|-------|\n| Contract | ✅ | npm run verify (lint + test + build) başarılı |\n| Integration | ✅ | S01→S02 bağımlılık düzgün |\n| Operational | N/A | Backend yok |\n| UAT | ✅ | Her slice için UAT kontrolleri PASS\n\n\n## Verdict Rationale\nTüm başarı kriterleri karşılandı, 347 test geçiyor, lint temiz, build başarılı.\n",
       "created_at": "2026-07-06T02:29:23.875Z"
+    },
+    {
+      "path": "/home/pc/dosh-oyun/.gsd/phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-VALIDATION.md",
+      "milestone_id": "M003",
+      "slice_id": null,
+      "task_id": null,
+      "status": "needs-attention",
+      "scope": "milestone-validation",
+      "full_content": "---\nverdict: needs-attention\nremediation_round: 0\n---\n\n# Milestone Validation: M003\n\n## Success Criteria Checklist\n- [x] S01: fetch-glosses.mjs çalışır ✅\n- [x] S01: API'den anlam çeker ✅\n- [x] S01: --dry-run modu var ✅\n- [ ] S02: INFO'ya yeni kelime eklenmedi (kullanıcı tercihi) ⚠️\n\n## Slice Delivery Audit\n| Slice | Planlanan | Gerçekleşen | Durum |\n|-------|-----------|-------------|-------|\n| S01 | fetch-glosses.mjs | Yazıldı, test edildi | ✅ |\n| S02 | INFO aktarımı | Kullanıcı iptal etti | ⏭️ Skipped |\n\n## Cross-Slice Integration\nS02 atlandığı için cross-slice entegrasyon sorunu yok.\n\n## Requirement Coverage\nINFO kapsamı artırılamadı. fetch-glosses.mjs gelecekteki kullanım için hazır.\n\n\n## Verdict Rationale\nS01 başarılı — Wiktionary'den anlam çeken script hazır. S02 kullanıcı kararıyla atlandı. Milestone hedefine ulaşılamadı ama değerli bir araç (fetch-glosses.mjs) kazanıldı.\n",
+      "created_at": "2026-07-06T02:56:30.610Z"
+    },
+    {
+      "path": "/home/pc/dosh-oyun/.gsd/phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-VALIDATION.md",
+      "milestone_id": "M004",
+      "slice_id": null,
+      "task_id": null,
+      "status": "pass",
+      "scope": "milestone-validation",
+      "full_content": "---\nverdict: pass\nremediation_round: 0\n---\n\n# Milestone Validation: M004\n\n## Success Criteria Checklist\n- [x] S01: .logo/.tower drop-shadow mobilde none ✅\n- [x] S01: .bub box-shadow mobilde tek katman ✅\n- [x] S01: #wheel svg polyline drop-shadow mobilde none ✅\n- [x] S01: npm run verify geçer ✅\n- [x] S02: Mobilde canvas'lar gizlenir ✅\n- [x] S02: npm run verify geçer ✅\n\n## Slice Delivery Audit\n| Slice | Planlanan | Gerçekleşen | Durum |\n|-------|-----------|-------------|-------|\n| S01 | CSS override'ları | 6 override eklendi | ✅ |\n| S02 | Canvas gizleme | main.js güncellendi | ✅ |\n\n## Cross-Slice Integration\nSlice'lar bağımsız: S01 CSS-only, S02 JS-only. Çakışma yok.\n\n## Requirement Coverage\nTüm başarı kriterleri karşılandı.\n\n## Verification Class Compliance\n| Sınıf | Durum | Kanıt |\n|--------|-------|-------|\n| Contract | ✅ | lint + test + build başarılı |\n| Integration | N/A | CSS/JS-only, backend yok |\n| Operational | N/A | |\n| UAT | ✅ | Her slice UAT PASS |\n\n\n## Verdict Rationale\nTüm başarı kriterleri karşılandı. 6 CSS özelliği mobilde hafifletildi, canvas'lar gizlendi. 347 test geçiyor.\n",
+      "created_at": "2026-07-06T03:06:38.198Z"
     }
   ],
   "quality_gates": [
@@ -1111,6 +1334,54 @@
     {
       "milestone_id": "M003",
       "slice_id": "S01",
+      "gate_id": "MV01",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "flag",
+      "rationale": "Success Criteria Checklist — milestone validation verdict: needs-attention",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:56:30.609Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "MV02",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "flag",
+      "rationale": "Slice Delivery Audit — milestone validation verdict: needs-attention",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:56:30.609Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "MV03",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "flag",
+      "rationale": "Cross-Slice Integration — milestone validation verdict: needs-attention",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:56:30.609Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "MV04",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "flag",
+      "rationale": "Requirement Coverage — milestone validation verdict: needs-attention",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:56:30.609Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
       "gate_id": "Q3",
       "scope": "slice",
       "task_id": "",
@@ -1287,6 +1558,198 @@
       "rationale": "",
       "findings": "",
       "evaluated_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "MV01",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Success Criteria Checklist — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:38.198Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "MV02",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Slice Delivery Audit — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:38.198Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "MV03",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Cross-Slice Integration — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:38.198Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "MV04",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Requirement Coverage — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:38.198Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:05:37.531Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:05:37.531Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:05:37.531Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S01",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:05:47.647Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:14.719Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:14.719Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:14.719Z"
+    },
+    {
+      "milestone_id": "M004",
+      "slice_id": "S02",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T03:06:23.337Z"
     }
   ],
   "verification_evidence": [
