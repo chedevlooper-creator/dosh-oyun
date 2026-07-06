@@ -1,0 +1,10 @@
+file:///home/pc/dosh-oyun/[eval1]:24
+  const withGloss = [...allWords].filter(w => INFO[w.toLowerCase()]);
+                                                     ^
+
+TypeError: w.toLowerCase is not a function
+    at file:///home/pc/dosh-oyun/[eval1]:24:54
+    at Array.filter (<anonymous>)
+    at file:///home/pc/dosh-oyun/[eval1]:24:35
+
+Node.js v22.23.1

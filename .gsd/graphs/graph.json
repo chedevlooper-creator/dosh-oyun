@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    {
+      "id": "milestone:M001",
+      "label": "M001: Bundle Optimizasyonu ve Kalite İyileştirmeleri",
+      "type": "milestone",
+      "description": "Active milestone: M001",
+      "confidence": "EXTRACTED",
+      "sourceFile": "STATE.md"
+    },
+    {
+      "id": "concept:phase:validating-milestone",
+      "label": "Phase: validating-milestone",
+      "type": "concept",
+      "confidence": "EXTRACTED",
+      "sourceFile": "STATE.md"
+    }
+  ],
+  "edges": [],
+  "builtAt": "2026-07-06T02:06:57.790Z"
+}

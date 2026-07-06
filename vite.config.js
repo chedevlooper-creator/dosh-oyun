@@ -51,7 +51,6 @@ export default defineConfig({
         enabled: true
       },
       workbox: {
-        // bg-*.jpg'ler yalnızca eski Safari fallback'i — precache'e WebP'ler girsin
         globPatterns: ['**/*.{js,css,html,png,webp,woff2,webmanifest}'],
       },
       manifest: {
