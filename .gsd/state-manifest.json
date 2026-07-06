@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exported_at": "2026-07-06T02:07:25.750Z",
+  "exported_at": "2026-07-06T02:29:32.525Z",
   "requirements": [],
   "artifacts": [
     {
@@ -52,6 +52,46 @@
       "full_content": "---\nestimated_steps: 1\nestimated_files: 1\nskills_used: []\n---\n\n# T01: Sentry durumunu doğrula ve build analizini belgele\n\nSentry zaten ayrı bir chunk (sentry-IucMPv48.js, 463KB/153KB gzip) ve sadece reportError çağrıldığında lazy-load oluyor. main chunk 56KB/20KB gzip ile hedefin altında. Bu task'ta mevcut durumu belgeleyip S01'i kapatacağız. Eğer ek optimizasyon gerekirse (örn. Sentry chunk'ının daha da ertelenmesi), onu not edeceğiz.\n\n## Inputs\n\n- `js/utils/report.js`\n- `js/main.js`\n\n## Expected Output\n\n- `js/utils/report.js`\n\n## Verification\n\nnpm run build && ls -lh dist/assets/sentry-*.js dist/assets/main-*.js\n",
       "imported_at": "2026-07-06T02:05:13.712Z",
       "content_hash": "9b0d1882d90fab5431fbadce7a35998add79115bb9d20e09090ed571104a94b0"
+    },
+    {
+      "path": "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-01-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "task_id": null,
+      "full_content": "# S01: Skor Kalıcılığı ve Store Entegrasyonu\n\n**Goal:** Time Attack skorlarını S.stats'a kaydet, store şemasını genişlet.\n**Demo:** Time Attack bitince skor S.stats.taBest'e kaydedilir; sayfa yenilense bile skor kalır.\n\n## Must-Haves\n\n- 1. S.stats.taBest ve S.stats.taGames alanları var\n- 2. Oyun bitince skor S.stats'a yazılır\n- 3. save migration çalışır (eski save'ler bozulmaz)\n- 4. Tüm testler geçer\n\n## Proof Level\n\n- This slice proves: acceptance-test\n\n## Integration Closure\n\ntime-attack.js'de endTimeAttack() store'a yazar; store.js'de yeni alanlar hydrate edilir.\n\n## Verification\n\n- Skor kaydı başarısız olursa console.warn.\n\n<tasks>\n- [x] **T01**: Store'a taBest/taGames/taWords eklendi, time-attack endTimeAttack store'a yazıyor, i18n anahtarları eklendi. _(30m)_\n  1. store.js _S.stats'a taBest (en iyi skor), taGames (toplam oyun), taWords (en iyi kelime sayısı) alanlarını ekle\n  2. hydrate()'te bu alanlar için varsayılan değerleri tanımla\n  3. snapshot()'a yeni alanları ekle\n  4. time-attack.js endTimeAttack() içinde S.stats'a yaz\n  5. i18n anahtarlarını ekle: stats.taTitle, stats.taBest, stats.taGames, stats.taWords\n  6. npm test ile doğrula\n  - Files: `js/engine/store.js`, `js/game/time-attack.js`, `js/utils/i18n.js`\n  - Verify: npm test\n</tasks>\n\n## Files Likely Touched\n\n- js/engine/store.js\n- js/game/time-attack.js\n- js/utils/i18n.js\n",
+      "imported_at": "2026-07-06T02:28:08.863Z",
+      "content_hash": "9f60d202d1cc61fad9c3fb14a78dad6ff85d8ea455eb42ce8d4cca2242437f4d"
+    },
+    {
+      "path": "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-02-ASSESSMENT.md",
+      "artifact_type": "ASSESSMENT",
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "task_id": null,
+      "full_content": "# S02 Assessment\n\n**Milestone:** M002\n**Slice:** S02\n**Completed Slice:** S02\n**Verdict:** roadmap-confirmed\n**Created:** 2026-07-06T02:29:14.859Z\n\n## Assessment\n\nHer iki slice planlandığı gibi tamamlandı. S01 store şemasını genişletti ve time-attack bitişte kaydediyor. S02 UI'da skorları gösteriyor. Ek slice'a gerek yok.\n",
+      "imported_at": "2026-07-06T02:29:14.859Z",
+      "content_hash": "5372ba16fa89c5776e5789fc9b4bed0581215cd71b766a77833021d9ad4f7858"
+    },
+    {
+      "path": "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-02-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "task_id": null,
+      "full_content": "# S02: Ana Ekran ve İstatistiklerde Skor Gösterimi\n\n**Goal:** Time Attack skorlarını ana ekranda ve istatistikler panelinde göster.\n**Demo:** Ana ekranda 'En İyi TA: 850' gösterilir; istatistikler panelinde TA bölümü vardır.\n\n## Must-Haves\n\n- 1. Ana ekranda btn-timeattack altında veya içinde en iyi skor görünür\n- 2. İstatistikler panelinde TA bölümü vardır (en iyi skor, oynanan oyun)\n- 3. i18n anahtarları ce/ru/tr eklenir\n- 4. Tüm testler geçer\n\n## Proof Level\n\n- This slice proves: acceptance-test\n\n## Integration Closure\n\nhome.js renderHome() TA skorunu okur; stats.js openStats() TA bölümünü renderlar.\n\n## Verification\n\n- UI state güncellemesi hata vermez (null-safe).\n\n<tasks>\n- [x] **T01**: Ana ekranda TA en iyi skoru, istatistikler panelinde TA bölümü eklendi. _(30m)_\n  1. js/screens/home.js renderHome(): btn-timeattack altına en iyi TA skorunu ekle (örn. '🏆 850')\n  2. js/screens/stats.js openStats(): yeni TA bölümü ekle (en iyi skor, toplam oyun, en iyi kelime)\n  3. i18n: gerekirse ek anahtarlar (stats.taSection vb.)\n  4. Testleri güncelle/ekle\n  5. npm run verify\n  - Files: `js/screens/home.js`, `js/screens/stats.js`, `js/utils/i18n.js`\n  - Verify: npm run verify\n</tasks>\n\n## Files Likely Touched\n\n- js/screens/home.js\n- js/screens/stats.js\n- js/utils/i18n.js\n",
+      "imported_at": "2026-07-06T02:29:01.736Z",
+      "content_hash": "b9e0713172fe1bb3aac63564dffecc0521d57206ac86f2c4de3ed7d77c140087"
+    },
+    {
+      "path": "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-ROADMAP.md",
+      "artifact_type": "ROADMAP",
+      "milestone_id": "M002",
+      "slice_id": null,
+      "task_id": null,
+      "full_content": "# M002: Time Attack Skor Kaydı ve Kalıcı Leaderboard\n\n**Vision:** Time Attack skorlarını S.stats'a kaydet, ana ekranda ve istatistiklerde en iyi skoru göster, leaderboard'u kalıcı ve erişilebilir yap.\n\n## Slices\n\n- [x] **S01: Skor Kalıcılığı ve Store Entegrasyonu** `risk:low` `depends:[]`\n  > After this: Time Attack bitince skor S.stats.taBest'e kaydedilir; sayfa yenilense bile skor kalır.\n\n- [x] **S02: Ana Ekran ve İstatistiklerde Skor Gösterimi** `risk:low` `depends:[S01]`\n  > After this: Ana ekranda 'En İyi TA: 850' gösterilir; istatistikler panelinde TA bölümü vardır.\n\n## Boundary Map\n\nNot provided.\n",
+      "imported_at": "2026-07-06T02:29:32.503Z",
+      "content_hash": "34c7286223ec5e7f19ce5d17fa0fa4c7b1d6c25a6e3700f2c1227f5e80ce6f66"
     }
   ],
   "milestones": [
@@ -63,6 +103,26 @@
       "created_at": "2026-07-06T01:58:06.003Z",
       "completed_at": "2026-07-06T02:07:25.693Z",
       "vision": "İlk yükleme boyutunu ~150KB gzip azaltmak, Sentry'yi lazy-load yapmak, JPG fallback'leri temizlemek ve build output'unu küçültmek.",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "Not provided.",
+      "boundary_map_markdown": "Not provided.",
+      "sequence": 0
+    },
+    {
+      "id": "M002",
+      "title": "Time Attack Skor Kaydı ve Kalıcı Leaderboard",
+      "status": "complete",
+      "depends_on": [],
+      "created_at": "2026-07-06T02:26:22.991Z",
+      "completed_at": "2026-07-06T02:29:32.501Z",
+      "vision": "Time Attack skorlarını S.stats'a kaydet, ana ekranda ve istatistiklerde en iyi skoru göster, leaderboard'u kalıcı ve erişilebilir yap.",
       "success_criteria": [],
       "key_risks": [],
       "proof_strategy": [],
@@ -119,6 +179,58 @@
       "proof_level": "acceptance-test",
       "integration_closure": "theme.js basitleşir; index.html ve build config'de JPG referansı kalmaz.",
       "observability_impact": "Tema yükleme hatası console.warn ile loglanır.",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 2,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M002",
+      "id": "S01",
+      "title": "Skor Kalıcılığı ve Store Entegrasyonu",
+      "status": "complete",
+      "risk": "low",
+      "depends": [],
+      "demo": "Time Attack bitince skor S.stats.taBest'e kaydedilir; sayfa yenilense bile skor kalır.",
+      "created_at": "2026-07-06T02:26:34.357Z",
+      "completed_at": "2026-07-06T02:28:20.325Z",
+      "full_summary_md": "---\nid: S01\nparent: M002\nmilestone: M002\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T02:28:20.325Z\nblocker_discovered: false\n---\n\n# S01: Skor Kalıcılığı ve Store Entegrasyonu\n\n**taBest/taGames/taWords store'a eklendi, time-attack bitişte kaydediyor, i18n hazır.**\n\n## What Happened\n\nStore şeması genişletildi: S.stats'a taBest, taGames, taWords alanları eklendi. time-attack.js'de endTimeAttack() fonksiyonu oyun bitince bu alanları güncelliyor. Eski save'ler hydrate() tarafından sorunsuz migrate ediliyor (eksik alanlar 0 ile dolduruluyor). i18n anahtarları üç dilde eklendi. Yeni store testi eklendi. 347/347 test geçiyor.\n\n## Verification\n\nnpm test: 347 tests passed. Lint: clean.\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nNone.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `js/engine/store.js` — _S.stats'a taBest, taGames, taWords eklendi; hydrate ve varsayılanlar güncellendi\n- `js/game/time-attack.js` — endTimeAttack() store'a skor yazıyor\n- `js/utils/i18n.js` — stats.taSection/Best/Games/Words ce/ru/tr eklendi\n- `js/__tests__/store.test.js` — TA alanları için hydrate testi eklendi\n",
+      "full_uat_md": "# S01: Skor Kalıcılığı ve Store Entegrasyonu — UAT\n\n**Milestone:** M002\n**Written:** 2026-07-06T02:28:20.326Z\n\n## UAT: Skor Kalıcılığı\n\n### UAT-01: store'da yeni alanlar var\n- **Kontrol**: S.stats.taBest, taGames, taWords\n- **Kanıt**: store.js'de _S.stats tanımında mevcut\n- **Sonuç**: ✅ PASS\n\n### UAT-02: endTimeAttack store'a yazıyor\n- **Kontrol**: time-attack.js endTimeAttack() içinde S.stats atamaları\n- **Kanıt**: `S.stats.taGames = (S.stats.taGames || 0) + 1; if (score > ...) S.stats.taBest = score;`\n- **Sonuç**: ✅ PASS\n\n### UAT-03: hydrate eski save'leri bozmuyor\n- **Kontrol**: store test: eksik TA alanları 0 ile dolduruluyor\n- **Kanıt**: `hydrate({ _v:2, coins:200, ... })` → taBest=0, taGames=0, taWords=0\n- **Sonuç**: ✅ PASS\n\n### UAT-04: i18n anahtarları mevcut\n- **Kontrol**: ce/ru/tr her dilde stats.taSection, stats.taBest, stats.taGames, stats.taWords\n- **Kanıt**: i18n.js'de mevcut\n- **Sonuç**: ✅ PASS\n",
+      "goal": "Time Attack skorlarını S.stats'a kaydet, store şemasını genişlet.",
+      "success_criteria": "1. S.stats.taBest ve S.stats.taGames alanları var\n2. Oyun bitince skor S.stats'a yazılır\n3. save migration çalışır (eski save'ler bozulmaz)\n4. Tüm testler geçer",
+      "proof_level": "acceptance-test",
+      "integration_closure": "time-attack.js'de endTimeAttack() store'a yazar; store.js'de yeni alanlar hydrate edilir.",
+      "observability_impact": "Skor kaydı başarısız olursa console.warn.",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 1,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M002",
+      "id": "S02",
+      "title": "Ana Ekran ve İstatistiklerde Skor Gösterimi",
+      "status": "complete",
+      "risk": "low",
+      "depends": [
+        "S01"
+      ],
+      "demo": "Ana ekranda 'En İyi TA: 850' gösterilir; istatistikler panelinde TA bölümü vardır.",
+      "created_at": "2026-07-06T02:26:34.357Z",
+      "completed_at": "2026-07-06T02:29:10.722Z",
+      "full_summary_md": "---\nid: S02\nparent: M002\nmilestone: M002\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T02:29:10.722Z\nblocker_discovered: false\n---\n\n# S02: Ana Ekran ve İstatistiklerde Skor Gösterimi\n\n**Ana ekranda TA skoru, istatistiklerde TA bölümü — kullanıcı skorlarını her yerde görüyor.**\n\n## What Happened\n\nİki UI değişikliği: (1) Ana ekrandaki ⏱ butonunda, eğer daha önce Time Attack oynandıysa en iyi skor label olarak gösteriliyor. (2) İstatistikler panelinde yeni \"Zamana Karşı ⏱\" bölümü eklendi; en iyi skor, toplam oyun sayısı ve en iyi kelime sayısı gösteriliyor. Tüm dillerde i18n anahtarları mevcut.\n\n## Verification\n\nnpm run verify: lint clean, 347/347 tests passed, build successful.\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nNone.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `js/screens/home.js` — renderHome() TA skorunu btn-timeattack label'ına yazıyor\n- `js/screens/stats.js` — openStats() TA bölümü eklendi\n",
+      "full_uat_md": "# S02: Ana Ekran ve İstatistiklerde Skor Gösterimi — UAT\n\n**Milestone:** M002\n**Written:** 2026-07-06T02:29:10.723Z\n\n## UAT: TA Skor Gösterimi\n\n### UAT-01: Ana ekranda skor görünüyor\n- **Kontrol**: renderHome() içinde taBest > 0 ise btn-timeattack .lb güncelleniyor\n- **Kanıt**: `taLabel.textContent = '⏱ ' + taBest`\n- **Sonuç**: ✅ PASS\n\n### UAT-02: İstatistiklerde TA bölümü var\n- **Kontrol**: openStats() içinde stats.taSection başlıklı yeni bölüm\n- **Kanıt**: taBest, taGames, taWords stat-card'ları render ediliyor\n- **Sonuç**: ✅ PASS\n\n### UAT-03: Tüm testler geçiyor\n- **Kontrol**: npm test\n- **Kanıt**: 24 files, 347 tests, all passed\n- **Sonuç**: ✅ PASS\n",
+      "goal": "Time Attack skorlarını ana ekranda ve istatistikler panelinde göster.",
+      "success_criteria": "1. Ana ekranda btn-timeattack altında veya içinde en iyi skor görünür\n2. İstatistikler panelinde TA bölümü vardır (en iyi skor, oynanan oyun)\n3. i18n anahtarları ce/ru/tr eklenir\n4. Tüm testler geçer",
+      "proof_level": "acceptance-test",
+      "integration_closure": "home.js renderHome() TA skorunu okur; stats.js openStats() TA bölümünü renderlar.",
+      "observability_impact": "UI state güncellemesi hata vermez (null-safe).",
       "target_repositories": [
         "project"
       ],
@@ -216,6 +328,101 @@
       "escalation_awaiting_review": 0,
       "escalation_artifact_path": null,
       "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "id": "T01",
+      "title": "Store'a taBest/taGames/taWords eklendi, time-attack endTimeAttack store'a yazıyor, i18n anahtarları eklendi.",
+      "status": "complete",
+      "one_liner": "Store'a taBest/taGames/taWords eklendi, time-attack endTimeAttack store'a yazıyor, i18n anahtarları eklendi.",
+      "narrative": "store.js _S.stats'a taBest (en iyi skor), taGames (toplam oyun), taWords (en iyi kelime sayısı) alanları eklendi. hydrate()'te varsayılan değerler tanımlandı, snapshot() zaten tüm stats'ı kopyaladığı için ek değişiklik gerekmedi. time-attack.js endTimeAttack() içinde S.stats.taGames artırılıyor ve en iyi skor güncelleniyor. i18n.js'ye ce/ru/tr için stats.taSection, stats.taBest, stats.taGames, stats.taWords anahtarları eklendi. Yeni store testi hydrate'in eksik TA alanlarını 0 ile doldurduğunu doğruluyor. 347/347 test geçiyor.",
+      "verification_result": "npm test: 24 files, 347 tests, all passed. Yeni test: hydrate() initializes TA stats fields.",
+      "duration": "",
+      "completed_at": "2026-07-06T02:28:08.816Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "None.",
+      "key_files": [
+        "js/engine/store.js",
+        "js/game/time-attack.js",
+        "js/utils/i18n.js",
+        "js/__tests__/store.test.js"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S01\nmilestone: M002\nkey_files:\n  - js/engine/store.js\n  - js/game/time-attack.js\n  - js/utils/i18n.js\n  - js/__tests__/store.test.js\nkey_decisions:\n  - (none)\nduration: \nverification_result: passed\ncompleted_at: 2026-07-06T02:28:08.779Z\nblocker_discovered: false\n---\n\n# T01: Store'a taBest/taGames/taWords eklendi, time-attack endTimeAttack store'a yazıyor, i18n anahtarları eklendi.\n\n**Store'a taBest/taGames/taWords eklendi, time-attack endTimeAttack store'a yazıyor, i18n anahtarları eklendi.**\n\n## What Happened\n\nstore.js _S.stats'a taBest (en iyi skor), taGames (toplam oyun), taWords (en iyi kelime sayısı) alanları eklendi. hydrate()'te varsayılan değerler tanımlandı, snapshot() zaten tüm stats'ı kopyaladığı için ek değişiklik gerekmedi. time-attack.js endTimeAttack() içinde S.stats.taGames artırılıyor ve en iyi skor güncelleniyor. i18n.js'ye ce/ru/tr için stats.taSection, stats.taBest, stats.taGames, stats.taWords anahtarları eklendi. Yeni store testi hydrate'in eksik TA alanlarını 0 ile doldurduğunu doğruluyor. 347/347 test geçiyor.\n\n## Verification\n\nnpm test: 24 files, 347 tests, all passed. Yeni test: hydrate() initializes TA stats fields.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| 1 | `npm test 2>&1 | grep -E '(Tests|passed)'` | 0 | ✅ pass | 1600ms |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `js/engine/store.js`\n- `js/game/time-attack.js`\n- `js/utils/i18n.js`\n- `js/__tests__/store.test.js`\n",
+      "description": "1. store.js _S.stats'a taBest (en iyi skor), taGames (toplam oyun), taWords (en iyi kelime sayısı) alanlarını ekle\n2. hydrate()'te bu alanlar için varsayılan değerleri tanımla\n3. snapshot()'a yeni alanları ekle\n4. time-attack.js endTimeAttack() içinde S.stats'a yaz\n5. i18n anahtarlarını ekle: stats.taTitle, stats.taBest, stats.taGames, stats.taWords\n6. npm test ile doğrula",
+      "estimate": "30m",
+      "files": [
+        "js/engine/store.js",
+        "js/game/time-attack.js",
+        "js/utils/i18n.js"
+      ],
+      "verify": "npm test",
+      "inputs": [
+        "js/engine/store.js",
+        "js/game/time-attack.js",
+        "js/utils/i18n.js"
+      ],
+      "expected_output": [],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "id": "T01",
+      "title": "Ana ekranda TA en iyi skoru, istatistikler panelinde TA bölümü eklendi.",
+      "status": "complete",
+      "one_liner": "Ana ekranda TA en iyi skoru, istatistikler panelinde TA bölümü eklendi.",
+      "narrative": "home.js renderHome(): btn-timeattack altındaki .lb etiketine, taBest > 0 ise skor yazılıyor (örn. \"⏱ 850\"). stats.js openStats(): yeni TA bölümü eklendi — en iyi skor, toplam oyun, en iyi kelime sayısı gösteriliyor. Lint temiz, 347 test geçiyor, build başarılı.",
+      "verification_result": "npm run verify: lint clean, 347/347 tests passed, build successful.",
+      "duration": "",
+      "completed_at": "2026-07-06T02:29:01.695Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "None.",
+      "key_files": [
+        "js/screens/home.js",
+        "js/screens/stats.js"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S02\nmilestone: M002\nkey_files:\n  - js/screens/home.js\n  - js/screens/stats.js\nkey_decisions:\n  - (none)\nduration: \nverification_result: passed\ncompleted_at: 2026-07-06T02:29:01.694Z\nblocker_discovered: false\n---\n\n# T01: Ana ekranda TA en iyi skoru, istatistikler panelinde TA bölümü eklendi.\n\n**Ana ekranda TA en iyi skoru, istatistikler panelinde TA bölümü eklendi.**\n\n## What Happened\n\nhome.js renderHome(): btn-timeattack altındaki .lb etiketine, taBest > 0 ise skor yazılıyor (örn. \"⏱ 850\"). stats.js openStats(): yeni TA bölümü eklendi — en iyi skor, toplam oyun, en iyi kelime sayısı gösteriliyor. Lint temiz, 347 test geçiyor, build başarılı.\n\n## Verification\n\nnpm run verify: lint clean, 347/347 tests passed, build successful.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| 1 | `npm run verify 2>&1 | tail -5` | 0 | ✅ pass | 35000ms |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `js/screens/home.js`\n- `js/screens/stats.js`\n",
+      "description": "1. js/screens/home.js renderHome(): btn-timeattack altına en iyi TA skorunu ekle (örn. '🏆 850')\n2. js/screens/stats.js openStats(): yeni TA bölümü ekle (en iyi skor, toplam oyun, en iyi kelime)\n3. i18n: gerekirse ek anahtarlar (stats.taSection vb.)\n4. Testleri güncelle/ekle\n5. npm run verify",
+      "estimate": "30m",
+      "files": [
+        "js/screens/home.js",
+        "js/screens/stats.js",
+        "js/utils/i18n.js"
+      ],
+      "verify": "npm run verify",
+      "inputs": [
+        "js/screens/home.js",
+        "js/screens/stats.js",
+        "js/utils/i18n.js",
+        "js/engine/store.js"
+      ],
+      "expected_output": [],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
     }
   ],
   "decisions": [],
@@ -232,6 +439,16 @@
       "created_at": "2026-07-06T02:07:03.116Z"
     },
     {
+      "path": ".gsd/phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-02-ASSESSMENT.md",
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "task_id": null,
+      "status": "roadmap-confirmed",
+      "scope": "roadmap",
+      "full_content": "Her iki slice planlandığı gibi tamamlandı. S01 store şemasını genişletti ve time-attack bitişte kaydediyor. S02 UI'da skorları gösteriyor. Ek slice'a gerek yok.",
+      "created_at": "2026-07-06T02:29:14.838Z"
+    },
+    {
       "path": "/home/pc/dosh-oyun/.gsd/phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-VALIDATION.md",
       "milestone_id": "M001",
       "slice_id": null,
@@ -240,6 +457,16 @@
       "scope": "milestone-validation",
       "full_content": "---\nverdict: pass\nremediation_round: 0\n---\n\n# Milestone Validation: M001\n\n## Success Criteria Checklist\n- [x] S01: main chunk ≤45KB gzip → 20.22KB ✅\n- [x] S01: Sentry chunk ilk yükte gelmez → ayrı chunk, dynamic import ✅\n- [x] S01: Tüm testler geçer → 346/346 ✅\n- [x] S02: public/ içinde bg-*.jpg kalmaz → silindi ✅\n- [x] S02: theme.js sadece WebP yükler → WEBP_OK kontrolü kaldırıldı ✅\n- [x] S02: Build başarılı → ✓ built in 1.14s ✅\n- [x] S02: Tüm testler geçer → 346/346 ✅\n\n## Slice Delivery Audit\n| Slice | Planlanan | Gerçekleşen | Durum |\n|-------|-----------|-------------|-------|\n| S01 | Sentry lazy-load | Zaten lazy-load çalışıyordu, değişiklik gerekmedi | ✅ |\n| S02 | JPG temizliği | 5 JPG silindi, theme.js basitleşti | ✅ |\n\n## Cross-Slice Integration\nSlice'lar bağımsız çalıştı. S01'in bulgusu (Sentry zaten optimal) S02'yi etkilemedi. Her iki slice da aynı theme.js dosyasına dokunmadı — çakışma yok.\n\n## Requirement Coverage\nTüm başarı kriterleri karşılandı. Ek gereksinim çıkmadı.\n\n## Verification Class Compliance\n| Sınıf | Durum | Kanıt |\n|--------|-------|-------|\n| Contract | ✅ | npm run verify (lint + test + build) başarılı |\n| Integration | ✅ | Cross-slice çakışma yok |\n| Operational | N/A | Backend yok |\n| UAT | ✅ | Her slice için UAT kontrolleri PASS\n\n\n## Verdict Rationale\nTüm başarı kriterleri karşılandı, testler geçiyor, build başarılı, kod basitleşti. Eksik veya sorun yok.\n",
       "created_at": "2026-07-06T02:07:14.389Z"
+    },
+    {
+      "path": "/home/pc/dosh-oyun/.gsd/phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-VALIDATION.md",
+      "milestone_id": "M002",
+      "slice_id": null,
+      "task_id": null,
+      "status": "pass",
+      "scope": "milestone-validation",
+      "full_content": "---\nverdict: pass\nremediation_round: 0\n---\n\n# Milestone Validation: M002\n\n## Success Criteria Checklist\n- [x] S01: S.stats.taBest ve S.stats.taGames alanları var ✅\n- [x] S01: Oyun bitince skor S.stats'a yazılır ✅\n- [x] S01: save migration çalışır (eski save'ler bozulmaz) ✅\n- [x] S01: Tüm testler geçer (347) ✅\n- [x] S02: Ana ekranda en iyi skor görünür ✅\n- [x] S02: İstatistikler panelinde TA bölümü var ✅\n- [x] S02: i18n anahtarları ce/ru/tr mevcut ✅\n- [x] S02: Tüm testler geçer ✅\n\n## Slice Delivery Audit\n| Slice | Planlanan | Gerçekleşen | Durum |\n|-------|-----------|-------------|-------|\n| S01 | Store + time-attack kayıt | 4 dosya değişti, 1 yeni test | ✅ |\n| S02 | UI skor gösterimi | home.js + stats.js güncellendi | ✅ |\n\n## Cross-Slice Integration\nS01 store alanlarını tanımladı, S02 bu alanları UI'da okudu. Bağımlılık düzgün çalıştı.\n\n## Requirement Coverage\nTüm başarı kriterleri karşılandı.\n\n## Verification Class Compliance\n| Sınıf | Durum | Kanıt |\n|--------|-------|-------|\n| Contract | ✅ | npm run verify (lint + test + build) başarılı |\n| Integration | ✅ | S01→S02 bağımlılık düzgün |\n| Operational | N/A | Backend yok |\n| UAT | ✅ | Her slice için UAT kontrolleri PASS\n\n\n## Verdict Rationale\nTüm başarı kriterleri karşılandı, 347 test geçiyor, lint temiz, build başarılı.\n",
+      "created_at": "2026-07-06T02:29:23.875Z"
     }
   ],
   "quality_gates": [
@@ -434,6 +661,198 @@
       "rationale": "Operational Readiness section left empty — recorded as omitted",
       "findings": "",
       "evaluated_at": "2026-07-06T02:06:57.763Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "MV01",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Success Criteria Checklist — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:23.875Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "MV02",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Slice Delivery Audit — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:23.875Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "MV03",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Cross-Slice Integration — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:23.875Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "MV04",
+      "scope": "milestone",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "pass",
+      "rationale": "Requirement Coverage — milestone validation verdict: pass",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:23.875Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:28:08.864Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:28:08.864Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:28:08.864Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S01",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:28:20.366Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:01.736Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:01.736Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:01.736Z"
+    },
+    {
+      "milestone_id": "M002",
+      "slice_id": "S02",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:29:10.744Z"
     }
   ],
   "verification_evidence": [
@@ -469,6 +888,28 @@
       "verdict": "✅ pass",
       "duration_ms": 35000,
       "created_at": "2026-07-06T02:06:45.148Z"
+    },
+    {
+      "id": 4,
+      "task_id": "T01",
+      "slice_id": "S01",
+      "milestone_id": "M002",
+      "command": "npm test 2>&1 | grep -E '(Tests|passed)'",
+      "exit_code": 0,
+      "verdict": "✅ pass",
+      "duration_ms": 1600,
+      "created_at": "2026-07-06T02:28:08.816Z"
+    },
+    {
+      "id": 5,
+      "task_id": "T01",
+      "slice_id": "S02",
+      "milestone_id": "M002",
+      "command": "npm run verify 2>&1 | tail -5",
+      "exit_code": 0,
+      "verdict": "✅ pass",
+      "duration_ms": 35000,
+      "created_at": "2026-07-06T02:29:01.695Z"
     }
   ],
   "milestone_commit_attributions": []
