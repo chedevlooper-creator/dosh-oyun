@@ -804,8 +804,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .tower{filter:none !important}
   .tool-ic svg{filter:none !important}
   #wheel svg polyline{filter:none !important}
-  .bub{box-shadow:0 2px 6px rgba(0,0,0,.35) !important}
-  .bub.sel{box-shadow:0 0 8px rgba(242,181,61,.5) !important}
+  .bub{box-shadow:0 2px 6px rgba(0,0,0,.35) !important;will-change:auto !important}
+  .bub.sel{box-shadow:0 0 8px rgba(242,181,61,.5) !important;will-change:auto !important}
 }
 /* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */
 @media (pointer:coarse) and (max-width:480px){

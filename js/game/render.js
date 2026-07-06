@@ -11,6 +11,7 @@ import { getState, getBubbles } from "./state.js";
 /* ---------- ÖNİZLEME (renderSel için önbellek) ---------- */
 let _capEl = null;
 let _capSpans = [];
+let _polylineEl = null; // SVG polyline cache — her pointermove'da querySelector yapma
 
 function _ensureCap() {
   if (!_capEl) {
@@ -122,6 +123,7 @@ export function fillCell(cell, hint = false) {
 export function buildWheel(letters, onBubbleKey) {
   const wheel = document.getElementById("wheel");
   wheel.querySelectorAll(".bub").forEach((b) => b.remove());
+  _polylineEl = null; // wheel yeniden oluştu, cache'i sıfırla
   const n = letters.length;
   const zone = document.getElementById("wheel-zone");
   const D = Math.max(190, Math.min(340, Math.min(
@@ -208,10 +210,10 @@ export function renderSel() {
   const G = getState();
   if (!G) return;
   _updateCap(G.sel);
-  const svg = document.querySelector("#wheel svg polyline");
-  if (!svg) return;
+  if (!_polylineEl) _polylineEl = document.querySelector("#wheel svg polyline");
+  if (!_polylineEl) return;
   // Balon x/y çark-izafidir; SVG viewBox çark boyutuna eşit, doğrudan kullan
-  svg.setAttribute("points", G.sel.map((b) => b.x + "," + b.y).join(" "));
+  _polylineEl.setAttribute("points", G.sel.map((b) => b.x + "," + b.y).join(" "));
 }
 
 /** Seçimi temizle (görsel + state). */
