@@ -51,4 +51,12 @@ Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ ч
 
 Vercel (`vercel.json`): strict CSP, cache headers, `/editor` rewrite+noindex. `NODE_ENV=production` at build (required for PWA plugin). Absolute URLs in `index.html`, `public/robots.txt`, `public/sitemap.xml` assume `https://dosh-oyun.vercel.app` — update all three if domain changes.
 
+Repoyu gözden geçir: `.env` dosyası ignore edilmiş (`**/.env*` rule). Şablon için `.env.example` kullanılıyor. Vercel CLI dev özel token'ını `.env.local`'e yazar — repo'da olmamalı.
+
 CI (`ci.yml`) runs lint → vitest → e2e → build on PRs to main. `content-pipeline.yml` auto-fetches from Wiktionary weekly, validates lemmas, emits daily word, auto-commits `js/data/next.json`.
+
+## Mobile thermal performance
+
+iPhone/iPad termal yükünü azaltmak için P0–P1 düzeltmeleri uygulandı (`css/animations.css`, `css/layout.css`, `css/components.css` `@media (pointer:coarse)` kuralları). Yeni sonsuz animasyon/dekoratif CSS eklerken mobil eşdeğerini unutmayın; `kenburns`, `sunPulse`, `logoShine`, `ringSpin`, `borderFlow`, `pulseRing`, `skeletonShimmer`, `glowSweep`, `pulse-ring::after`, `ctaPulse`, `pricePulse` mobilde zaten kapatılmış. Yeni eklenenler de aynı yere eklenmeli.
+
+`js/main.js` iOS'ta varsayılan olarak `S.settings.scene3d=false` yapar (üç boyutlu sahnenin termal yükünü önlemek için). `js/engine/store.js` mobile'larda save debounce'u 1000ms'ye çıkarır (300ms yerine). Bu kararlar surrealdegildir ama e2e testlerde (`?playtest=1` dışında) `S.settings.scene3d` açık kalmalı; testler bu ayarı varsaymamalı.

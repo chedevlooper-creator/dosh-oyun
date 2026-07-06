@@ -8,6 +8,8 @@ import { ac, SFX } from "../engine/audio.js";
 import { confetti } from "../fx/particles.js";
 import { dailyLevelId, isDailyDone, currentStreak } from "../engine/daily.js";
 import { startLevel } from "./game.js";
+import { loadAllLevels } from "../data/level-loader.js";
+import { startTimeAttack } from "../game/time-attack.js";
 
 /* ================= ANA EKRAN ================= */
 export function renderHome(){
@@ -58,11 +60,6 @@ $("btn-stats").onclick = () => import("./stats.js").then(({ openStats }) => open
 $("btn-dict").onclick = () => import("./dict.js").then(({ openDict }) => openDict());
 $("btn-timeattack").onclick = () => {
   ac(); SFX.coin();
-  Promise.all([
-    import("../data/level-loader.js"),
-    import("../game/time-attack.js"),
-  ]).then(([{ loadAllLevels }, { startTimeAttack }]) =>
-    loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0))
-  );
+  loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
 };
 

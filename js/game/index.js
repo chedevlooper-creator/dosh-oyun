@@ -26,7 +26,7 @@ import { show, updateCoins, toast, flyCoins, vibrate } from "../utils/helpers.js
 import { onResize } from "../utils/resize.js";
 import { speak } from "../utils/tts.js";
 import { track, EVENTS } from "../utils/analytics.js";
-import { resetTimeAttack, isTimeAttack, recordTAScore } from "./time-attack.js";
+import { resetTimeAttack, isTimeAttack, recordTAScore, advanceTALevel } from "./time-attack.js";
 import {
   G as storeG, getState, getBubbles, initState, isDragging,
 } from "./state.js";
@@ -77,46 +77,59 @@ function selPopLast() {
   renderSel();
 }
 
+/** Daha önce çözülmüş kelimeyi veya bonusu tekrar gönderme girişimi. */
+function _handleDuplicate() {
+  clearSel()("dup");
+  toast(t("game.found"));
+}
+
+/** Bonus kelime bulundu: coin + UI güncelleme. */
+function _handleBonus(word) {
+  const G = getState();
+  if (!G) return;
+  clearSel()("ok");
+  resetWrongRow();
+  G.foundBonus.add(word);
+  document.getElementById("bonus-count").textContent = G.foundBonus.size;
+  addFoundWord(word, { isBonus: true, coins: CFG.bonusWordCoins });
+  G.earned += CFG.bonusWordCoins;
+  updateCoins();
+  SFX.bonus();
+  flyCoins(document.getElementById("bonus-chest"), 3);
+  toast(t("game.bonusMsg", CFG.bonusWordCoins), "gold");
+}
+
+/** Yanlış cevap: hata sayacını artır, ipucu yardımını tetikle. */
+function _handleMistake() {
+  const G = getState();
+  if (!G) return;
+  G.mistakes++;
+  G.streak = 0;
+  clearSel()("bad");
+  SFX.bad();
+  vibrate([40, 50, 40]);
+  toast(t("game.wrong"), "bad");
+  onWrongGuess({ checkAutoSolve, checkDone });
+}
+
 /** Tüm kelime çözüm mantığı (seçim → hedef eşleşme veya yanlış). */
 export function submitSel() {
   const G = getState();
   if (!G) return;
   const word = G.sel.map((b) => b.letter).join("");
-  const doClear = clearSel();
 
-  if (G.sel.length < 2) { doClear(); return; }
+  if (G.sel.length < 2) { clearSel()(); return; }
 
   const target = G.words.find((w) => !w.solved && w.norm === word);
-  if (target) { doClear("ok"); solveWord(target, false); return; }
+  if (target) { clearSel()("ok"); solveWord(target, false); return; }
 
   if (G.words.some((w) => w.solved && w.norm === word) || G.foundBonus.has(word)) {
-    doClear("dup");
-    toast(t("game.found"));
-    return;
+    _handleDuplicate(); return;
   }
 
-  if (G.bonusSet.has(word)) {
-    doClear("ok");
-    resetWrongRow();
-    G.foundBonus.add(word);
-    document.getElementById("bonus-count").textContent = G.foundBonus.size;
-    addFoundWord(word, { isBonus: true, coins: CFG.bonusWordCoins });
-    G.earned += CFG.bonusWordCoins;
-    updateCoins();
-    SFX.bonus();
-    flyCoins(document.getElementById("bonus-chest"), 3);
-    toast(t("game.bonusMsg", CFG.bonusWordCoins), "gold");
-    return;
-  }
+  if (G.bonusSet.has(word)) { _handleBonus(word); return; }
 
-  // Hata
-  G.mistakes++;
-  G.streak = 0;
-  doClear("bad");
-  SFX.bad();
-  vibrate([40, 50, 40]);
-  toast(t("game.wrong"), "bad");
-  onWrongGuess({ checkAutoSolve, checkDone });
+  _handleMistake();
 }
 
 /** Bir hücre tıklandığında çağrılır (input.js + DOM). */
@@ -188,10 +201,7 @@ function solveWord(w, byHint) {
   // Time Attack: puan kaydet ve seviye atla
   if (!byHint && isTimeAttack()) {
     recordTAScore(w.norm);
-    const tta = import("./time-attack.js");
-    tta.then((mod) => {
-      if (mod.isTimeAttack()) mod.advanceTALevel();
-    });
+    advanceTALevel();
   }
   checkAutoSolve();
   if (G.words.every((x) => x.solved)) {

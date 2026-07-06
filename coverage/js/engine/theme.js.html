@@ -1,0 +1,301 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for js/engine/theme.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">js/engine</a> theme.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/30</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/22</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/7</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/26</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// @ts-check
+import { S } from "./store.js";
+&nbsp;
+/* ================= TEMA =================
+ * Tema değişimi iki şey yapar:
+ * 1. &lt;body&gt; üzerine 'theme-*' class'ı uygular (CSS değişkenleri için)
+ * 2. Aktif temanın arka plan fotoğrafını (data-t ile eşleşen .ph divi) yükler.
+ *    Diğer temaların fotoğrafları sayfa açılışında değil, ilk kez o temaya
+ *    geçildiğinde indirilir — bu 5×JPG (~2.4MB) maliyetini başlangıçtan
+ *    kaldırır (F13). */
+&nbsp;
+export const THEMES = <span class="cstat-no" title="statement not covered" >[</span>
+  {id:"kavkaz", name:"Кавказ", dot:"linear-gradient(135deg,#7ec8e3,#123c5a)", img:"bg-kavkaz.jpg"},
+  {id:"night",  name:"Буьйса", dot:"linear-gradient(135deg,#1b2450,#070a20)", img:"bg-night.jpg"},
+  {id:"forest", name:"Хьун",   dot:"linear-gradient(135deg,#a8d5a2,#1d5c40)", img:"bg-forest.jpg"},
+  {id:"autumn", name:"Гуьйре", dot:"linear-gradient(135deg,#ffd9a0,#8a4530)", img:"bg-autumn.jpg"},
+  {id:"winter", name:"Ӏа",     dot:"linear-gradient(135deg,#dceefb,#4a7ba6)", img:"bg-winter.jpg"},
+];
+&nbsp;
+/* WebP yarı boyut (scripts/optimize-images.mjs üretir); desteklemeyen
+ * eski Safari (&lt;14) JPEG'e düşer. Canvas encode desteği decode desteğinin
+ * güvenli bir alt kümesi olduğundan yanlış pozitif vermez. */
+const WEBP_OK = <span class="cstat-no" title="statement not covered" >(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    return document.createElement("canvas").toDataURL("image/webp").startsWith("data:image/webp");</span>
+  } catch { <span class="cstat-no" title="statement not covered" >return false; </span>}
+})();
+function <span class="fstat-no" title="function not covered" >themeImg(</span>t){
+<span class="cstat-no" title="statement not covered" >  return WEBP_OK ? t.img.replace(/\.jpg$/, ".webp") : t.img;</span>
+}
+&nbsp;
+// başlangıçta aktif temanın fotoğrafını hemen yükle (FOUC'suz)
+function <span class="fstat-no" title="function not covered" >preloadInitial(</span>){
+  const initial = <span class="cstat-no" title="statement not covered" >S?.settings?.theme || "kavkaz";</span>
+  const el = <span class="cstat-no" title="statement not covered" >document.querySelector(`#photo .ph[data-t="${initial}"]`);</span>
+<span class="cstat-no" title="statement not covered" >  if (el &amp;&amp; !el.style.backgroundImage) {</span>
+    const theme = <span class="cstat-no" title="statement not covered" >THEMES.find(<span class="fstat-no" title="function not covered" >t </span>=&gt; <span class="cstat-no" title="statement not covered" >t.id === initial)</span> || THEMES[0];</span>
+<span class="cstat-no" title="statement not covered" >    el.style.backgroundImage = `url('${themeImg(theme)}')`;</span>
+  }
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >applyTheme(</span>){
+  // eski tema class'larını kaldır
+<span class="cstat-no" title="statement not covered" >  for (const c of [...document.body.classList]) {</span>
+<span class="cstat-no" title="statement not covered" >    if (c.startsWith("theme-")) <span class="cstat-no" title="statement not covered" >document.body.classList.remove(c);</span></span>
+  }
+<span class="cstat-no" title="statement not covered" >  document.body.classList.add("theme-"+S.settings.theme);</span>
+  // aktif temayı görünür yap, diğerlerini gizle (CSS .on seçici ile)
+  const activeId = <span class="cstat-no" title="statement not covered" >S.settings.theme;</span>
+<span class="cstat-no" title="statement not covered" >  document.querySelectorAll("#photo .ph").forEach(<span class="fstat-no" title="function not covered" >el </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (el.dataset.t === activeId) {</span>
+      // lazy: eğer daha önce yüklenmediyse şimdi yükle
+<span class="cstat-no" title="statement not covered" >      if (!el.style.backgroundImage) {</span>
+        const t = <span class="cstat-no" title="statement not covered" >THEMES.find(<span class="fstat-no" title="function not covered" >th </span>=&gt; <span class="cstat-no" title="statement not covered" >th.id === el.dataset.t)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if (t) <span class="cstat-no" title="statement not covered" >el.style.backgroundImage = `url('${themeImg(t)}')`;</span></span>
+      }
+<span class="cstat-no" title="statement not covered" >      el.classList.add("on");</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      el.classList.remove("on");</span>
+    }
+  });
+}
+&nbsp;
+// ilk yükleme: HTML body parse edilmeden çağrılırsa el bulunamaz;
+// applyTheme()'in ilk çağrısı yine de yükleyecek. Yine de erken başlatmak için:
+<span class="cstat-no" title="statement not covered" >if (typeof document !== "undefined") {</span>
+<span class="cstat-no" title="statement not covered" >  if (document.readyState === "loading") {</span>
+<span class="cstat-no" title="statement not covered" >    document.addEventListener("DOMContentLoaded", preloadInitial, { once: true });</span>
+  } else {
+<span class="cstat-no" title="statement not covered" >    preloadInitial();</span>
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-07-05T23:57:32.356Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

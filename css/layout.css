@@ -52,12 +52,22 @@ main{perspective:1100px}
    ================================================================ */
 @media (pointer:coarse){
   /* Ken Burns animasyonu mobil GPU'da gereksiz yük — statik fotoğraf yeterli */
-  #photo .ph.on{animation:none}
+  #photo .ph.on{animation:none;transform:none;will-change:auto}
   /* 3D CSS transformlar (translateZ/rotateX) gereksiz compositing layer oluşturur */
-  .screen{transform:translateY(26px)}
-  .screen.on{transform:none}
+  .screen{transform:translateY(26px);transition:opacity .25s}
+  .screen.on{transform:none;transition:opacity .25s}
   /* vinyet overlay kaldır */
   body::after{display:none}
   /* perspective bile 3D compositing layer oluşturabilir */
   main{perspective:none}
+  /* Çark ve panel 3D rotasyonunu küçült */
+  #wheel{transform:rotateX(6deg) translateZ(0)}
+  .panel{transform:rotateX(6deg) scale(.88) translateY(20px) translateZ(0)}
+  /* #grid-wrap içindeki .cell perspective zorla kaldır */
+  #grid-wrap{transform:none !important}
+  /* iOS Safari transform: compositing layer oluşturmaması için backface görünürlüğünü açık tut */
+  .screen,
+  .icon-btn,
+  .panel,
+  #wheel { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 }

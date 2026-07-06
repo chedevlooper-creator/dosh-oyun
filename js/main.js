@@ -1,8 +1,8 @@
 // @ts-check
 import { applyTheme } from "./engine/theme.js";
-import { renderHome } from "./screens/home.js";
 import { show, $, initSplashParticles, hapticTap, prefersReducedMotion } from "./utils/helpers.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
+import { dailyLevelId, isDailyDone } from "./engine/daily.js";
 import { load } from "./engine/save.js";
 import { setOnThemeChange, S } from "./engine/store.js";
 import { initGameScreens, startLevel } from "./screens/game.js";
@@ -10,6 +10,19 @@ import { getDir } from "./utils/i18n.js";
 import { installGlobalHandler } from "./utils/report.js";
 
 "use strict";
+
+/* =========================================================
+ * MOBİL TERMAL — iPhone / iPad'da Three.js sahnesi varsayılan
+ * kapalı. GPU ısınma + batarya tasarrufu. Ses/sfx aynı,
+ * kullanıcı ayarlardan manuel açabilir.
+ * ========================================================= */
+try {
+  const ua = navigator.userAgent;
+  const isiOS = /iPhone|iPad|iPod/.test(ua) || (ua.includes("Mac") && "ontouchstart" in document);
+  if (isiOS && S.settings.scene3d === undefined) {
+    S.settings.scene3d = false;
+  }
+} catch {}
 
 /* ================= 3D SAHNE (LAZY) =================
  * Three.js bundle'ı (~600KB) ana yola dahil edilmesin diye dynamic import
@@ -50,23 +63,22 @@ setOnThemeChange(() => {
   else if (S.settings.scene3d !== false && !prefersReducedMotion()) loadGL();
 });
 
-// P3.5: Hata Ayıklama (Debug) Modu
+// P3.5: Hata Ayıklama (Debug) Modu (production build'te tree-shake olur)
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('debug') === '1') {
+if (import.meta.env.DEV && urlParams.get('debug') === '1') {
   window.__DOSH_DEBUG__ = true;
   console.warn("[DEBUG] Debug modu aktif. Store durumu:", S);
   console.warn("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
 }
 
 /* ================= BAŞLAT ================= */
-applyTheme(); renderHome(); show("scr-home");
+applyTheme();
+import("./screens/home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
 initGameScreens();
 
 // PWA kısayolu: /?daily=1 → günlük bulmacayı doğrudan aç (yapılmadıysa)
 if (urlParams.get("daily") === "1") {
-  import("./engine/daily.js").then(({ dailyLevelId, isDailyDone }) => {
-    if (!isDailyDone()) startLevel(dailyLevelId(), { daily: true });
-  }).catch(() => {});
+  if (!isDailyDone()) startLevel(dailyLevelId(), { daily: true });
 }
 
 // Editor test play: /?playtest=1

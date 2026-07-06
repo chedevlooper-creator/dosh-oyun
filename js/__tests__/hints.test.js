@@ -1,6 +1,6 @@
 // @ts-check
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { initState, getState, pushWrongGuess, resetWrongRow } from "../game/state.js";
+import { initState, getState, resetWrongRow } from "../game/state.js";
 import { S, hydrate } from "../engine/store.js";
 import { onWrongGuess, spend, hintLetter, hintTarget, hintWand, onCellTap } from "../game/hints.js";
 import { CFG } from "../data/config.js";

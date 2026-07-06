@@ -35,8 +35,6 @@ export default defineConfig({
           if (id.includes("node_modules/@sentry")) return "sentry";
           if (id.includes("node_modules")) return "vendor";
           if (id.includes("/js/data/info.js")) return "data-info";
-          if (id.includes("/js/data/")) return "data";
-          if (id.includes("/js/game/")) return "game";
         },
       },
     },

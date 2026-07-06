@@ -8,5 +8,12 @@ export default defineConfig({
     environment: "jsdom",
     globals: false,
     include: ["js/__tests__/**/*.test.js"],
+    coverage: {
+      provider: "v8",
+      include: ["js/**/*.js"],
+      exclude: ["js/__tests__/**", "js/data/levels/**", "js/data/info.js"],
+      reporter: ["text", "text-summary", "html"],
+      reportsDirectory: "coverage",
+    },
   },
 });

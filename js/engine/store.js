@@ -35,11 +35,15 @@ function notifyTheme(){
     try{ _onThemeChange(); }catch(e){ console.warn("[store] theme cb:", e); }
   }
 }
+/* Mobilde JSON.stringify(localStorage.setItem) -> daha uzun debounce.
+ * Masaüstünde 300ms (hızlı kayıt), mobilde 1000ms (CPU/batarya tasarrufu). */
+const _isCoarse = (typeof matchMedia === "function") && matchMedia("(pointer: coarse)").matches;
+const _saveDelay = _isCoarse ? 1000 : 300;
 function scheduleSave(){
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(()=>{
     try{ save(); }catch(e){ console.error("[store] save failed:", e); }
-  }, 1000);
+  }, _saveDelay);
 }
 
 /* ---------- Proxy ---------- */

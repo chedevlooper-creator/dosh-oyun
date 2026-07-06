@@ -749,13 +749,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
    ================================================================ */
 @media (pointer:coarse){
   /* backdrop-filter mobil GPU'da çok pahalı -> mobile'da tamamen kaldır */
-  #wheel{backdrop-filter:none}
-  .glass{backdrop-filter:none}
-  .toolrow{backdrop-filter:none}
-  #preview .cap{backdrop-filter:none}
-  #toast{backdrop-filter:none}
-  #veil{backdrop-filter:none}
-  .cell{backdrop-filter:none}
+  #wheel{backdrop-filter:none;-webkit-backdrop-filter:none}
+  .glass{backdrop-filter:none;-webkit-backdrop-filter:none}
+  .toolrow{backdrop-filter:none;-webkit-backdrop-filter:none}
+  #preview .cap{backdrop-filter:none;-webkit-backdrop-filter:none}
+  #toast{backdrop-filter:none;-webkit-backdrop-filter:none}
+  #veil{backdrop-filter:none;-webkit-backdrop-filter:none}
+  .cell{backdrop-filter:none;-webkit-backdrop-filter:none}
   /* ---------- P1: sonsuz animasyonları kaldır ---------- */
   .logo{animation:float 4s ease-in-out infinite}
   #btn-start{animation:none}
@@ -767,15 +767,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .glow-sweep::before{animation:none}
   .stars-row::before{animation:none}
   .sun{animation:none}
+  /* giriş animasyonları (süresi kısa ama stack/composit yükü var) */
+  .bub,
+  .node.in,
+  #preview .cap span,
+  .bounce-in { animation-duration: .08s !important; }
   /* ---------- P1: drop-shadow katmanlarını azalt ---------- */
-  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55))}
-  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55))}
+  .logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55)) !important}
+  .tower{filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) !important}
   .btn{box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 24px rgba(0,0,0,.25)}
   .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
   .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 12px rgba(214,137,16,.35)}
+  .coins-chip{box-shadow:0 4px 10px rgba(0,0,0,.22) !important}
+  .icon-btn{box-shadow:0 4px 10px rgba(0,0,0,.22) !important}
+  /* çoklu drop-shadow zincirlerini tek katmana indir */
+  .tool-ic svg,
+  .icon-btn .ic svg{filter:none}
+  /* node.cur çift gölge (özel hover/aktif) */
+  .node.cur{box-shadow:0 0 14px rgba(255,201,77,.45),0 4px 10px rgba(0,0,0,.22)}
+  /* .wheel svg polyline: 2 drop-shadow kaldır */
+  #wheel svg polyline{filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
   /* 3D rotate küçült */
-  #wheel{transform:rotateX(6deg)}
-  .panel{transform:rotateX(6deg) scale(.88) translateY(20px)}
+  #wheel{transform:rotateX(6deg) translateZ(0)}
+  .panel{transform:rotateX(6deg) scale(.88) translateY(20px) translateZ(0)}
+  /* translate3d/perspective zorla kaldır — compositing layer tetiklemeyi önle */
+  #grid-wrap{transform:none !important}
+  .glass,
+  .toolrow,
+  .panel{will-change:auto}
   /* kartal wing çırpma -> yumuşak (smooth anim zaten) */
 }
 /* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */

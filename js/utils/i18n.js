@@ -2,6 +2,7 @@
 /* ================= ÇOKLU DİL (i18n) ALTYAPISI ================= */
 
 import { S, commitSettings } from "../engine/store.js";
+import { track, EVENTS } from "./analytics.js";
 
 /** Dil kodu → yön eşlemesi */
 export const DIR_MAP = {
@@ -382,9 +383,7 @@ export function setLanguage(code) {
       document.documentElement.dir = DIR_MAP[code] || "ltr";
     }
     // Analytics: dil değişimi
-    import("./analytics.js").then(({ track, EVENTS }) => {
-      if (prev !== code) track(EVENTS.LANG_CHANGE, { from: prev, to: code });
-    }).catch(() => { /* analytics yoksa sessizce geç */ });
+    if (prev !== code) track(EVENTS.LANG_CHANGE, { from: prev, to: code });
     location.reload();
   }
 }

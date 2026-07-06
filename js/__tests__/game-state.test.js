@@ -4,7 +4,6 @@ import {
   G, getState, initState, pushWrongGuess, resetWrongRow, markRescued,
   unfilled, randomUnfilled,
 } from "../game/state.js";
-import { setG } from "../engine/store.js";
 
 const SAMPLE_LEVEL = {
   id: 0,

@@ -35,7 +35,8 @@ export function closePanel(){
     try{ lastFocus.focus({ preventScroll:true }); }catch{}
   }
 }
-$("veil").addEventListener("click", e=>{ if(e.target===$("veil")) closePanel(); });
+const _veil = $("veil");
+if (_veil) _veil.addEventListener("click", e=>{ if(e.target===_veil) closePanel(); });
 addEventListener("keydown", e=>{
   if(!$("veil").classList.contains("on")) return;
   if(e.key === "Escape"){ closePanel(); return; }

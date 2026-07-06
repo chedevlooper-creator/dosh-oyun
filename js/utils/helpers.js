@@ -31,7 +31,6 @@ export function toast(msg, cls=""){
   t.role = cls.includes("bad") ? "alert" : "status";
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.className="", 1800);
 }
-
 /* ================= REDUCED MOTION =================
  * OS düzeyinde "azaltılmış hareket" tercihine saygı. Sahne animasyonları
  * ve partikül efektleri bunu sorgulayarak kendilerini yavaşlatır/iptal eder. */

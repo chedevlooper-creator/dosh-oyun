@@ -13,6 +13,13 @@ import { CFG } from "../data/config.js";
 import { t } from "../utils/i18n.js";
 import { SFX } from "../engine/audio.js";
 import { show, updateCoins, toast, flyCoins } from "../utils/helpers.js";
+import { initState, getState } from "./state.js";
+import { buildWheel, buildGrid, fillCell } from "./render.js";
+import { attachCellHandlers, onBubbleKey } from "./input.js";
+import { submitSel, selAdd } from "./index.js";
+import { showWordInfo } from "./reward.js";
+import { openPanel, closePanel } from "../screens/panel.js";
+import { getLevel, loadAllLevels } from "../data/level-loader.js";
 
 const TIME_LIMIT_MS = 60_000;
 const POOL_PACKS = [1, 2, 3];
@@ -201,31 +208,23 @@ function showLeaderboardModal(lb, lastScore) {
       <button class="btn small" id="ta-home">${t("ta.home")}</button>
     </div>
   `;
-  // Basit bir panel aç — gerçek UI: openPanel kullanılabilir
-  // Burada lazy: import panel.js
-  import("../screens/panel.js").then(({ openPanel, closePanel }) => {
-    openPanel(html);
-    document.getElementById("ta-retry").onclick = () => {
-      closePanel();
-      // Yeniden başlat
-      import("../data/level-loader.js").then(({ loadAllLevels }) => {
-        loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
-      });
-    };
-    document.getElementById("ta-home").onclick = () => {
-      closePanel();
-      import("../screens/home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
-    };
-  });
+  openPanel(html);
+  document.getElementById("ta-retry").onclick = () => {
+    closePanel();
+    // Yeniden başlat
+    loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
+  };
+  document.getElementById("ta-home").onclick = () => {
+    closePanel();
+    import("../screens/home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
+  };
 }
 
 /** Sonraki seviyeyi yükle (mevcut state'i yeniden kurar). */
 async function loadNextTA(levelId) {
-  const { getLevel } = await import("../data/level-loader.js");
   const lv = await getLevel(levelId).catch(() => null);
   if (!lv || !ta) return;
 
-  const { initState, getState } = await import("./state.js");
   initState(lv, { timeAttack: true });
 
   document.getElementById("lvl-num").textContent = (ta.levelIndex + 1) + "/" + ta.pool.length;
@@ -236,10 +235,6 @@ async function loadNextTA(levelId) {
   if (!G) return;
 
   // wheel + grid
-  const { buildWheel, buildGrid, attachCellHandlers, onBubbleKey, fillCell } = await import("./render.js");
-  const { submitSel, selAdd } = await import("./index.js");
-  const { showWordInfo } = await import("./reward.js");
-
   buildWheel(lv.letters.slice(), (e, el) => onBubbleKey(e, el, selAdd, () => submitSel()));
   requestAnimationFrame(() => {
     buildGrid();
@@ -290,7 +285,6 @@ export function recordTAScore(wordNorm) {
  */
 export async function advanceTALevel() {
   if (!ta) return;
-  const { getState } = await import("./state.js");
   const G = getState();
   if (!G) return;
   const allSolved = G.words.every((w) => w.solved);
@@ -300,7 +294,6 @@ export async function advanceTALevel() {
   ta.levelIndex++;
   if (ta.levelIndex >= ta.pool.length) {
     // havuz bitti — yeni rasgele seviyelerle doldur
-    const { loadAllLevels } = await import("../data/level-loader.js");
     const allLevels = await loadAllLevels();
     const filtered = allLevels.filter((lv) => POOL_PACKS.includes(lv.pack ?? 1));
     for (let i = 0; i < POOL_SIZE && filtered.length; i++) {
