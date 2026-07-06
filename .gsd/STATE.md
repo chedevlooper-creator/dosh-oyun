@@ -10,6 +10,7 @@
 - ✅ **M002:** Time Attack Skor Kaydı ve Kalıcı Leaderboard
 - 🔄 **M003:** INFO Kelime Kapsami - Wiktionary Anlam Cekme
 - ✅ **M004:** Mobil GPU Yuk Hafifletme - Drop-Shadow ve Filter Temizligi
+- ✅ **M005:** Offline-First Sertlestirme ve Performans Profili
 
 ## Recent Decisions
 - None recorded
