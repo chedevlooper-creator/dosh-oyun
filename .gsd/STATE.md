@@ -11,6 +11,7 @@
 - 🔄 **M003:** INFO Kelime Kapsami - Wiktionary Anlam Cekme
 - ✅ **M004:** Mobil GPU Yuk Hafifletme - Drop-Shadow ve Filter Temizligi
 - ✅ **M005:** Offline-First Sertlestirme ve Performans Profili
+- ⬜ **M006:** Kelime Zinciri Oyun Modu
 
 ## Recent Decisions
 - None recorded

@@ -62,6 +62,10 @@ $("btn-timeattack").onclick = () => {
   ac(); SFX.coin();
   loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
 };
+$("btn-chain")?.addEventListener?.("click", () => {
+  ac(); SFX.coin();
+  import("./chain.js").then(({ openChain }) => openChain());
+});
 
 // TA en iyi skoru göster (varsa)
 const taBest = S.stats?.taBest || 0;

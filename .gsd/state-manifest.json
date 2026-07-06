@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exported_at": "2026-07-06T03:29:14.963Z",
+  "exported_at": "2026-07-06T04:34:28.849Z",
   "requirements": [],
   "artifacts": [
     {
@@ -212,6 +212,26 @@
       "full_content": "# M005: Offline-First Sertlestirme ve Performans Profili\n\n**Vision:** PWA'nin offline çalışmasını garanti altına almak (pack JSON'ları dahil) ve gerçek tarayıcıda performans profilini çıkarıp kalan darboğazları tespit etmek.\n\n## Slices\n\n- [x] **S01: Workbox Runtime Caching ve Pack Precache** `risk:low` `depends:[]`\n  > After this: İnternet kapalıyken pack değiştirilebilir; tüm pack'ler ilk yüklemede cache'lenir.\n\n- [x] **S02: Tarayici Performans Profili** `risk:low` `depends:[S01]`\n  > After this: Ana ekran ve oyun ekranı için frame budget, layout thrashing, ve long task raporu.\n\n## Boundary Map\n\nNot provided.\n",
       "imported_at": "2026-07-06T03:29:14.959Z",
       "content_hash": "b93ab82361a840c6708291e80b185804734c839bae1c1fd2cb0df5897ebe8f35"
+    },
+    {
+      "path": "phases/06-kelime-zinciri-oyun-modu/06-01-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "task_id": null,
+      "full_content": "# S01: Zincir Motoru ve State\n\n**Goal:** Zincir state yönetimi, kelime havuzundan kısıtlı kelime seçimi, temel oyun döngüsü.\n**Demo:** Bir kelime seç, son harfini göster, yeni kelime için kısıtı uygula.\n\n## Must-Haves\n\n- Complete the planned slice outcomes.\n\n## Verification\n\n- Run the task and slice verification checks for this slice.\n\n<tasks>\n- [x] **T01**: Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test. _(40m)_\n  1. js/game/chain.js oluştur\n  2. State: { lastLetter, score, streak, words: [], usedWords: Set }\n  3. startChain(), submitChainWord(word, allWords), endChain() fonksiyonları\n  4. submit: kelime 'lastLetter' ile başlıyorsa +10*len, streak++ ; başlamıyorsa hata\n  5. Zincir için kelime havuzu: tüm INFO'daki kelimeler + pack bonus kelimeleri\n  6. Tüm kelimelerin norm'larını oluştur (grapheme norm ile)\n  7. Test: zincir.test.js ile 5+ test\n  - Files: `js/game/chain.js`, `js/data/config.js`, `js/__tests__/chain.test.js`\n  - Verify: npm test\n</tasks>\n\n## Files Likely Touched\n\n- js/game/chain.js\n- js/data/config.js\n- js/__tests__/chain.test.js\n",
+      "imported_at": "2026-07-06T04:34:19.596Z",
+      "content_hash": "776a4ba21c2cd411a495c269edc1a174555f224cd8bd669eaed4ce9e4412c181"
+    },
+    {
+      "path": "phases/06-kelime-zinciri-oyun-modu/06-ROADMAP.md",
+      "artifact_type": "ROADMAP",
+      "milestone_id": "M006",
+      "slice_id": null,
+      "task_id": null,
+      "full_content": "# M006: Kelime Zinciri Oyun Modu\n\n**Vision:** Yeni bir oyun modu: her kelimenin son harfi, bir sonraki kelimenin ilk harfi olmalı. Sürekli büyüyen zincir, çığ gibi büyüyen puan, sınırsız oynanış.\n\n## Slices\n\n- [x] **S01: Zincir Motoru ve State** `risk:medium` `depends:[]`\n  > After this: Bir kelime seç, son harfini göster, yeni kelime için kısıtı uygula.\n\n- [ ] **S02: Zincir UI ve Skor Kaliciligi** `risk:low` `depends:[S01]`\n  > After this: Zincir modu açılır, oynanır, en iyi skor kaydedilir.\n\n## Boundary Map\n\nNot provided.\n",
+      "imported_at": "2026-07-06T04:34:28.845Z",
+      "content_hash": "e411dcd4480c25a4b7cff46e9d0cedda3abe1c5a821be13f9a052b4897502b16"
     }
   ],
   "milestones": [
@@ -303,6 +323,26 @@
       "created_at": "2026-07-06T03:25:56.377Z",
       "completed_at": "2026-07-06T03:29:14.928Z",
       "vision": "PWA'nin offline çalışmasını garanti altına almak (pack JSON'ları dahil) ve gerçek tarayıcıda performans profilini çıkarıp kalan darboğazları tespit etmek.",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "Not provided.",
+      "boundary_map_markdown": "Not provided.",
+      "sequence": 0
+    },
+    {
+      "id": "M006",
+      "title": "Kelime Zinciri Oyun Modu",
+      "status": "active",
+      "depends_on": [],
+      "created_at": "2026-07-06T04:32:00.465Z",
+      "completed_at": null,
+      "vision": "Yeni bir oyun modu: her kelimenin son harfi, bir sonraki kelimenin ilk harfi olmalı. Sürekli büyüyen zincir, çığ gibi büyüyen puan, sınırsız oynanış.",
       "success_criteria": [],
       "key_risks": [],
       "proof_strategy": [],
@@ -568,6 +608,56 @@
       "target_repositories": [
         "project"
       ],
+      "sequence": 2,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M006",
+      "id": "S01",
+      "title": "Zincir Motoru ve State",
+      "status": "complete",
+      "risk": "medium",
+      "depends": [],
+      "demo": "Bir kelime seç, son harfini göster, yeni kelime için kısıtı uygula.",
+      "created_at": "2026-07-06T04:32:12.863Z",
+      "completed_at": "2026-07-06T04:34:28.802Z",
+      "full_summary_md": "---\nid: S01\nparent: M006\nmilestone: M006\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T04:34:28.803Z\nblocker_discovered: false\n---\n\n# S01: Zincir Motoru ve State\n\n**Zincir motoru hazır — start, submit, error, end + 9 test.**\n\n## What Happened\n\nZincir modunun çekirdek mantığı yazıldı. js/game/chain.js içinde: startChain (rastgele başlangıç), submitChainWord (kısıt kontrolü + puan), chainError (2 hata = bitiş), endChain (S.stats'a yazma). Kelime havuzu INFO + pack bonus kelimelerinden oluşur. Grapheme normalizasyonu ile son harf kontrolü yapılır. 9 birim test ile tüm senaryolar kapandı.\n\n## Verification\n\n\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nNone.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `js/game/chain.js` — Yeni dosya: zincir motoru\n- `js/data/config.js` — CFG.chain eklendi\n- `js/__tests__/chain.test.js` — 9 birim test eklendi\n",
+      "full_uat_md": "# S01: Zincir Motoru ve State — UAT\n\n**Milestone:** M006\n**Written:** 2026-07-06T04:34:28.803Z\n\n## UAT: Zincir Motoru\n\n### UAT-01: startChain state başlatır\n- **Kontrol**: getChainState() çağrısı sonrası\n- **Kanıt**: words: [start], score: 0, streak: 0, lastLetter = son grafem\n- **Sonuç**: ✅ PASS\n\n### UAT-02: Doğru zincirleme kabul\n- **Kontrol**: lastLetter ile başlayan kelime\n- **Kanıt**: submitChainWord → ok: true, points > 0\n- **Sonuç**: ✅ PASS\n\n### UAT-03: Yanlış harf reddi\n- **Kontrol**: farklı başlangıçla\n- **Kanıt**: reason: \"wrong_letter\"\n- **Sonuç**: ✅ PASS\n\n### UAT-04: 2 hata → bitiş\n- **Kontrol**: zincError 2 kez\n- **Kanıt**: 2. çağrıda ended: true\n- **Sonuç**: ✅ PASS\n\n### UAT-05: endChain sonuç döndürür\n- **Kontrol**: zincir bittikten sonra\n- **Kanıt**: score, longestChain, words\n- **Sonuç**: ✅ PASS\n",
+      "goal": "Zincir state yönetimi, kelime havuzundan kısıtlı kelime seçimi, temel oyun döngüsü.",
+      "success_criteria": "",
+      "proof_level": "",
+      "integration_closure": "",
+      "observability_impact": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 1,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M006",
+      "id": "S02",
+      "title": "Zincir UI ve Skor Kaliciligi",
+      "status": "pending",
+      "risk": "low",
+      "depends": [
+        "S01"
+      ],
+      "demo": "Zincir modu açılır, oynanır, en iyi skor kaydedilir.",
+      "created_at": "2026-07-06T04:32:12.863Z",
+      "completed_at": null,
+      "full_summary_md": "",
+      "full_uat_md": "",
+      "goal": "Ana ekrana giriş butonu, UI overlay (son harf, skor, zincir uzunluğu), S.stats.chainBest alanı.",
+      "success_criteria": "1. Ana ekranda Zincir butonu\n2. Oyun UI'da son harf göstergesi\n3. chainBest, chainLongest S.stats'a kaydedilir\n4. İstatistikler panelinde Zincir bölümü\n5. Tüm testler geçer",
+      "proof_level": "acceptance-test",
+      "integration_closure": "store.js genişletilir, screens/home.js ve screens/stats.js güncellenir.",
+      "observability_impact": "Oyun bitişi ve yeni rekorlar console.log.",
+      "target_repositories": [],
       "sequence": 2,
       "replan_triggered_at": null,
       "is_sketch": 0,
@@ -1036,6 +1126,52 @@
       "files": [],
       "verify": "browser evaluate ile performans metrikleri",
       "inputs": [],
+      "expected_output": [],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "id": "T01",
+      "title": "Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.",
+      "status": "complete",
+      "one_liner": "Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.",
+      "narrative": "js/game/chain.js oluşturuldu. State: score, streak, words, usedWords, lastLetter, errors. Havuz INFO + pack bonus kelimelerinden oluşur. submitChainWord: kelime lastLetter ile başlamalı, havuzda olmalı, kullanılmamış olmalı. Skor: uzunluk * coinsPerGrapheme + 3 kelimede bir combo bonus. İki hata zinciri bitirir, sonuç S.stats'a yazılır. js/__tests__/chain.test.js: 9 test (state, doğru zincir, yanlış harf, tekrar, kısa, havuz dışı, hata yönetimi). Tüm 356 test geçiyor.",
+      "verification_result": "npm test: 25 files, 356 tests, all passed.",
+      "duration": "",
+      "completed_at": "2026-07-06T04:34:19.582Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "None.",
+      "key_files": [
+        "js/game/chain.js",
+        "js/data/config.js",
+        "js/__tests__/chain.test.js"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S01\nmilestone: M006\nkey_files:\n  - js/game/chain.js\n  - js/data/config.js\n  - js/__tests__/chain.test.js\nkey_decisions:\n  - (none)\nduration: \nverification_result: untested\ncompleted_at: 2026-07-06T04:34:19.582Z\nblocker_discovered: false\n---\n\n# T01: Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.\n\n**Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.**\n\n## What Happened\n\njs/game/chain.js oluşturuldu. State: score, streak, words, usedWords, lastLetter, errors. Havuz INFO + pack bonus kelimelerinden oluşur. submitChainWord: kelime lastLetter ile başlamalı, havuzda olmalı, kullanılmamış olmalı. Skor: uzunluk * coinsPerGrapheme + 3 kelimede bir combo bonus. İki hata zinciri bitirir, sonuç S.stats'a yazılır. js/__tests__/chain.test.js: 9 test (state, doğru zincir, yanlış harf, tekrar, kısa, havuz dışı, hata yönetimi). Tüm 356 test geçiyor.\n\n## Verification\n\nnpm test: 25 files, 356 tests, all passed.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| — | No verification commands discovered | — | — | — |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `js/game/chain.js`\n- `js/data/config.js`\n- `js/__tests__/chain.test.js`\n",
+      "description": "1. js/game/chain.js oluştur\n2. State: { lastLetter, score, streak, words: [], usedWords: Set }\n3. startChain(), submitChainWord(word, allWords), endChain() fonksiyonları\n4. submit: kelime 'lastLetter' ile başlıyorsa +10*len, streak++ ; başlamıyorsa hata\n5. Zincir için kelime havuzu: tüm INFO'daki kelimeler + pack bonus kelimeleri\n6. Tüm kelimelerin norm'larını oluştur (grapheme norm ile)\n7. Test: zincir.test.js ile 5+ test",
+      "estimate": "40m",
+      "files": [
+        "js/game/chain.js",
+        "js/data/config.js",
+        "js/__tests__/chain.test.js"
+      ],
+      "verify": "npm test",
+      "inputs": [
+        "js/engine/grapheme.js",
+        "js/data/info.js"
+      ],
       "expected_output": [],
       "observability_impact": "",
       "full_plan_md": "",
@@ -2150,6 +2286,78 @@
       "rationale": "Operational Readiness section left empty — recorded as omitted",
       "findings": "",
       "evaluated_at": "2026-07-06T03:28:55.306Z"
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T04:34:19.596Z"
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T04:34:19.596Z"
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T04:34:19.596Z"
+    },
+    {
+      "milestone_id": "M006",
+      "slice_id": "S01",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T04:34:28.817Z"
     }
   ],
   "verification_evidence": [

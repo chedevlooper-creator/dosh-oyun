@@ -50,6 +50,14 @@ export function openStats(){
         <div class="stat-card"><div class="v">${st.taWords || 0}</div><div class="k">${t("stats.taWords")}</div></div>
       </div>
     </div>
+    <div class="panel-section">
+      <div class="panel-section-title">${t("chain.title")} 🔗</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v">${st.chainBest || 0} 🪙</div><div class="k">${t("chain.bestScore")}</div></div>
+        <div class="stat-card"><div class="v">${st.chainLongest || 0}</div><div class="k">${t("chain.bestLength")}</div></div>
+        <div class="stat-card"><div class="v">${st.chainGames || 0}</div><div class="k">${t("chain.gamesPlayed")}</div></div>
+      </div>
+    </div>
     <div class="btnrow"><button class="btn small" id="st-close">${t("settings.back")}</button></div>`);
   $("st-close").onclick = closePanel;
 }

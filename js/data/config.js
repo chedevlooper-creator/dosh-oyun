@@ -27,6 +27,9 @@ const CFG = {
   dailyRewardCoins: 50,
   dailyStreakBonus: 10,
   dailyStreakBonusCap: 7,
+  chain: {
+    poolFromInfo: true, // INFO'daki kelimeleri zincir havuzuna dahil et
+  },
 };
 
 /**
