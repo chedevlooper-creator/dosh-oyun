@@ -30,7 +30,7 @@ Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ ч
 
 **Screens** — `js/screens/*` render into static `<section>` in `index.html`. `show("scr-*")` toggles `.on`. Modals via `js/screens/panel.js` (`openPanel(html)`). Circular imports between game/home/map are broken with dynamic `import()`.
 
-**3D** — `js/fx/scene3d.js` (Three.js, ~490KB) is lazy-loaded from `js/main.js` via dynamic `import()`. Gated on `S.settings.scene3d !== false` AND user doesn't prefer reduced motion. Never statically import Three.js outside the fx directory.
+**3D** — `js/fx/scene3d.js` (Three.js, ~490KB) is lazy-loaded ONLY when navigating to game/map screens via `js/utils/helpers.js` `show()`, not on initial page load. `GL.ready()` provides a public init check. Never statically import Three.js outside the fx directory. Scene themes are kept in sync through `retheme()` calls in `show()` and `settings.js`.
 
 **Assets** — runtime-referenced files MUST live in `public/`. Backgrounds ship as WebP (JPEG fallback at runtime via `js/engine/theme.js`). PWA manifest is defined inline in `vite.config.js` (VitePWA plugin), not a standalone file. `vite-plugin-pwa` uses `autoUpdate` — no manual SW version bumps needed.
 
@@ -57,6 +57,6 @@ CI (`ci.yml`) runs lint → vitest → e2e → build on PRs to main. `content-pi
 
 ## Mobile thermal performance
 
-iPhone/iPad termal yükünü azaltmak için P0–P1 düzeltmeleri uygulandı (`css/animations.css`, `css/layout.css`, `css/components.css` `@media (pointer:coarse)` kuralları). Yeni sonsuz animasyon/dekoratif CSS eklerken mobil eşdeğerini unutmayın; `kenburns`, `sunPulse`, `logoShine`, `ringSpin`, `borderFlow`, `pulseRing`, `skeletonShimmer`, `glowSweep`, `pulse-ring::after`, `ctaPulse`, `pricePulse` mobilde zaten kapatılmış. Yeni eklenenler de aynı yere eklenmeli.
+iPhone/iPad/Android termal yükünü azaltmak için P0–P1 düzeltmeleri uygulandı (`css/animations.css`, `css/layout.css`, `css/components.css` `@media (pointer:coarse)` kuralları). Yeni sonsuz animasyon/dekoratif CSS eklerken mobil eşdeğerini unutmayın; `kenburns`, `sunPulse`, `logoShine`, `ringSpin`, `borderFlow`, `pulseRing`, `skeletonShimmer`, `glowSweep`, `pulse-ring::after`, `ctaPulse`, `pricePulse`, `tower.float`, `btn-gift.glow`, `btn-daily.glow` mobilde zaten kapatılmış. Yeni eklenenler de aynı yere eklenmeli.
 
-`js/main.js` iOS'ta varsayılan olarak `S.settings.scene3d=false` yapar (üç boyutlu sahnenin termal yükünü önlemek için). `js/engine/store.js` mobile'larda save debounce'u 1000ms'ye çıkarır (300ms yerine). Bu kararlar surrealdegildir ama e2e testlerde (`?playtest=1` dışında) `S.settings.scene3d` açık kalmalı; testler bu ayarı varsaymamalı.
+`js/main.js` tüm dokunmatik cihazlarda varsayılan olarak `S.settings.scene3d=false` yapar (üç boyutlu sahnenin termal yükünü önlemek için). `js/engine/store.js` mobile'larda save debounce'u 1000ms'ye çıkarır (300ms yerine). Bu kararlar surrealdegildir ama e2e testlerde (`?playtest=1` dışında) `S.settings.scene3d` açık kalmalı; testler bu ayarı varsaymamalı.

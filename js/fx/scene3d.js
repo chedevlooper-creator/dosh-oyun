@@ -85,7 +85,9 @@ export const GL = (() => {
     }
     col.needsUpdate = true;
   }
+  let _init = false;
   function init(){
+    if (_init) return;
     if(typeof THREE === "undefined") return;
     try{
       renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias:true, alpha:PHOTO_MODE });
@@ -326,6 +328,7 @@ export const GL = (() => {
       lastPM = now;
       tpx = e.clientX/innerWidth - 0.5; tpy = e.clientY/innerHeight - 0.5;
     }, { passive:true });
+    _init = true;
     document.body.classList.add("gl-on");
     let last = 0, paused = false;
     document.addEventListener("visibilitychange", ()=>{ paused = document.hidden; });
@@ -421,6 +424,6 @@ export const GL = (() => {
     else if(scr === "scr-map"){ camYT = 11; lookYT = 10; } // haritada: hafif kuşbakışı
     else { camYT = 9; lookYT = 12; }                       // ana ekran
   }
-  return { init, retheme, view };
+  return { init, retheme, view, ready: () => _init };
 })();
 

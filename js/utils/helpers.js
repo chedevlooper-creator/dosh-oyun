@@ -17,10 +17,13 @@ export function show(scr){
   $(scr).classList.add("on");
   $(scr).setAttribute("aria-hidden","false");
   $(scr).inert = false;
-  // 3D sahnenin view()'ı lazy yüklü; dynamic import ile tetikle.
-  // 3D kapalıysa veya reduce-motion açıksa import'u atla (gereksiz chunk yükleme)
-  if (S.settings.scene3d !== false && !prefersReducedMotion()) {
+  // 3D sahne: sadece oyun/harita ekranlarında yüklenir (ana ekran statik
+  // arka plan kullanır, Three.js yüklenmez). İlk yüklemede init, her
+  // seferinde retheme+view yapılır.
+  if (scr !== "scr-home" && S.settings.scene3d !== false && !prefersReducedMotion()) {
     import("../fx/scene3d.js").then((m) => {
+      if (!m.GL.ready()) m.GL.init();
+      m.GL.retheme();
       try { m.GL.view(scr); } catch {}
     }).catch(() => {});
   }

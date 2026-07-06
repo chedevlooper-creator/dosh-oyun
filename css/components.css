@@ -758,7 +758,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .cell{backdrop-filter:none;-webkit-backdrop-filter:none}
   /* ---------- P1: sonsuz animasyonları kaldır ---------- */
   .logo{animation:float 4s ease-in-out infinite}
+  .tower{animation:none}
   #btn-start{animation:none}
+  #btn-gift.glow{animation:none}
+  .btn-daily.glow{animation:none}
   #wheel::before{animation:none;opacity:.15}
   .hero::before{animation:none}
   .tool .price{animation:none}

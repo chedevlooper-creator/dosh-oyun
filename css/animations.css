@@ -98,7 +98,10 @@
   .logo { animation: float 4s ease-in-out infinite !important; }
   .logo::after,
   .logo::before { animation: none !important; }
+  .tower { animation: none !important; }
   #btn-start { animation: none !important; }
+  #btn-gift.glow { animation: none !important; }
+  .btn-daily.glow { animation: none !important; }
   #wheel::before { animation: none !important; opacity: .35 !important; }
   .hero::before { animation: none !important; }
   .hero::after { animation: none !important; }

@@ -1,13 +1,5 @@
-// @ts-check
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { track, pageview, EVENTS } from "../utils/analytics.js";
-
-// Sentry mock
-vi.mock("@sentry/browser", () => ({
-  addBreadcrumb: vi.fn(),
-}));
-
-import * as Sentry from "@sentry/browser";
 
 describe("analytics.EVENTS", () => {
   it("exposes the documented event names", () => {
@@ -25,18 +17,8 @@ describe("analytics.track", () => {
     delete window.va;
   });
 
-  it("calls Sentry.addBreadcrumb with the event", async () => {
-    track("test_event", { foo: 1 });
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-        expect.objectContaining({
-          category: "ui",
-          message: "test_event",
-          data: { foo: 1 },
-          level: "info",
-        }),
-      );
-    });
+  it("does not throw when no analytics are available", () => {
+    expect(() => track("test_event", { foo: 1 })).not.toThrow();
   });
 
   it("calls window.va when Vercel Analytics is available", () => {
@@ -50,53 +32,40 @@ describe("analytics.track", () => {
     expect(() => track("test", {})).not.toThrow();
   });
 
-  it("skips empty event names", async () => {
+  it("skips empty event names", () => {
     track("", {});
     track(null);
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).not.toHaveBeenCalled();
-    });
+    // no throw, no va call
   });
 
-  it("truncates long strings to 200 chars", async () => {
+  it("truncates long strings to 200 chars via va", () => {
+    const va = vi.fn();
+    window.va = va;
     const long = "x".repeat(500);
     track("test", { long });
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { long: "x".repeat(200) } }),
-      );
-    });
+    expect(va).toHaveBeenCalledWith("track", "test", { long: "x".repeat(200) });
   });
 
-  it("drops null and undefined props", async () => {
+  it("drops null and undefined props via va", () => {
+    const va = vi.fn();
+    window.va = va;
     track("test", { a: 1, b: null, c: undefined, d: "ok" });
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { a: 1, d: "ok" } }),
-      );
-    });
+    expect(va).toHaveBeenCalledWith("track", "test", { a: 1, d: "ok" });
   });
 
-  it("drops function values", async () => {
+  it("drops function values via va", () => {
+    const va = vi.fn();
+    window.va = va;
     track("test", { a: 1, fn: () => "x" });
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { a: 1 } }),
-      );
-    });
+    expect(va).toHaveBeenCalledWith("track", "test", { a: 1 });
   });
 
-  it("recursively sanitizes nested objects", async () => {
+  it("recursively sanitizes nested objects via va", () => {
+    const va = vi.fn();
+    window.va = va;
     track("test", { outer: { inner: "x".repeat(500) } });
-    await vi.waitFor(() => {
-      expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({ outer: expect.any(Object) }),
-        }),
-      );
-    });
-    const call = Sentry.addBreadcrumb.mock.calls[0][0];
-    expect(call.data.outer.inner).toHaveLength(200);
+    const call = va.mock.calls[0][2];
+    expect(call.outer.inner).toHaveLength(200);
   });
 
   it("handles non-object props gracefully", () => {

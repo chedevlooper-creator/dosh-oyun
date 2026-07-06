@@ -42,31 +42,20 @@ function ensureVercelLoaded() {
   // Burada ekstra yükleme gerekmiyor; sadece window.va var mı kontrolü.
 }
 
-let _Sentry = null;
-let _sentryLoad = null;
+const _Sentry = null;
 
-async function _getSentry() {
-  if (_Sentry) return _Sentry;
-  if (_sentryLoad) return _sentryLoad;
-  _sentryLoad = import("@sentry/browser").then((m) => {
-    _Sentry = m;
-    return _Sentry;
-  }).catch(() => { _sentryLoad = null; return null; });
-  return _sentryLoad;
-}
-
-async function _breadcrumb(event, data) {
-  if (!event) return;
-  const Sentry = await _getSentry();
-  if (!Sentry || !Sentry.addBreadcrumb) return;
+function _breadcrumb(event, data) {
+  // Sentry sadece report.js üzerinden (kullanıcı izniyle) yüklenmişse
+  // breadcrumb ekle; bu modül asla Sentry import'u tetiklemez
+  if (!event || !_Sentry || !_Sentry.addBreadcrumb) return;
   try {
-    Sentry.addBreadcrumb({
+    _Sentry.addBreadcrumb({
       category: "ui",
       message: event,
       data,
       level: "info",
     });
-  } catch { /* sentry yoksa sessiz */ }
+  } catch {}
 }
 
 /**

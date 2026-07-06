@@ -1,10 +1,10 @@
 // @ts-check
 import { applyTheme } from "./engine/theme.js";
-import { show, $, initSplashParticles, hapticTap, prefersReducedMotion } from "./utils/helpers.js";
+import { show, $, initSplashParticles, hapticTap } from "./utils/helpers.js";
 import { ac, MUSIC, SFX } from "./engine/audio.js";
 import { dailyLevelId, isDailyDone } from "./engine/daily.js";
 import { load } from "./engine/save.js";
-import { setOnThemeChange, S } from "./engine/store.js";
+import { S } from "./engine/store.js";
 import { initGameScreens, startLevel } from "./screens/game.js";
 import { getDir } from "./utils/i18n.js";
 import { installGlobalHandler } from "./utils/report.js";
@@ -12,37 +12,18 @@ import { installGlobalHandler } from "./utils/report.js";
 "use strict";
 
 /* =========================================================
- * MOBİL TERMAL — iPhone / iPad'da Three.js sahnesi varsayılan
- * kapalı. GPU ısınma + batarya tasarrufu. Ses/sfx aynı,
- * kullanıcı ayarlardan manuel açabilir.
+ * MOBİL TERMAL — dokunmatik cihazlarda Three.js sahnesi
+ * varsayılan kapalı. WebGL (3D dağlar, partiküller, bloom)
+ * mobil GPU'da sürekli işlem yapar → ısınma + batarya tüketimi.
+ * Kullanıcı ayarlardan manuel açabilir. E2E testler kendi
+ * localStorage seed'inde bu kararı override eder.
  * ========================================================= */
 try {
-  const ua = navigator.userAgent;
-  const isiOS = /iPhone|iPad|iPod/.test(ua) || (ua.includes("Mac") && "ontouchstart" in document);
-  if (isiOS && S.settings.scene3d === undefined) {
+  const isTouch = matchMedia("(pointer: coarse)").matches;
+  if (isTouch && S.settings.scene3d === undefined) {
     S.settings.scene3d = false;
   }
 } catch {}
-
-/* ================= 3D SAHNE (LAZY) =================
- * Three.js bundle'ı (~600KB) ana yola dahil edilmesin diye dynamic import
- * ile yüklenir. Sahne sadece S.settings.scene3d true olduğunda veya ilk
- * kez ekrana (game/map) girildiğinde başlatılır. */
-let GL = null;
-let glLoading = null;
-function loadGL() {
-  if (GL) return Promise.resolve(GL);
-  if (glLoading) return glLoading;
-  glLoading = import("./fx/scene3d.js").then((m) => {
-    GL = m.GL;
-    return GL;
-  }).catch((e) => {
-    console.warn("[main] 3D scene yüklenemedi, devre dışı:", e);
-    glLoading = null;
-    return null;
-  });
-  return glLoading;
-}
 
 /* ================= STATE YÜKLE ================= */
 load();
@@ -56,13 +37,7 @@ try {
   }
 } catch {}
 
-/* ================= TEMA → 3D SAHNE BAĞLANTISI ================= */
-// Tema değiştiğinde sahne yüklüyse retheme çağır, değilse yükleme tetikle
-setOnThemeChange(() => {
-  if (GL) { try { GL.retheme(); } catch {} }
-  else if (S.settings.scene3d !== false && !prefersReducedMotion()) loadGL();
-});
-
+/* ================= BAŞLAT ================= */
 // P3.5: Hata Ayıklama (Debug) Modu (production build'te tree-shake olur)
 const urlParams = new URLSearchParams(window.location.search);
 if (import.meta.env.DEV && urlParams.get('debug') === '1') {
@@ -71,7 +46,6 @@ if (import.meta.env.DEV && urlParams.get('debug') === '1') {
   console.warn("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
 }
 
-/* ================= BAŞLAT ================= */
 applyTheme();
 import("./screens/home.js").then(({ renderHome }) => { renderHome(); show("scr-home"); });
 initGameScreens();
@@ -95,15 +69,9 @@ if (urlParams.get("playtest") === "1") {
   } catch (e) { console.warn("[playtest]", e); }
 }
 
-// 3D sahne: scene3d setting false ise hiç yükleme; OS "hareket azalt"
-// diyorsa da atla (statik fotoğraf arka plan yeterli) — aksi halde idle'da başlat
-if (S.settings.scene3d !== false && !prefersReducedMotion()) {
-  if ("requestIdleCallback" in window) {
-    requestIdleCallback(() => loadGL().then((gl) => { if (gl) { gl.init(); gl.retheme(); } }));
-  } else {
-    setTimeout(() => loadGL().then((gl) => { if (gl) { gl.init(); gl.retheme(); } }), 200);
-  }
-}
+// 3D sahne artık burada yüklenmez — sadece helpers.js `show()` üzerinden
+// oyun/harita ekranına girilince lazy import edilir. Bu, ana ekranda
+// Three.js (~489KB) yüklenmesini önleyerek FCP/LCP'yi iyileştirir.
 
 // açılış ekranı: sahne hazır olunca yumuşakça kapan
 (function(){

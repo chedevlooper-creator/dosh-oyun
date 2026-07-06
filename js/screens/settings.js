@@ -58,9 +58,9 @@ export function openSettings(){
   document.querySelectorAll(".tdot").forEach(d=>d.onclick=()=>{
     S.settings.theme = d.dataset.t;
     applyTheme();
-    // 3D sahnenin retheme()'i lazy yüklü olabilir; import edip çağır
+    // 3D sahne zaten yüklüyse retheme, değilse CSS yeterli
     import("../fx/scene3d.js").then((m) => {
-      try { m.GL.retheme(); } catch {}
+      if (m.GL.ready()) try { m.GL.retheme(); } catch {}
     }).catch(() => {});
     document.querySelectorAll(".tdot").forEach(x=>{
       x.classList.toggle("on",x===d);
