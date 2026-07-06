@@ -809,7 +809,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
 }
 /* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */
 @media (pointer:coarse) and (max-width:480px){
-  .bub{box-shadow:0 2px 6px rgba(0,0,0,.3) !important;inset 0 -1px 2px rgba(150,124,70,.15)}
+  .bub{box-shadow:0 2px 6px rgba(0,0,0,.3),inset 0 -1px 2px rgba(150,124,70,.15) !important}
   .bub.sel{box-shadow:0 0 8px rgba(242,181,61,.5) !important}
   #wheel svg polyline{stroke-width:8;filter:none !important}
   .tool{min-height:68px}
