@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "lastWriter": "gsd-pi",
-  "lastProjectedAt": "2026-07-06T02:07:25.724Z",
+  "lastProjectedAt": "2026-07-06T02:29:32.503Z",
   "projections": {
     "phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-ROADMAP.md": {
       "sha": "1566e764f2412f3d",
@@ -36,6 +36,33 @@
       "entities": [
         "M001",
         "M001/S02"
+      ]
+    },
+    "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-ROADMAP.md": {
+      "sha": "34c7286223ec5e7f",
+      "entities": [
+        "M002"
+      ]
+    },
+    "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-01-PLAN.md": {
+      "sha": "9f60d202d1cc61fa",
+      "entities": [
+        "M002",
+        "M002/S01"
+      ]
+    },
+    "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-02-PLAN.md": {
+      "sha": "b9e0713172fe1bb3",
+      "entities": [
+        "M002",
+        "M002/S02"
+      ]
+    },
+    "phases/02-time-attack-skor-kayd-ve-kal-c-leaderboa/02-02-ASSESSMENT.md": {
+      "sha": "5372ba16fa89c577",
+      "entities": [
+        "M002",
+        "M002/S02"
       ]
     }
   },

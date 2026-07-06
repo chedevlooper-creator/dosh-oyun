@@ -127,6 +127,16 @@ describe("G proxy (active game state)", () => {
   });
 });
 
+/* ================= hydrate defaults for new fields ================= */
+describe("hydrate() initializes TA stats fields", () => {
+  it("sets taBest, taGames, taWords to 0 when missing from persisted data", () => {
+    hydrate({ _v: 2, coins: 200, stars: {}, dict: {}, settings: { theme: "kavkaz" } });
+    expect(S.stats.taBest).toBe(0);
+    expect(S.stats.taGames).toBe(0);
+    expect(S.stats.taWords).toBe(0);
+  });
+});
+
 /* ================= snapshot integrity ================= */
 describe("snapshot() doesn't leak Proxy markers", () => {
   it("no __proxy on top-level or nested", () => {

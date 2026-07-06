@@ -1,10 +1,10 @@
 {
   "nodes": [
     {
-      "id": "milestone:M001",
-      "label": "M001: Bundle Optimizasyonu ve Kalite İyileştirmeleri",
+      "id": "milestone:M002",
+      "label": "M002: Time Attack Skor Kaydı ve Kalıcı Leaderboard",
       "type": "milestone",
-      "description": "Active milestone: M001",
+      "description": "Active milestone: M002",
       "confidence": "EXTRACTED",
       "sourceFile": "STATE.md"
     },
@@ -17,5 +17,5 @@
     }
   ],
   "edges": [],
-  "builtAt": "2026-07-06T02:06:57.790Z"
+  "builtAt": "2026-07-06T02:29:10.785Z"
 }

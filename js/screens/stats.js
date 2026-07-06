@@ -42,6 +42,14 @@ export function openStats(){
         <div class="stat-card"><div class="v">${st.coinsSpent}</div><div class="k">${t("stats.spent")}</div></div>
       </div>
     </div>
+    <div class="panel-section">
+      <div class="panel-section-title">${t("stats.taSection")}</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v">${st.taBest || 0} 🪙</div><div class="k">${t("stats.taBest")}</div></div>
+        <div class="stat-card"><div class="v">${st.taGames || 0}</div><div class="k">${t("stats.taGames")}</div></div>
+        <div class="stat-card"><div class="v">${st.taWords || 0}</div><div class="k">${t("stats.taWords")}</div></div>
+      </div>
+    </div>
     <div class="btnrow"><button class="btn small" id="st-close">${t("settings.back")}</button></div>`);
   $("st-close").onclick = closePanel;
 }

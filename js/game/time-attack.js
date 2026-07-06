@@ -178,6 +178,12 @@ function endTimeAttack() {
   ta.leaderboard = newLb;
   toast(t("ta.end", score, words), "gold");
   SFX.win();
+  // Skoru kalıcı kayda yaz
+  S.stats.taGames = (S.stats.taGames || 0) + 1;
+  if (score > (S.stats.taBest || 0)) {
+    S.stats.taBest = score;
+    S.stats.taWords = words;
+  }
   // share text
   const share = `Dosh Time Attack: ${score} puan, ${words} kelime 🪙⏱`;
   try {

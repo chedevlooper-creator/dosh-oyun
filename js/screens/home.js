@@ -63,3 +63,10 @@ $("btn-timeattack").onclick = () => {
   loadAllLevels().then((lv) => startTimeAttack(lv, S.stats?.bestStreak || 0));
 };
 
+// TA en iyi skoru göster (varsa)
+const taBest = S.stats?.taBest || 0;
+const taLabel = $("btn-timeattack")?.querySelector(".lb");
+if (taLabel && taBest > 0) {
+  taLabel.textContent = `⏱ ${taBest}`;
+}
+

@@ -18,7 +18,8 @@ const _S = {
   dict: {},
   settings: { theme: "kavkaz", scene3d: true, sound: true, music: true, lang: "ce" },
   stats: { words: 0, coinsEarned: 0, coinsSpent: 0, hints: 0,
-           bonusWords: 0, bestStreak: 0, levelsDone: 0 },
+           bonusWords: 0, bestStreak: 0, levelsDone: 0,
+           taBest: 0, taGames: 0, taWords: 0 },
   lastDaily: "",
   lastGift: "",
   daily: { last: "", streak: 0, best: 0 },
@@ -160,7 +161,7 @@ export function hydrate(persisted){
   if(typeof _S.daily.streak !== "number") _S.daily.streak = 0;
   if(typeof _S.daily.best !== "number") _S.daily.best = 0;
   if(!_S.stats || typeof _S.stats !== "object") _S.stats = {};
-  for(const k of ["words","coinsEarned","coinsSpent","hints","bonusWords","bestStreak","levelsDone"]){
+  for(const k of ["words","coinsEarned","coinsSpent","hints","bonusWords","bestStreak","levelsDone","taBest","taGames","taWords"]){
     if(typeof _S.stats[k] !== "number") _S.stats[k] = 0;
   }
   if(typeof _S.settings.theme !== "string") _S.settings.theme = "kavkaz";
