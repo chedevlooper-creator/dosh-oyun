@@ -1,0 +1,20 @@
+{
+  "id": "6176ce3c-ebcf-45dc-adde-e54636ea50ce",
+  "runtime": "node",
+  "purpose": "Oyundaki tüm benzersiz kelimeler - fs ile",
+  "script_chars": 1168,
+  "started_at": "2026-07-06T02:51:45.068Z",
+  "finished_at": "2026-07-06T02:51:45.094Z",
+  "exit_code": 1,
+  "signal": null,
+  "timed_out": false,
+  "aborted": false,
+  "force_resolved": false,
+  "duration_ms": 26,
+  "stdout_bytes": 0,
+  "stderr_bytes": 578,
+  "stdout_truncated": false,
+  "stderr_truncated": false,
+  "stdout_path": "/home/pc/dosh-oyun/.gsd/exec/6176ce3c-ebcf-45dc-adde-e54636ea50ce.stdout",
+  "stderr_path": "/home/pc/dosh-oyun/.gsd/exec/6176ce3c-ebcf-45dc-adde-e54636ea50ce.stderr"
+}

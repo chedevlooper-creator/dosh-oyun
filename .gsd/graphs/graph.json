@@ -1,21 +1,21 @@
 {
   "nodes": [
     {
-      "id": "milestone:M002",
-      "label": "M002: Time Attack Skor Kaydı ve Kalıcı Leaderboard",
+      "id": "milestone:M003",
+      "label": "M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme",
       "type": "milestone",
-      "description": "Active milestone: M002",
+      "description": "Active milestone: M003",
       "confidence": "EXTRACTED",
       "sourceFile": "STATE.md"
     },
     {
-      "id": "concept:phase:validating-milestone",
-      "label": "Phase: validating-milestone",
+      "id": "concept:phase:refining",
+      "label": "Phase: refining",
       "type": "concept",
       "confidence": "EXTRACTED",
       "sourceFile": "STATE.md"
     }
   ],
   "edges": [],
-  "builtAt": "2026-07-06T02:29:10.785Z"
+  "builtAt": "2026-07-06T02:38:09.235Z"
 }

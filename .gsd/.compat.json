@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "lastWriter": "gsd-pi",
-  "lastProjectedAt": "2026-07-06T02:29:32.503Z",
+  "lastProjectedAt": "2026-07-06T02:56:18.092Z",
   "projections": {
     "phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-ROADMAP.md": {
       "sha": "1566e764f2412f3d",
@@ -63,6 +63,33 @@
       "entities": [
         "M002",
         "M002/S02"
+      ]
+    },
+    "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-ROADMAP.md": {
+      "sha": "6d2457825ad1a042",
+      "entities": [
+        "M003"
+      ]
+    },
+    "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-01-PLAN.md": {
+      "sha": "fee937d40c2c8c4e",
+      "entities": [
+        "M003",
+        "M003/S01"
+      ]
+    },
+    "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-01-ASSESSMENT.md": {
+      "sha": "f17ef51a5285d2de",
+      "entities": [
+        "M003",
+        "M003/S01"
+      ]
+    },
+    "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-02-PLAN.md": {
+      "sha": "869e87600127f5b9",
+      "entities": [
+        "M003",
+        "M003/S02"
       ]
     }
   },

@@ -1,0 +1,20 @@
+{
+  "id": "4faa1f39-728f-464e-85b1-4943e1167081",
+  "runtime": "node",
+  "purpose": "Oyundaki tüm benzersiz kelimeleri ve INFO'da eksik olanları listele",
+  "script_chars": 1325,
+  "started_at": "2026-07-06T02:51:34.963Z",
+  "finished_at": "2026-07-06T02:51:34.990Z",
+  "exit_code": 1,
+  "signal": null,
+  "timed_out": false,
+  "aborted": false,
+  "force_resolved": false,
+  "duration_ms": 27,
+  "stdout_bytes": 0,
+  "stderr_bytes": 593,
+  "stdout_truncated": false,
+  "stderr_truncated": false,
+  "stdout_path": "/home/pc/dosh-oyun/.gsd/exec/4faa1f39-728f-464e-85b1-4943e1167081.stdout",
+  "stderr_path": "/home/pc/dosh-oyun/.gsd/exec/4faa1f39-728f-464e-85b1-4943e1167081.stderr"
+}

@@ -1,3 +1,3 @@
 # Queue
 
-- No queued milestones.
+- 🔄 **M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme**
