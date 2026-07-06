@@ -12,21 +12,24 @@ npm test                # vitest run (jsdom env, tests under js/__tests__/)
 npm run test:e2e        # Playwright smoke (auto-starts dev server at :8765)
 npx vitest run js/__tests__/daily.test.js   # single test file
 node scripts/generate-pack.mjs <N>          # deterministic new level pack
-node scripts/analyze-coverage.mjs --md      # INFO gloss coverage → docs/
+node scripts/analyze-coverage.mjs --md      # INFO gloss coverage → docs/eksik-kelimeler.md
 node scripts/open-review-issues.mjs --limit 20
+node scripts/optimize-images.mjs            # regenerate WebP backgrounds
 ```
 
 ## Content policy (HARD RULE)
 
-**Never fabricate Chechen.** Puzzle words must come from Wiktionary Chechen lemma category (candidates: `docs/yeni-kelimeler-2026.md`). Word meanings (glosses in `js/data/info.js`) must be from native speakers — the "tahmini" column is NOT a valid source. UI strings in ce may only use words already attested in the codebase.
+**Never fabricate Chechen.** Puzzle words must come from Wiktionary Chechen lemma category (candidates: `docs/yeni-kelimeler-2026.md`). Word meanings (glosses in `js/data/info.js`) must be from native speakers — the "tahmini" column is NOT a valid source. UI strings in ce may only use words already attested in the codebase. `docs/eksik-kelimeler.md` is the community contribution table for missing glosses.
 
-Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ чӀ юь яь) count as ONE letter. All word handling MUST go through `js/engine/grapheme.js` (`norm`, `splitG`, `dispG`). `norm` maps all palochka variants AND `I`/`i` to `Ӏ`.
+Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ чӀ юь яь) count as ONE letter. All word handling MUST go through `js/engine/grapheme.js` (`norm`, `splitG`, `dispG`). `norm` maps all palochka variants AND `I`/`i` to `Ӏ`; `dispG` renders uppercase with palochka→I.
 
 ## Architecture
 
-**State** — `js/engine/store.js`: single source of truth. `S` (persistent: coins, stars, dict, settings, stats, daily) and `G` (active level) are Proxy-wrapped. Direct mutation (`S.coins += 5`) auto-debounces `save()` (300ms) and fires theme callbacks. When adding persistent fields: extend `_S`, add defaults to `hydrate()` in save.js, and add to `snapshot()`. localStorage key: `dosh-save-v1`; save.js has a versioned migration pipeline (`SAVE_VERSION`).
+**State** — `js/engine/store.js`: single source of truth. `S` (persistent: coins, stars, dict, settings, stats, daily) and `G` (active level) are Proxy-wrapped. Direct mutation (`S.coins += 5`) auto-debounces `save()` (300ms) and fires theme callbacks. When adding persistent fields: extend `_S`, add defaults to `hydrate()` in save.js, and add to `snapshot()`. localStorage key: `dosh-save-v1`; save.js has a versioned migration pipeline (`SAVE_VERSION`); `hydrate()` repairs missing fields so old backups import cleanly.
 
 **Level packs** — `js/data/levels/pack-N.json` (25 levels each), lazy-loaded via `js/data/level-loader.js` (`import.meta.glob`). `js/data/level-index.js` is the tiny sync index (`PACK_RANGES`, `LEVEL_COUNT`, `LAST_LEVEL_ID`). Adding a pack: generate JSON, extend `PACK_RANGES` + counts, add metadata to `js/data/packs.js`, bump expected counts in tests.
+
+**Game logic** — lives in `js/game/index.js` (`startLevel(id, opts)` is async); `js/screens/game.js` is a re-export shim kept for old import paths.
 
 **Screens** — `js/screens/*` render into static `<section>` in `index.html`. `show("scr-*")` toggles `.on`. Modals via `js/screens/panel.js` (`openPanel(html)`). Circular imports between game/home/map are broken with dynamic `import()`.
 
@@ -35,6 +38,8 @@ Chechen digraphs (аь гӀ кх къ кӀ оь пӀ тӀ уь хь хӀ цӀ ч
 **Assets** — runtime-referenced files MUST live in `public/`. Backgrounds ship as WebP (JPEG fallback at runtime via `js/engine/theme.js`). PWA manifest is defined inline in `vite.config.js` (VitePWA plugin), not a standalone file. `vite-plugin-pwa` uses `autoUpdate` — no manual SW version bumps needed.
 
 **i18n** — `js/utils/i18n.js` `t(key)` fallback: tr→ru→ce→key. Every new UI key needs at least a ce entry.
+
+**Error reporting** — `js/utils/report.js` derives a Sentry endpoint from `VITE_SENTRY_DSN`, gated on user consent (`localStorage["dosh-consent"] === "1"`, settings 🐞 toggle; default off).
 
 **Daily puzzle** — `js/engine/daily.js`: date-hash level pick, streak, share text. Daily mode (`G.daily`) must NOT write `S.stars` or map progression. Deep link: `/?daily=1`.
 

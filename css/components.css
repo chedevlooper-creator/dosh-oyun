@@ -799,12 +799,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,.node:focus-visible,.bu
   .toolrow,
   .panel{will-change:auto}
   /* kartal wing çırpma -> yumuşak (smooth anim zaten) */
+  /* ---------- P2: drop-shadow ve box-shadow hafifletme ---------- */
+  .logo{filter:none !important}
+  .tower{filter:none !important}
+  .tool-ic svg{filter:none !important}
+  #wheel svg polyline{filter:none !important}
+  .bub{box-shadow:0 2px 6px rgba(0,0,0,.35) !important}
+  .bub.sel{box-shadow:0 0 8px rgba(242,181,61,.5) !important}
 }
 /* Düşük-orta seviye cihaz: 4 çekirdek veya 4GB RAM altı için daha agresif */
 @media (pointer:coarse) and (max-width:480px){
-  .bub{box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 -1px 3px rgba(150,124,70,.2)}
-  .bub.sel{box-shadow:0 0 14px rgba(242,181,61,.6),0 4px 14px rgba(214,137,16,.4),inset 0 -2px 5px rgba(140,90,0,.35)}
-  #wheel svg polyline{stroke-width:8;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3))}
+  .bub{box-shadow:0 2px 6px rgba(0,0,0,.3) !important;inset 0 -1px 2px rgba(150,124,70,.15)}
+  .bub.sel{box-shadow:0 0 8px rgba(242,181,61,.5) !important}
+  #wheel svg polyline{stroke-width:8;filter:none !important}
   .tool{min-height:68px}
   #preview .cap{padding:7px 14px;font-size:18px}
 }

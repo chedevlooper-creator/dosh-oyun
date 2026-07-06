@@ -1,7 +1,7 @@
 # Codebase Map
 
-Generated: 2026-07-06T01:57:37Z | Files: 118 | Described: 0/118
-<!-- gsd:codebase-meta {"generatedAt":"2026-07-06T01:57:37Z","fingerprint":"97aa02ede4c093303214a361bf68aaa11765ec5c","fileCount":118,"truncated":false} -->
+Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
+<!-- gsd:codebase-meta {"generatedAt":"2026-07-06T03:01:58Z","fingerprint":"bf5e645be844d4e396f7ba601175a008e6d3e141","fileCount":122,"truncated":false} -->
 
 ### (root)/
 - `.gitignore`
@@ -128,8 +128,14 @@ Generated: 2026-07-06T01:57:37Z | Files: 118 | Described: 0/118
 ### scripts/
 - `scripts/analyze-coverage.mjs`
 - `scripts/emit-daily-word.mjs`
+- `scripts/fetch-glosses.mjs`
 - `scripts/fetch-wiktionary.mjs`
 - `scripts/generate-pack.mjs`
 - `scripts/open-review-issues.mjs`
 - `scripts/optimize-images.mjs`
 - `scripts/validate-lemmas.mjs`
+
+### scripts/cache/
+- `scripts/cache/glosses-progress.json`
+- `scripts/cache/glosses.json`
+- `scripts/cache/lemmas-validated.json`

@@ -9,13 +9,13 @@
       "sourceFile": "STATE.md"
     },
     {
-      "id": "concept:phase:refining",
-      "label": "Phase: refining",
+      "id": "concept:phase:blocked",
+      "label": "Phase: blocked",
       "type": "concept",
       "confidence": "EXTRACTED",
       "sourceFile": "STATE.md"
     }
   ],
   "edges": [],
-  "builtAt": "2026-07-06T02:38:09.235Z"
+  "builtAt": "2026-07-06T03:06:23.371Z"
 }

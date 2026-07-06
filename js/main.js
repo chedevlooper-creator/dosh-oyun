@@ -87,6 +87,16 @@ if (urlParams.get("playtest") === "1") {
   setTimeout(() => sp.remove(), 2600);
 })();
 
+// mobilde 3D kapalıysa canvas'ları gizle (GPU compositing yükünü azalt)
+try {
+  if ((matchMedia("(pointer: coarse)").matches || S.settings.scene3d === false) && S.settings.scene3d !== true) {
+    const gl = document.getElementById("gl");
+    const fx = document.getElementById("fx");
+    if (gl) gl.style.display = "none";
+    if (fx) fx.style.display = "none";
+  }
+} catch {}
+
 // ilk dokunuşta ses motorunu + müziği başlat (tarayıcı autoplay kuralı)
 addEventListener("pointerdown", function once(){
   removeEventListener("pointerdown", once);

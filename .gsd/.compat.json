@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "lastWriter": "gsd-pi",
-  "lastProjectedAt": "2026-07-06T02:56:18.092Z",
+  "lastProjectedAt": "2026-07-06T03:06:46.144Z",
   "projections": {
     "phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-ROADMAP.md": {
       "sha": "1566e764f2412f3d",
@@ -90,6 +90,33 @@
       "entities": [
         "M003",
         "M003/S02"
+      ]
+    },
+    "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-ROADMAP.md": {
+      "sha": "4648b0f822bd85ef",
+      "entities": [
+        "M004"
+      ]
+    },
+    "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-01-PLAN.md": {
+      "sha": "20e5d11f0ea7c65a",
+      "entities": [
+        "M004",
+        "M004/S01"
+      ]
+    },
+    "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-02-PLAN.md": {
+      "sha": "62875c11c5033b33",
+      "entities": [
+        "M004",
+        "M004/S02"
+      ]
+    },
+    "phases/04-mobil-gpu-yuk-hafifletme-drop-shadow-ve/04-02-ASSESSMENT.md": {
+      "sha": "b1f9ef1dce244aa3",
+      "entities": [
+        "M004",
+        "M004/S02"
       ]
     }
   },
