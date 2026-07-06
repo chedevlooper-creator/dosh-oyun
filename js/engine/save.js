@@ -2,6 +2,7 @@
 /* ================= KALICI KAYIT (localStorage) ================= */
 import { snapshot, hydrate } from "./store.js";
 import { toast } from "../utils/helpers.js";
+import { warn, error } from "../utils/logger.js";
 
 const KEY = "dosh-save-v1";
 
@@ -13,7 +14,7 @@ export function load(){
       return true;
     }
   }catch(e){
-    console.warn("[save] localStorage yüklenemedi:", e);
+    warn("[save] localStorage yüklenemedi:", e);
   }
   return false;
 }
@@ -25,10 +26,10 @@ export function save(){
     return true;
   }catch(e){
     if(e && e.name === "QuotaExceededError"){
-      console.error("[save] Kota aşıldı, ilerleme kaydedilemedi.");
+      error("[save] Kota aşıldı, ilerleme kaydedilemedi.");
       toast("Эшам: Йитер меттиг яц! ⚠️", "bad");
     } else {
-      console.error("[save] Kayıt başarısız:", e);
+      error("[save] Kayıt başarısız:", e);
     }
     return false;
   }

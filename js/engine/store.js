@@ -10,6 +10,7 @@
    API: commitS(patch), commitG(patch), resetG(), resetS()
    ================================================================ */
 import { save } from "./save.js";
+import { warn, error } from "../utils/logger.js";
 
 /* ---------- dahili durum ---------- */
 const _S = {
@@ -32,7 +33,7 @@ let _saveTimer = 0;
 /* ---------- yardimcilar ---------- */
 function notifyTheme(){
   if(typeof _onThemeChange === "function"){
-    try{ _onThemeChange(); }catch(e){ console.warn("[store] theme cb:", e); }
+    try{ _onThemeChange(); }catch(e){ warn("[store] theme cb:", e); }
   }
 }
 /* Mobilde JSON.stringify(localStorage.setItem) -> daha uzun debounce.
@@ -42,7 +43,7 @@ const _saveDelay = _isCoarse ? 1000 : 300;
 function scheduleSave(){
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(()=>{
-    try{ save(); }catch(e){ console.error("[store] save failed:", e); }
+    try{ save(); }catch(e){ error("[store] save failed:", e); }
   }, _saveDelay);
 }
 
