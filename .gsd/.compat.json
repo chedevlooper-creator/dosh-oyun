@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "lastWriter": "gsd-pi",
-  "lastProjectedAt": "2026-07-06T04:34:28.845Z",
+  "lastProjectedAt": "2026-07-06T05:28:39.343Z",
   "projections": {
     "phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-ROADMAP.md": {
       "sha": "1566e764f2412f3d",
@@ -147,7 +147,7 @@
       ]
     },
     "phases/06-kelime-zinciri-oyun-modu/06-ROADMAP.md": {
-      "sha": "e411dcd4480c25a4",
+      "sha": "e05042a8aa471657",
       "entities": [
         "M006"
       ]
@@ -157,6 +157,13 @@
       "entities": [
         "M006",
         "M006/S01"
+      ]
+    },
+    "phases/06-kelime-zinciri-oyun-modu/06-02-PLAN.md": {
+      "sha": "3423609e6f4663a7",
+      "entities": [
+        "M006",
+        "M006/S02"
       ]
     }
   },

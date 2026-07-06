@@ -1,7 +1,7 @@
 # Codebase Map
 
-Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
-<!-- gsd:codebase-meta {"generatedAt":"2026-07-06T03:01:58Z","fingerprint":"bf5e645be844d4e396f7ba601175a008e6d3e141","fileCount":122,"truncated":false} -->
+Generated: 2026-07-06T05:24:36Z | Files: 126 | Described: 0/126
+<!-- gsd:codebase-meta {"generatedAt":"2026-07-06T05:24:36Z","fingerprint":"afe08201629aa8ab59ff247cf97bc177e66d4236","fileCount":126,"truncated":false} -->
 
 ### (root)/
 - `.gitignore`
@@ -28,6 +28,9 @@ Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
 - `.github/workflows/content-pipeline.yml`
 - `.github/workflows/vercel-deploy.yml`
 
+### .kilo/
+- `.kilo/kilo.jsonc`
+
 ### css/
 - `css/animations.css`
 - `css/base.css`
@@ -53,7 +56,7 @@ Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
 - `js/main.js`
 
 ### js/__tests__/
-- *(24 files: 24 .js)*
+- *(25 files: 25 .js)*
 
 ### js/data/
 - `js/data/config.js`
@@ -89,6 +92,7 @@ Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
 - `js/fx/scene3d.js`
 
 ### js/game/
+- `js/game/chain.js`
 - `js/game/hints.js`
 - `js/game/index.js`
 - `js/game/input.js`
@@ -98,6 +102,7 @@ Generated: 2026-07-06T03:01:58Z | Files: 122 | Described: 0/122
 - `js/game/time-attack.js`
 
 ### js/screens/
+- `js/screens/chain.js`
 - `js/screens/dict.js`
 - `js/screens/feedback.js`
 - `js/screens/game.js`

@@ -73,4 +73,11 @@ const taLabel = $("btn-timeattack")?.querySelector(".lb");
 if (taLabel && taBest > 0) {
   taLabel.textContent = `⏱ ${taBest}`;
 }
+// Zincir butonu i18n
+const chainBtn = $("btn-chain");
+if (chainBtn) {
+  const chainLb = chainBtn.querySelector(".lb");
+  if (chainLb) chainLb.textContent = t("chain.btn");
+  chainBtn.setAttribute("aria-label", t("chain.btn"));
+}
 

@@ -12,3 +12,4 @@
 {"id":"bc4b70dc-cbc5-46ea-96d7-47c9f2a3e17a","ts":"2026-07-06T02:52:45.969Z","severity":"warning","message":"[tool] complete-task rolled back DB completion for M003/S02/T01 because hard-blocker escalation handling is disabled; SUMMARY.md left on disk for retry.","source":"workflow-logger","read":true}
 {"id":"2c64f5d4-8778-4610-b716-10c7ff8f5b2c","ts":"2026-07-06T03:36:17.714Z","severity":"warning","message":"Web search: Set BRAVE_API_KEY or use an Anthropic model for built-in search","source":"notify","read":true}
 {"id":"0828deb0-e276-4935-996b-5dfc2a1fc7bf","ts":"2026-07-06T05:19:12.336Z","severity":"warning","message":"Web search: Set BRAVE_API_KEY or use an Anthropic model for built-in search","source":"notify","read":true}
+{"id":"439db8af-c350-4a43-8ebb-bdd6e91baa05","ts":"2026-07-06T05:23:44.678Z","severity":"warning","message":"Web search: Set BRAVE_API_KEY or use an Anthropic model for built-in search","source":"notify","read":false}

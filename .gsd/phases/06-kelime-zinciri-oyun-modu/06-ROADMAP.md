@@ -7,7 +7,7 @@
 - [x] **S01: Zincir Motoru ve State** `risk:medium` `depends:[]`
   > After this: Bir kelime seç, son harfini göster, yeni kelime için kısıtı uygula.
 
-- [ ] **S02: Zincir UI ve Skor Kaliciligi** `risk:low` `depends:[S01]`
+- [x] **S02: Zincir UI ve Skor Kaliciligi** `risk:low` `depends:[S01]`
   > After this: Zincir modu açılır, oynanır, en iyi skor kaydedilir.
 
 ## Boundary Map

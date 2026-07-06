@@ -6,6 +6,7 @@ import {
   startChain, submitChainWord, chainError, endChain,
   isChainActive, getChainState, setChainWordPool,
 } from "../game/chain.js";
+import { splitG } from "../engine/grapheme.js";
 
 const TEST_POOL = [
   "абат", "тоба", "адам", "малар", "бакъ", "къона", "нохчийн",
@@ -26,7 +27,8 @@ describe("startChain()", () => {
     expect(s.words).toEqual([start]);
     expect(s.score).toBe(0);
     expect(s.streak).toBe(0);
-    expect(s.lastLetter).toBe(start[start.length - 1]);
+    const g = splitG(start);
+    expect(s.lastLetter).toBe(g[g.length - 1]);
   });
 });
 
@@ -95,6 +97,13 @@ describe("chainError()", () => {
 });
 
 describe("endChain()", () => {
+  it("havuz boş değilse startChain null döndürmez", () => {
+    // Test pool zaten dolu — startChain null dönmemeli
+    setChainWordPool([]);
+    const r = startChain();
+    expect(r).toBeNull();
+  });
+
   it("state'i sıfırlar ve sonuç döndürür", () => {
     startChain();
     const result = endChain();

@@ -7,4 +7,4 @@
 - 🔄 **M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme** (`depends:[—]`)
 - ✅ **M004: Mobil GPU Yuk Hafifletme - Drop-Shadow ve Filter Temizligi** (`depends:[—]`)
 - ✅ **M005: Offline-First Sertlestirme ve Performans Profili** (`depends:[—]`)
-- 🔄 **M006: Kelime Zinciri Oyun Modu** (`depends:[—]`)
+- ✅ **M006: Kelime Zinciri Oyun Modu** (`depends:[—]`)

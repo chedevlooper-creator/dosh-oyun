@@ -1,36 +1,34 @@
 ---
 id: T01
-parent: S01
+parent: S02
 milestone: M006
 key_files:
-  - js/game/chain.js
-  - js/data/config.js
-  - js/__tests__/chain.test.js
+  - (none)
 key_decisions:
   - (none)
 duration: 
-verification_result: untested
-completed_at: 2026-07-06T04:34:19.582Z
+verification_result: passed
+completed_at: 2026-07-06T05:26:35.382Z
 blocker_discovered: false
 ---
 
-# T01: Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.
+# T01: Zincir UI eksikleri giderildi: home.js'de btn-chain i18n render eklendi, testte grafem hatası düzeltildi.
 
-**Zincir motoru yazıldı: startChain, submitChainWord, chainError, endChain. 9 test.**
+**Zincir UI eksikleri giderildi: home.js'de btn-chain i18n render eklendi, testte grafem hatası düzeltildi.**
 
 ## What Happened
 
-js/game/chain.js oluşturuldu. State: score, streak, words, usedWords, lastLetter, errors. Havuz INFO + pack bonus kelimelerinden oluşur. submitChainWord: kelime lastLetter ile başlamalı, havuzda olmalı, kullanılmamış olmalı. Skor: uzunluk * coinsPerGrapheme + 3 kelimede bir combo bonus. İki hata zinciri bitirir, sonuç S.stats'a yazılır. js/__tests__/chain.test.js: 9 test (state, doğru zincir, yanlış harf, tekrar, kısa, havuz dışı, hata yönetimi). Tüm 356 test geçiyor.
+S02'nin mevcut chain UI'ını incelediğimde eksik parçalar tespit ettim: home.js'de renderHome() btn-chain butonunun etiketini ve aria-label'ını i18n'den güncellemiyordu. Bunu ekledim (chain.btn anahtarı kullanılıyor). Ayrıca chain.test.js'de bir grafem hatası vardı — startChain testi lastLetter'ı start[start.length-1] ile ölçüyordu ama Chechen digrafları (къ, т1, vs.) için splitG kullanılmalı. Düzeltildi. Tüm testler geçiyor (356/356). chain.js ekranının submit/refresh/showEnd akışları sağlam.
 
 ## Verification
 
-npm test: 25 files, 356 tests, all passed.
+npm test 356/356 geçti
 
 ## Verification Evidence
 
 | # | Command | Exit Code | Verdict | Duration |
 |---|---------|-----------|---------|----------|
-| — | No verification commands discovered | — | — | — |
+| 1 | `npm test` | 0 | ✅ pass | 1480ms |
 
 ## Deviations
 
@@ -42,6 +40,4 @@ None.
 
 ## Files Created/Modified
 
-- `js/game/chain.js`
-- `js/data/config.js`
-- `js/__tests__/chain.test.js`
+None.

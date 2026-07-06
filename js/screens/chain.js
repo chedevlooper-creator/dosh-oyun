@@ -11,7 +11,7 @@ import { SFX } from "../engine/audio.js";
 import { dispG } from "../engine/grapheme.js";
 import {
   startChain, submitChainWord, chainError, endChain, isChainActive, getChainState,
-  setChainWordPool, getChainWordPool,
+  setChainWordPool,
 } from "../game/chain.js";
 import { loadAllLevels } from "../data/level-loader.js";
 

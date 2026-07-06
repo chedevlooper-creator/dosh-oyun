@@ -72,18 +72,6 @@ export function setChainWordPool(words) {
   _wordPool = words.map(norm).filter(w => w.length >= 2);
 }
 
-/**
- * Verilen harfle başlayan rastgele bir kelime seç (henüz kullanılmamış).
- * @param {string} letter
- * @returns {string|null}
- */
-function pickWord(letter) {
-  const pool = getChainWordPool();
-  const candidates = pool.filter(w => w[0] === letter && !cs.usedWords.has(w));
-  if (!candidates.length) return null;
-  return candidates[(Math.random() * candidates.length) | 0];
-}
-
 /** İlk kelimeyi oluştur ve zinciri başlat. */
 export function startChain() {
   const pool = getChainWordPool();
