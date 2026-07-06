@@ -1,13 +1,14 @@
 # GSD State
 
-**Last Completed Milestone:** M002: Time Attack Skor Kaydı ve Kalıcı Leaderboard
+**Active Milestone:** M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme
 **Active Slice:** None
-**Phase:** complete
+**Phase:** validating-milestone
 **Requirements Status:** 0 active · 0 validated · 0 deferred · 0 out of scope
 
 ## Milestone Registry
 - ✅ **M001:** Bundle Optimizasyonu ve Kalite İyileştirmeleri
 - ✅ **M002:** Time Attack Skor Kaydı ve Kalıcı Leaderboard
+- 🔄 **M003:** INFO Kelime Kapsami - Wiktionary Anlam Cekme
 
 ## Recent Decisions
 - None recorded
@@ -16,4 +17,4 @@
 - None
 
 ## Next Action
-All milestones complete.
+Validate milestone M003 before completion.

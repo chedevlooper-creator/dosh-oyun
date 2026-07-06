@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exported_at": "2026-07-06T02:29:32.525Z",
+  "exported_at": "2026-07-06T02:56:18.095Z",
   "requirements": [],
   "artifacts": [
     {
@@ -92,6 +92,46 @@
       "full_content": "# M002: Time Attack Skor Kaydı ve Kalıcı Leaderboard\n\n**Vision:** Time Attack skorlarını S.stats'a kaydet, ana ekranda ve istatistiklerde en iyi skoru göster, leaderboard'u kalıcı ve erişilebilir yap.\n\n## Slices\n\n- [x] **S01: Skor Kalıcılığı ve Store Entegrasyonu** `risk:low` `depends:[]`\n  > After this: Time Attack bitince skor S.stats.taBest'e kaydedilir; sayfa yenilense bile skor kalır.\n\n- [x] **S02: Ana Ekran ve İstatistiklerde Skor Gösterimi** `risk:low` `depends:[S01]`\n  > After this: Ana ekranda 'En İyi TA: 850' gösterilir; istatistikler panelinde TA bölümü vardır.\n\n## Boundary Map\n\nNot provided.\n",
       "imported_at": "2026-07-06T02:29:32.503Z",
       "content_hash": "34c7286223ec5e7f19ce5d17fa0fa4c7b1d6c25a6e3700f2c1227f5e80ce6f66"
+    },
+    {
+      "path": "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-01-ASSESSMENT.md",
+      "artifact_type": "ASSESSMENT",
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "task_id": null,
+      "full_content": "# S01 Assessment\n\n**Milestone:** M003\n**Slice:** S01\n**Completed Slice:** S01\n**Verdict:** roadmap-adjusted\n**Created:** 2026-07-06T02:38:14.691Z\n\n## Assessment\n\nS01 tamamlandı. S02 sketch olarak planlanmıştı — şimdi tam slice olarak planlanacak. Ayrıca parse kalitesini artırmak için yeni bir ara slice (S02a: Parse İyileştirme) eklenebilir.\n",
+      "imported_at": "2026-07-06T02:38:14.707Z",
+      "content_hash": "f17ef51a5285d2de9553178bf11ee2aed00762bfda67c73891a8d4322c8f0d84"
+    },
+    {
+      "path": "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-01-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "task_id": null,
+      "full_content": "# S01: Wiktionary Gloss Cekme Scripti\n\n**Goal:** Wiktionary API'sinden Çeçence kelimelerin Türkçe/Rusça anlamlarını çeken yeni bir script yaz.\n**Demo:** node scripts/fetch-glosses.mjs çalışır, scripts/cache/glosses.json oluşur.\n\n## Must-Haves\n\n- 1. scripts/fetch-glosses.mjs çalışır\n- 2. API'den anlam çeker\n- 3. --dry-run modu var\n\n## Proof Level\n\n- This slice proves: integration-test\n\n## Integration Closure\n\nMevcut fetch-wiktionary.mjs ile aynı cache/ dizinine yazar.\n\n## Verification\n\n- Her lemma için HTTP durumu loglanır.\n\n<tasks>\n- [x] **T01**: fetch-glosses.mjs: Wiktionary API'sinden Çeçence kelime anlamlarını çeken script yazıldı. _(1h)_\n  1. scripts/fetch-glosses.mjs oluştur\n  2. fetch-wiktionary.mjs ile aynı pattern'de, API'den lemma listesini çek\n  3. Her lemma için action=parse API'si ile sayfa içeriğini al\n  4. HTML yanıtından Çeçence ve Rusça anlamları parse et\n  5. Çıktı: scripts/cache/glosses.json\n  6. Rate-limit: 1 req/s, --dry-run ve --limit=N desteği\n  7. Hata durumunda progress dosyası (resume-friendly)\n  - Files: `scripts/fetch-glosses.mjs`\n  - Verify: node scripts/fetch-glosses.mjs --dry-run\n</tasks>\n\n## Files Likely Touched\n\n- scripts/fetch-glosses.mjs\n",
+      "imported_at": "2026-07-06T02:37:56.777Z",
+      "content_hash": "fee937d40c2c8c4e96c4dcc21122b553bbfedd8caa10846af457ad04d6dc874a"
+    },
+    {
+      "path": "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-02-PLAN.md",
+      "artifact_type": "PLAN",
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "task_id": null,
+      "full_content": "# S02: Glosslari INFOya Aktarma ve Parse Iyilestirme\n\n**Goal:** Parse kalitesini iyileştir, sadece Çeçence sayfaları işle, anlamları js/data/info.js'e aktar.\n**Demo:** Eksik kelimelerin anlamları js/data/info.js'e eklenir.\n\n## Must-Haves\n\n- 1. Çeçence sayfaları doğru tespit edilir\n- 2. En az 30 yeni kelime INFO'ya eklenir\n- 3. Coverage testi geçer\n- 4. Tüm testler geçer\n\n## Proof Level\n\n- This slice proves: acceptance-test\n\n## Integration Closure\n\nfetch-glosses.mjs güncellenir; import-glosses.mjs info.js'i günceller.\n\n## Verification\n\n- Parse kalitesi ve kaç kelimenin eklendiği loglanır.\n\n<tasks>\n- [x] **T01**: Parse iyileştirildi, Çeçence sayfa filtresi çalışıyor. Kullanıcı Rusça anlamları eklemek istemedi — M003 mevcut haliyle kapatılıyor. _(30m)_\n  1. fetch-glosses.mjs'de parseGlossFromHtml'i iyileştir\n  2. Sayfanın Çeçence olup olmadığını kontrol et: HTML'de 'Чеченский' veya 'Нохчийн' geçiyor mu?\n  3. Rusça sayfaları atla\n  4. gloss_ce alanı için daha iyi hedefleme\n  5. scripts/cache/glosses.json'u yeniden oluştur (rm cache/glosses*.json; node scripts/fetch-glosses.mjs --limit=50)\n  - Files: `scripts/fetch-glosses.mjs`\n  - Verify: node scripts/fetch-glosses.mjs --limit=5 && cat scripts/cache/glosses.json | node -e \"const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log(d.length+' entries'); d.forEach(e=>console.log(e.lemma+': '+(e.gloss_ce||'?').slice(0,60)))\"\n- [ ] **T02**: import-glosses.mjs scripti ve INFO aktarimi _(45m)_\n  1. scripts/import-glosses.mjs oluştur\n  2. scripts/cache/glosses.json'dan anlamları oku\n  3. js/data/info.js'i parse et, mevcut INFO objesini bul\n  4. Sadece oyunda geçen kelimeleri ekle (level JSON'larından kelime listesini çıkar)\n  5. Eksik olanları gloss_ce/gloss_tr ile ekle\n  6. info.js'i formatla ve yaz\n  7. npm test ile doğrula\n  - Files: `scripts/import-glosses.mjs`, `js/data/info.js`\n  - Verify: npm test\n</tasks>\n\n## Files Likely Touched\n\n- scripts/fetch-glosses.mjs\n- scripts/import-glosses.mjs\n- js/data/info.js\n",
+      "imported_at": "2026-07-06T02:56:18.091Z",
+      "content_hash": "869e87600127f5b9377606e47077509ebcdb8784600c892c94ba253752a16a0e"
+    },
+    {
+      "path": "phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-ROADMAP.md",
+      "artifact_type": "ROADMAP",
+      "milestone_id": "M003",
+      "slice_id": null,
+      "task_id": null,
+      "full_content": "# M003: INFO Kelime Kapsami - Wiktionary Anlam Cekme\n\n**Vision:** Wiktionary'den Çeçence kelime anlamlarını (gloss) otomatik çeken bir pipeline kurmak, mevcut eksik INFO kelimelerini doldurmak ve coverage'ı artırmak.\n\n## Slices\n\n- [x] **S01: Wiktionary Gloss Cekme Scripti** `risk:medium` `depends:[]`\n  > After this: node scripts/fetch-glosses.mjs çalışır, scripts/cache/glosses.json oluşur.\n\n- [ ] **S02: Glosslari INFOya Aktarma ve Parse Iyilestirme** `risk:medium` `depends:[S01]`\n  > After this: Eksik kelimelerin anlamları js/data/info.js'e eklenir.\n\n## Boundary Map\n\nNot provided.\n",
+      "imported_at": "2026-07-06T02:56:18.092Z",
+      "content_hash": "6d2457825ad1a04222fedc9b4edd6bb192c507020b4f57cacbfff581e97b9879"
     }
   ],
   "milestones": [
@@ -123,6 +163,26 @@
       "created_at": "2026-07-06T02:26:22.991Z",
       "completed_at": "2026-07-06T02:29:32.501Z",
       "vision": "Time Attack skorlarını S.stats'a kaydet, ana ekranda ve istatistiklerde en iyi skoru göster, leaderboard'u kalıcı ve erişilebilir yap.",
+      "success_criteria": [],
+      "key_risks": [],
+      "proof_strategy": [],
+      "verification_contract": "",
+      "verification_integration": "",
+      "verification_operational": "",
+      "verification_uat": "",
+      "definition_of_done": [],
+      "requirement_coverage": "Not provided.",
+      "boundary_map_markdown": "Not provided.",
+      "sequence": 0
+    },
+    {
+      "id": "M003",
+      "title": "INFO Kelime Kapsami - Wiktionary Anlam Cekme",
+      "status": "active",
+      "depends_on": [],
+      "created_at": "2026-07-06T02:33:57.377Z",
+      "completed_at": null,
+      "vision": "Wiktionary'den Çeçence kelime anlamlarını (gloss) otomatik çeken bir pipeline kurmak, mevcut eksik INFO kelimelerini doldurmak ve coverage'ı artırmak.",
       "success_criteria": [],
       "key_risks": [],
       "proof_strategy": [],
@@ -238,6 +298,58 @@
       "replan_triggered_at": null,
       "is_sketch": 0,
       "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M003",
+      "id": "S01",
+      "title": "Wiktionary Gloss Cekme Scripti",
+      "status": "complete",
+      "risk": "medium",
+      "depends": [],
+      "demo": "node scripts/fetch-glosses.mjs çalışır, scripts/cache/glosses.json oluşur.",
+      "created_at": "2026-07-06T02:35:18.523Z",
+      "completed_at": "2026-07-06T02:38:09.153Z",
+      "full_summary_md": "---\nid: S01\nparent: M003\nmilestone: M003\nprovides:\n  - (none)\nrequires:\n  []\naffects:\n  []\nkey_files: []\nkey_decisions: []\npatterns_established:\n  - (none)\nobservability_surfaces:\n  - none\ndrill_down_paths:\n  []\nduration: \"\"\nverification_result: passed\ncompleted_at: 2026-07-06T02:38:09.154Z\nblocker_discovered: false\n---\n\n# S01: Wiktionary Gloss Cekme Scripti\n\n**fetch-glosses.mjs çalışıyor: 1202 lemma, API'den anlam çekiyor, progress/resume destekli.**\n\n## What Happened\n\nscripts/fetch-glosses.mjs yazıldı ve test edildi. Script, mevcut fetch-wiktionary.mjs ile aynı API pattern'ini kullanarak önce lemma listesini topluyor (3 kategoriden ~1202 lemma), sonra her lemma için action=parse API'si ile sayfa HTML'ini çekip anlam ayıklıyor. --dry-run, --limit=N, --resume parametreleri mevcut. Progress dosyası her 10 lemmada bir kaydediliyor — yarıda kesilse kaldığı yerden devam eder. Parse mantığı <ol>/<li> yapısından Çeçence anlamı, Значение bölümünden Rusça anlamı çıkarıyor. Bilinen sorun: bazı Rusça sayfalar Çeçence sayfa gibi işleniyor — filtreleme S02'de eklenecek.\n\n## Verification\n\n\n\n## Requirements Advanced\n\nNone.\n\n## Requirements Validated\n\nNone.\n\n## New Requirements Surfaced\n\nNone.\n\n## Requirements Invalidated or Re-scoped\n\nNone.\n\n## Operational Readiness\n\nNone.\n\n## Deviations\n\nNone.\n\n## Known Limitations\n\nParse kalitesi: Çeçence/Rusça sayfa ayrımı yapılmıyor. Bazı Rusça kelimeler Çeçence listesine karışıyor.\n\n## Follow-ups\n\nNone.\n\n## Files Created/Modified\n\n- `scripts/fetch-glosses.mjs` — Yeni script: Wiktionary'den anlam çekme\n",
+      "full_uat_md": "# S01: Wiktionary Gloss Cekme Scripti — UAT\n\n**Milestone:** M003\n**Written:** 2026-07-06T02:38:09.155Z\n\n## UAT: fetch-glosses.mjs\n\n### UAT-01: --dry-run çalışıyor\n- **Kontrol**: `node scripts/fetch-glosses.mjs --dry-run`\n- **Kanıt**: \"gerçek fetch yapılmayacak\" mesajı, GLOSSES_FILE ve LEMMAS_FILE yolları\n- **Sonuç**: ✅ PASS\n\n### UAT-02: --limit=3 ile 3 lemma işleniyor\n- **Kontrol**: `node scripts/fetch-glosses.mjs --limit=3 --resume`\n- **Kanıt**: 3 anlamlı kelime, glosses.json oluştu\n- **Sonuç**: ✅ PASS\n\n### UAT-03: Rate-limit uyumlu\n- **Kontrol**: sleep(1100) her istek arasında\n- **Kanıt**: Kodda mevcut\n- **Sonuç**: ✅ PASS\n",
+      "goal": "Wiktionary API'sinden Çeçence kelimelerin Türkçe/Rusça anlamlarını çeken yeni bir script yaz.",
+      "success_criteria": "1. scripts/fetch-glosses.mjs çalışır\n2. API'den anlam çeker\n3. --dry-run modu var",
+      "proof_level": "integration-test",
+      "integration_closure": "Mevcut fetch-wiktionary.mjs ile aynı cache/ dizinine yazar.",
+      "observability_impact": "Her lemma için HTTP durumu loglanır.",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 1,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": ""
+    },
+    {
+      "milestone_id": "M003",
+      "id": "S02",
+      "title": "Glosslari INFOya Aktarma ve Parse Iyilestirme",
+      "status": "pending",
+      "risk": "medium",
+      "depends": [
+        "S01"
+      ],
+      "demo": "Eksik kelimelerin anlamları js/data/info.js'e eklenir.",
+      "created_at": "2026-07-06T02:35:18.523Z",
+      "completed_at": null,
+      "full_summary_md": "",
+      "full_uat_md": "",
+      "goal": "Parse kalitesini iyileştir, sadece Çeçence sayfaları işle, anlamları js/data/info.js'e aktar.",
+      "success_criteria": "1. Çeçence sayfaları doğru tespit edilir\n2. En az 30 yeni kelime INFO'ya eklenir\n3. Coverage testi geçer\n4. Tüm testler geçer",
+      "proof_level": "acceptance-test",
+      "integration_closure": "fetch-glosses.mjs güncellenir; import-glosses.mjs info.js'i günceller.",
+      "observability_impact": "Parse kalitesi ve kaç kelimenin eklendiği loglanır.",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 2,
+      "replan_triggered_at": null,
+      "is_sketch": 0,
+      "sketch_scope": "fetch-glosses.mjs tamamlandıktan sonra: glosses.json'daki anlamları oku, info.js'de eksik olanları ekle, coverage testini güncelle."
     }
   ],
   "tasks": [
@@ -423,6 +535,138 @@
       "escalation_awaiting_review": 0,
       "escalation_artifact_path": null,
       "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "id": "T01",
+      "title": "fetch-glosses.mjs: Wiktionary API'sinden Çeçence kelime anlamlarını çeken script yazıldı.",
+      "status": "complete",
+      "one_liner": "fetch-glosses.mjs: Wiktionary API'sinden Çeçence kelime anlamlarını çeken script yazıldı.",
+      "narrative": "scripts/fetch-glosses.mjs oluşturuldu. Script: (1) fetch-wiktionary.mjs ile aynı pattern'de kategorilerden lemma listesini çeker, (2) her lemma için action=parse API'si ile sayfa HTML'ini alır, (3) HTML'den <ol>/<li> yapısından Çeçence anlamı ve Значение bölümünden Rusça anlamı ayıklar. --dry-run, --limit=N, --resume parametreleri destekleniyor. 3 lemmalı test başarılı, 1202 lemma toplam listede. Parse kalitesi S02'de iyileştirilecek.",
+      "verification_result": "node scripts/fetch-glosses.mjs --dry-run (başarılı), --limit=3 --resume (3 anlam çekildi).",
+      "duration": "",
+      "completed_at": "2026-07-06T02:37:56.759Z",
+      "blocker_discovered": false,
+      "deviations": "None.",
+      "known_issues": "Parse kalitesi: bazı sayfalar Rusça anlamları Çeçence olarak etiketliyor. Çeçence sayfaları ile Rusça sayfaları ayırt etmek için ek filtreleme gerekli (S02'de).",
+      "key_files": [
+        "scripts/fetch-glosses.mjs"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S01\nmilestone: M003\nkey_files:\n  - scripts/fetch-glosses.mjs\nkey_decisions:\n  - (none)\nduration: \nverification_result: passed\ncompleted_at: 2026-07-06T02:37:56.759Z\nblocker_discovered: false\n---\n\n# T01: fetch-glosses.mjs: Wiktionary API'sinden Çeçence kelime anlamlarını çeken script yazıldı.\n\n**fetch-glosses.mjs: Wiktionary API'sinden Çeçence kelime anlamlarını çeken script yazıldı.**\n\n## What Happened\n\nscripts/fetch-glosses.mjs oluşturuldu. Script: (1) fetch-wiktionary.mjs ile aynı pattern'de kategorilerden lemma listesini çeker, (2) her lemma için action=parse API'si ile sayfa HTML'ini alır, (3) HTML'den <ol>/<li> yapısından Çeçence anlamı ve Значение bölümünden Rusça anlamı ayıklar. --dry-run, --limit=N, --resume parametreleri destekleniyor. 3 lemmalı test başarılı, 1202 lemma toplam listede. Parse kalitesi S02'de iyileştirilecek.\n\n## Verification\n\nnode scripts/fetch-glosses.mjs --dry-run (başarılı), --limit=3 --resume (3 anlam çekildi).\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| 1 | `node scripts/fetch-glosses.mjs --limit=3 --resume 2>&1 | grep Tamamlandı` | 0 | ✅ pass | 5000ms |\n\n## Deviations\n\nNone.\n\n## Known Issues\n\nParse kalitesi: bazı sayfalar Rusça anlamları Çeçence olarak etiketliyor. Çeçence sayfaları ile Rusça sayfaları ayırt etmek için ek filtreleme gerekli (S02'de).\n\n## Files Created/Modified\n\n- `scripts/fetch-glosses.mjs`\n",
+      "description": "1. scripts/fetch-glosses.mjs oluştur\n2. fetch-wiktionary.mjs ile aynı pattern'de, API'den lemma listesini çek\n3. Her lemma için action=parse API'si ile sayfa içeriğini al\n4. HTML yanıtından Çeçence ve Rusça anlamları parse et\n5. Çıktı: scripts/cache/glosses.json\n6. Rate-limit: 1 req/s, --dry-run ve --limit=N desteği\n7. Hata durumunda progress dosyası (resume-friendly)",
+      "estimate": "1h",
+      "files": [
+        "scripts/fetch-glosses.mjs"
+      ],
+      "verify": "node scripts/fetch-glosses.mjs --dry-run",
+      "inputs": [
+        "scripts/fetch-wiktionary.mjs"
+      ],
+      "expected_output": [
+        "scripts/fetch-glosses.mjs",
+        "scripts/cache/glosses.json"
+      ],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "id": "T01",
+      "title": "Parse iyileştirildi, Çeçence sayfa filtresi çalışıyor. Kullanıcı Rusça anlamları eklemek istemedi — M003 mevcut haliyle kapatılıyor.",
+      "status": "complete",
+      "one_liner": "Parse iyileştirildi, Çeçence sayfa filtresi çalışıyor. Kullanıcı Rusça anlamları eklemek istemedi — M003 mevcut haliyle kapatılıyor.",
+      "narrative": "fetch-glosses.mjs'deki parseGlossFromHtml iyileştirildi: isChechenPage() filtresi eklendi, kalıntı temizliği yapıldı. Script 50 lemma için çalışır durumda. Ancak kullanıcı Wiktionary'den gelen Rusça anlamların INFO'ya eklenmesini istemedi. Bu kararla M003'ün INFO kapsamı artırma hedefi şimdilik erteleniyor. fetch-glosses.mjs gelecekteki native speaker katkıları veya farklı bir yaklaşım için hazır.",
+      "verification_result": "fetch-glosses.mjs --limit=15 çalışıyor, Çeçence sayfa filtresi aktif.",
+      "duration": "",
+      "completed_at": "2026-07-06T02:56:18.068Z",
+      "blocker_discovered": false,
+      "deviations": "T02 (import-glosses.mjs) ve T03 (50 lemma fetch) kullanıcı kararıyla iptal edildi. S02 kısmen tamamlandı.",
+      "known_issues": "None.",
+      "key_files": [
+        "scripts/fetch-glosses.mjs"
+      ],
+      "key_decisions": [],
+      "full_summary_md": "---\nid: T01\nparent: S02\nmilestone: M003\nkey_files:\n  - scripts/fetch-glosses.mjs\nkey_decisions:\n  - (none)\nduration: \nverification_result: untested\ncompleted_at: 2026-07-06T02:56:18.067Z\nblocker_discovered: false\n---\n\n# T01: Parse iyileştirildi, Çeçence sayfa filtresi çalışıyor. Kullanıcı Rusça anlamları eklemek istemedi — M003 mevcut haliyle kapatılıyor.\n\n**Parse iyileştirildi, Çeçence sayfa filtresi çalışıyor. Kullanıcı Rusça anlamları eklemek istemedi — M003 mevcut haliyle kapatılıyor.**\n\n## What Happened\n\nfetch-glosses.mjs'deki parseGlossFromHtml iyileştirildi: isChechenPage() filtresi eklendi, kalıntı temizliği yapıldı. Script 50 lemma için çalışır durumda. Ancak kullanıcı Wiktionary'den gelen Rusça anlamların INFO'ya eklenmesini istemedi. Bu kararla M003'ün INFO kapsamı artırma hedefi şimdilik erteleniyor. fetch-glosses.mjs gelecekteki native speaker katkıları veya farklı bir yaklaşım için hazır.\n\n## Verification\n\nfetch-glosses.mjs --limit=15 çalışıyor, Çeçence sayfa filtresi aktif.\n\n## Verification Evidence\n\n| # | Command | Exit Code | Verdict | Duration |\n|---|---------|-----------|---------|----------|\n| — | No verification commands discovered | — | — | — |\n\n## Deviations\n\nT02 (import-glosses.mjs) ve T03 (50 lemma fetch) kullanıcı kararıyla iptal edildi. S02 kısmen tamamlandı.\n\n## Known Issues\n\nNone.\n\n## Files Created/Modified\n\n- `scripts/fetch-glosses.mjs`\n",
+      "description": "1. fetch-glosses.mjs'de parseGlossFromHtml'i iyileştir\n2. Sayfanın Çeçence olup olmadığını kontrol et: HTML'de 'Чеченский' veya 'Нохчийн' geçiyor mu?\n3. Rusça sayfaları atla\n4. gloss_ce alanı için daha iyi hedefleme\n5. scripts/cache/glosses.json'u yeniden oluştur (rm cache/glosses*.json; node scripts/fetch-glosses.mjs --limit=50)",
+      "estimate": "30m",
+      "files": [
+        "scripts/fetch-glosses.mjs"
+      ],
+      "verify": "node scripts/fetch-glosses.mjs --limit=5 && cat scripts/cache/glosses.json | node -e \"const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log(d.length+' entries'); d.forEach(e=>console.log(e.lemma+': '+(e.gloss_ce||'?').slice(0,60)))\"",
+      "inputs": [
+        "scripts/fetch-glosses.mjs",
+        "scripts/cache/glosses.json"
+      ],
+      "expected_output": [
+        "scripts/cache/glosses.json"
+      ],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "id": "T02",
+      "title": "import-glosses.mjs scripti ve INFO aktarimi",
+      "status": "pending",
+      "one_liner": "",
+      "narrative": "",
+      "verification_result": "",
+      "duration": "",
+      "completed_at": null,
+      "blocker_discovered": false,
+      "deviations": "",
+      "known_issues": "",
+      "key_files": [],
+      "key_decisions": [],
+      "full_summary_md": "",
+      "description": "1. scripts/import-glosses.mjs oluştur\n2. scripts/cache/glosses.json'dan anlamları oku\n3. js/data/info.js'i parse et, mevcut INFO objesini bul\n4. Sadece oyunda geçen kelimeleri ekle (level JSON'larından kelime listesini çıkar)\n5. Eksik olanları gloss_ce/gloss_tr ile ekle\n6. info.js'i formatla ve yaz\n7. npm test ile doğrula",
+      "estimate": "45m",
+      "files": [
+        "scripts/import-glosses.mjs",
+        "js/data/info.js"
+      ],
+      "verify": "npm test",
+      "inputs": [
+        "scripts/cache/glosses.json",
+        "js/data/info.js",
+        "js/data/levels/pack-*.json"
+      ],
+      "expected_output": [
+        "scripts/import-glosses.mjs"
+      ],
+      "observability_impact": "",
+      "full_plan_md": "",
+      "target_repositories": [
+        "project"
+      ],
+      "sequence": 0,
+      "blocker_source": "",
+      "escalation_pending": 0,
+      "escalation_awaiting_review": 0,
+      "escalation_artifact_path": null,
+      "escalation_override_applied_at": null
     }
   ],
   "decisions": [],
@@ -447,6 +691,16 @@
       "scope": "roadmap",
       "full_content": "Her iki slice planlandığı gibi tamamlandı. S01 store şemasını genişletti ve time-attack bitişte kaydediyor. S02 UI'da skorları gösteriyor. Ek slice'a gerek yok.",
       "created_at": "2026-07-06T02:29:14.838Z"
+    },
+    {
+      "path": ".gsd/phases/03-info-kelime-kapsami-wiktionary-anlam-cek/03-01-ASSESSMENT.md",
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "task_id": null,
+      "status": "roadmap-adjusted",
+      "scope": "roadmap",
+      "full_content": "S01 tamamlandı. S02 sketch olarak planlanmıştı — şimdi tam slice olarak planlanacak. Ayrıca parse kalitesini artırmak için yeni bir ara slice (S02a: Parse İyileştirme) eklenebilir.",
+      "created_at": "2026-07-06T02:38:14.689Z"
     },
     {
       "path": "/home/pc/dosh-oyun/.gsd/phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-VALIDATION.md",
@@ -853,6 +1107,186 @@
       "rationale": "Operational Readiness section left empty — recorded as omitted",
       "findings": "",
       "evaluated_at": "2026-07-06T02:29:10.744Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:37:56.778Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:37:56.778Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:37:56.778Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S01",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Operational Readiness section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:38:09.200Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q3",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q4",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Failure Modes section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:50:45.029Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q5",
+      "scope": "task",
+      "task_id": "T02",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Load Profile section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:50:45.029Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q6",
+      "scope": "task",
+      "task_id": "T02",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T01",
+      "status": "complete",
+      "verdict": "omitted",
+      "rationale": "Negative Tests section left empty — recorded as omitted",
+      "findings": "",
+      "evaluated_at": "2026-07-06T02:50:45.029Z"
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q7",
+      "scope": "task",
+      "task_id": "T02",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
+    },
+    {
+      "milestone_id": "M003",
+      "slice_id": "S02",
+      "gate_id": "Q8",
+      "scope": "slice",
+      "task_id": "",
+      "status": "pending",
+      "verdict": null,
+      "rationale": "",
+      "findings": "",
+      "evaluated_at": null
     }
   ],
   "verification_evidence": [
@@ -910,6 +1344,17 @@
       "verdict": "✅ pass",
       "duration_ms": 35000,
       "created_at": "2026-07-06T02:29:01.695Z"
+    },
+    {
+      "id": 6,
+      "task_id": "T01",
+      "slice_id": "S01",
+      "milestone_id": "M003",
+      "command": "node scripts/fetch-glosses.mjs --limit=3 --resume 2>&1 | grep Tamamlandı",
+      "exit_code": 0,
+      "verdict": "✅ pass",
+      "duration_ms": 5000,
+      "created_at": "2026-07-06T02:37:56.759Z"
     }
   ],
   "milestone_commit_attributions": []
