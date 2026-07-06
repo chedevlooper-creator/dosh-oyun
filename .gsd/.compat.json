@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "lastWriter": "gsd-pi",
-  "lastProjectedAt": "2026-07-06T03:06:46.144Z",
+  "lastProjectedAt": "2026-07-06T03:29:14.959Z",
   "projections": {
     "phases/01-bundle-optimizasyonu-ve-kalite-i-yile-ti/01-ROADMAP.md": {
       "sha": "1566e764f2412f3d",
@@ -117,6 +117,33 @@
       "entities": [
         "M004",
         "M004/S02"
+      ]
+    },
+    "phases/05-offline-first-sertlestirme-ve-performans/05-ROADMAP.md": {
+      "sha": "b93ab82361a840c6",
+      "entities": [
+        "M005"
+      ]
+    },
+    "phases/05-offline-first-sertlestirme-ve-performans/05-01-PLAN.md": {
+      "sha": "d9f6e6b030491a12",
+      "entities": [
+        "M005",
+        "M005/S01"
+      ]
+    },
+    "phases/05-offline-first-sertlestirme-ve-performans/05-02-PLAN.md": {
+      "sha": "ba9c82ddc2d967c5",
+      "entities": [
+        "M005",
+        "M005/S02"
+      ]
+    },
+    "phases/05-offline-first-sertlestirme-ve-performans/05-02-ASSESSMENT.md": {
+      "sha": "bfdf660ae2151f18",
+      "entities": [
+        "M005",
+        "M005/S02"
       ]
     }
   },

@@ -51,7 +51,36 @@ export default defineConfig({
         enabled: true
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,webp,woff2,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,png,webp,woff2,webmanifest,json}'],
+        runtimeCaching: [
+          {
+            // Pack JSON'ları: önce cache, arkada güncelle (offline-first)
+            urlPattern: /\/assets\/pack-\d+/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'level-packs',
+              expiration: { maxEntries: 20, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // Diğer asset'ler (js, css, font, resim): cache-first
+            urlPattern: /\/assets\/.*\.(?:js|css|woff2|png|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets',
+              expiration: { maxEntries: 60, maxAgeSeconds: 90 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // HTML sayfaları: network-first, offline'da cache fallback
+            urlPattern: ({ request }) => request.destination === 'document',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages',
+              expiration: { maxEntries: 10, maxAgeSeconds: 7 * 24 * 60 * 60 },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'Дош — Нохчийн дош',
