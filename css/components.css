@@ -233,9 +233,13 @@ button:active:not(#shuffle){transform:scale(.95)}
 .flycoin{position:fixed;z-index:95;font-size:20px;pointer-events:none;transition:all .8s cubic-bezier(.5,0,.7,.4)}
 @media (max-height:640px){ .logo{font-size:64px} #preview{min-height:38px} }
 @media (max-width:420px){
-  .toolrow{gap:8px;padding-inline:10px}
-  .tool{min-height:72px;padding-inline:4px}
-  .tool-label{font-size:11px}
+  .toolrow{gap:6px;padding:6px 8px}
+  .tool{min-height:48px;flex-direction:row;justify-content:center;gap:4px;padding:6px 4px 10px;border-radius:14px}
+  .tool-ic svg{width:18px;height:18px}
+  .tool-label{font-size:10px;text-align:start;line-height:1}
+  .tool-label br{display:none}
+  .tool .price{font-size:9px;bottom:-5px;padding:1px 5px}
+  #info-strip{min-height:18px;padding:2px 18px 4px}
 }
 /* Kısa ekran kompakt modu: araçlar tek satır yatay şerit olur,
    grid ve çarka dikey alan bırakılır */
