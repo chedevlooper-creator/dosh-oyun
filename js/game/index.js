@@ -61,10 +61,11 @@ import { resetWrongRow } from "./state.js";
 export function selAdd(b) {
   const G = getState();
   if (!G) return;
+  const isFirst = G.sel.length === 0;
   G.sel.push(b);
   b.el.classList.add("sel");
   SFX.pick(G.sel.length - 1);
-  vibrate(8);
+  if (isFirst) vibrate(8); // sadece ilk harfte titreşim, her pointermove'da değil
   renderSel();
 }
 

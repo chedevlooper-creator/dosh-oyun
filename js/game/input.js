@@ -15,8 +15,10 @@ import { getState, getBubbles, isDragging, setDragging } from "./state.js";
  */
 export function bubbleAt(x, y) {
   const bubbles = getBubbles();
-  for (const b of bubbles) {
-    if ((x - b.cx) ** 2 + (y - b.cy) ** 2 <= b.r * b.r) return b;
+  for (let i = 0; i < bubbles.length; i++) {
+    const b = bubbles[i];
+    const dx = x - b.cx, dy = y - b.cy;
+    if (dx * dx + dy * dy <= b.r * b.r) return b;
   }
   return null;
 }
@@ -39,6 +41,7 @@ export function setupWheelListeners(cbs) {
     const b = bubbleAt(e.clientX, e.clientY);
     if (!b) return;
     setDragging(true);
+    _lastMoveTs = 0; // throttle reset — ilk hareket anında yakala
     try { wheel.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     G.sel = [];
     const bubbles = getBubbles();
@@ -46,8 +49,15 @@ export function setupWheelListeners(cbs) {
     cbs.onSelectAdd(b);
   };
 
+  let _lastMoveTs = 0;
+
   const onPointerMove = (e) => {
     if (!isDragging()) return;
+    // 60fps throttle — her pointermove event'inde değil, frame başına bir kez
+    const now = performance.now();
+    if (now - _lastMoveTs < 14) return; // ~70fps max
+    _lastMoveTs = now;
+
     const G = getState();
     if (!G) return;
     const b = bubbleAt(e.clientX, e.clientY);

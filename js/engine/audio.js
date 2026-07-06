@@ -15,7 +15,8 @@ export function tone(f, dur=0.12, type="sine", vol=0.16, when=0){
   }catch{}
 }
 export const SFX = {
-  pick(i){ tone(430 + i*55, .09, "sine", .14); },
+  _lastPick: -1,
+  pick(i){ if(i === this._lastPick) return; this._lastPick = i; tone(430 + i*55, .09, "sine", .14); },
   solve(){ [523,659,784].forEach((f,i)=>tone(f,.16,"sine",.16,i*.07)); },
   bonus(){ [880,1174].forEach((f,i)=>tone(f,.12,"triangle",.15,i*.08)); },
   coin(){ tone(1318,.09,"triangle",.12); },
