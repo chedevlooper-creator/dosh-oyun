@@ -8,6 +8,7 @@ import { setOnThemeChange, S } from "./engine/store.js";
 import { initGameScreens, startLevel } from "./screens/game.js";
 import { getDir } from "./utils/i18n.js";
 import { installGlobalHandler } from "./utils/report.js";
+import { warn } from "./utils/logger.js";
 
 "use strict";
 
@@ -37,7 +38,7 @@ function loadGL() {
     GL = m.GL;
     return GL;
   }).catch((e) => {
-    console.warn("[main] 3D scene yüklenemedi, devre dışı:", e);
+    warn("[main] 3D scene yüklenemedi, devre dışı:", e);
     glLoading = null;
     return null;
   });
@@ -67,8 +68,8 @@ setOnThemeChange(() => {
 const urlParams = new URLSearchParams(window.location.search);
 if (import.meta.env.DEV && urlParams.get('debug') === '1') {
   window.__DOSH_DEBUG__ = true;
-  console.warn("[DEBUG] Debug modu aktif. Store durumu:", S);
-  console.warn("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
+  warn("[DEBUG] Debug modu aktif. Store durumu:", S);
+  warn("[DEBUG] Kayıt verisini sıfırlamak için: localStorage.removeItem('dosh-save-v1'); location.reload();");
 }
 
 /* ================= BAŞLAT ================= */
@@ -92,7 +93,7 @@ if (urlParams.get("playtest") === "1") {
       S.settings.scene3d = false;
       setTimeout(() => startLevel(lv.id || 0, {}, lv), 100);
     }
-  } catch (e) { console.warn("[playtest]", e); }
+  } catch (e) { warn("[playtest]", e); }
 }
 
 // 3D sahne: scene3d setting false ise hiç yükleme; OS "hareket azalt"

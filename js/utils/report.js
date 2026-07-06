@@ -9,6 +9,8 @@
  *
  * ?debug=1 modunda her zaman console'a yazar. */
 
+import { warn } from "./logger.js";
+
 let _Sentry = null;
 let _sentryLoad = null;
 
@@ -39,12 +41,12 @@ async function _getSentry() {
         enabled: userConsented(),
       });
     } catch (e) {
-      console.warn("[report] Sentry init başarısız:", e);
+      warn("[report] Sentry init başarısız:", e);
       _Sentry = null;
     }
     return _Sentry;
   }).catch((e) => {
-    console.warn("[report] Sentry yüklenemedi:", e);
+    warn("[report] Sentry yüklenemedi:", e);
     _sentryLoad = null;
     return null;
   });
@@ -71,7 +73,7 @@ export function reportError(err, context) {
   };
 
   if (debugOn() || userConsented()) {
-    try { console.warn("[report]", payload); } catch {}
+    try { warn("[report]", payload); } catch {}
   }
 
   if (DSN && userConsented()) {
