@@ -268,13 +268,21 @@ button:active:not(#shuffle){transform:scale(.95)}
      zone içeriğine oturur. dvh: adres çubuğu açılıp kapansa da doğru ölçü. */
   #grid-wrap{flex:1 1 0;max-height:50vh;max-height:50dvh;padding:4px 10px}
   #wheel-zone{flex:0 0 auto;min-height:0;padding:2px 0 8px}
-  /* İpucu araçları küçük: yalnızca ikon + fiyat rozeti, dar tek satır */
-  .toolrow{gap:6px;padding:4px 10px 10px}
-  .tool{min-height:40px;padding:6px 8px 10px}
-  .tool-label{display:none}
-  .tool-ic{font-size:18px}
-  .tool-ic svg{width:18px;height:18px}
-  .tool .price{font-size:9px;bottom:-6px;padding:1px 5px}
+  /* İpucu araçları çarkın iki yanındaki boş köşelere taşınır: dock kartı
+     kaldırılır, 2 sol + 2 sağ dikey sütun (bonus+harf solda, hedef+değnek
+     sağda). Konteyner pointer-events:none — yalnızca butonlar tıklanır,
+     aradaki çark dokunuşları engellenmez. #scr-game öneki: aşağıdaki genel
+     .toolrow dock kuralı (cam kart) kaynak sırasıyla ezmesin diye. */
+  #scr-game .toolrow{position:absolute;inset-inline:10px;bottom:max(14px,env(safe-area-inset-bottom));
+    display:grid;grid-auto-flow:column;grid-template-columns:auto auto;grid-template-rows:auto auto;
+    justify-content:space-between;gap:12px;width:auto;max-width:none;margin:0;padding:0;
+    background:none;border:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+    pointer-events:none;z-index:3}
+  #scr-game .tool{pointer-events:auto;width:50px;min-height:50px;padding:0;flex-direction:column;justify-content:center;gap:0}
+  #scr-game .tool-label{display:none}
+  #scr-game .tool-ic{font-size:19px}
+  #scr-game .tool-ic svg{width:19px;height:19px}
+  #scr-game .tool .price{font-size:9px;bottom:-5px;padding:1px 5px}
 }
 
 /* ---------- GERÇEK FOTOĞRAF ARKA PLAN (Ken Burns sinematik pan) ---------- */

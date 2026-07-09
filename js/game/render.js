@@ -144,7 +144,10 @@ export function buildWheel(letters, onBubbleKey) {
     const scr = document.getElementById("scr-game");
     if (scr) {
       for (const el of scr.children) {
-        if (el.id !== "grid-wrap" && el.id !== "wheel-zone") fixed += el.offsetHeight;
+        if (el.id === "grid-wrap" || el.id === "wheel-zone") continue;
+        // akış dışı elemanlar dikey yer kaplamaz (mobilde araçlar çark köşelerinde)
+        if (getComputedStyle(el).position === "absolute") continue;
+        fixed += el.offsetHeight;
       }
     }
     const gridBudget = Math.max(170, innerHeight * 0.3);

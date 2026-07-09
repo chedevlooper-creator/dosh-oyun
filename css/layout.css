@@ -70,4 +70,13 @@ main{perspective:1100px}
   .icon-btn,
   .panel,
   #wheel { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+  /* Arka plan: gerçek fotoğraf tek başına yeter — üstüne binen prosedürel
+     üçgen dağ SVG'si ve yapay güneş fotoğrafla çakışıyor, kaldır */
+  #bg svg{display:none}
+  #bg .sun{display:none}
+}
+@media (pointer:coarse) and (orientation:portrait){
+  /* Yatay (1920px) fotoğraf dikey ekranda ortadan kadrajlanınca çoğunlukla
+     boş gökyüzü gösteriyor; ufku aşağı al — dağlar/köy görünür kalsın */
+  #photo .ph{background-position:50% 72%}
 }
