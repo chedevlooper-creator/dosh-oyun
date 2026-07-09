@@ -177,8 +177,7 @@ function solveWord(w, byHint) {
     }
   }, i * 70));
 
-  addFoundWord(w.norm);
-  S.stats.words++;
+  addFoundWord(w.norm); // stats.words sayacını da artırır (store.js)
 
   if (!byHint) {
     G.streak++;
