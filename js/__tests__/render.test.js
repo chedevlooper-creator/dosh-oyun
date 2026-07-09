@@ -256,6 +256,72 @@ describe("renderSel", () => {
   });
 });
 
+// mobil (coarse pointer) düzen dalı
+describe("mobil düzen (pointer: coarse)", () => {
+  const origMM = globalThis.matchMedia;
+  const origW = globalThis.innerWidth;
+  const origH = globalThis.innerHeight;
+
+  const mm = (matches) => (q) => ({
+    matches: matches && q.includes("coarse"), media: q,
+    addListener() {}, removeListener() {},
+    addEventListener() {}, removeEventListener() {},
+  });
+
+  afterEach(() => {
+    globalThis.matchMedia = origMM;
+    globalThis.innerWidth = origW;
+    globalThis.innerHeight = origH;
+  });
+
+  it("çark çapı ekran genişliğine göre büyür (genişlik - 20 tavanı)", async () => {
+    globalThis.matchMedia = mm(true);
+    globalThis.innerWidth = 412;
+    globalThis.innerHeight = 900;
+    const { buildWheel } = await import("../game/render.js");
+    buildWheel(["а", "б", "в"], null);
+    const wheel = document.getElementById("wheel");
+    expect(wheel.style.width).toBe("392px"); // 412 - 20
+  });
+
+  it("aşırı kısa ekranda 220px tabanına oturur (negatif/dejenere boyut yok)", async () => {
+    globalThis.matchMedia = mm(true);
+    globalThis.innerWidth = 320;
+    globalThis.innerHeight = 300;
+    const { buildWheel } = await import("../game/render.js");
+    buildWheel(["а", "б", "в"], null);
+    const wheel = document.getElementById("wheel");
+    expect(wheel.style.width).toBe("220px");
+  });
+
+  it("masaüstü yolunda eski 340px üst sınırı korunur", async () => {
+    globalThis.matchMedia = mm(false);
+    globalThis.innerWidth = 1400;
+    globalThis.innerHeight = 1000;
+    const zone = document.getElementById("wheel-zone");
+    Object.defineProperty(zone, "clientHeight", { value: 600, configurable: true });
+    const { buildWheel } = await import("../game/render.js");
+    buildWheel(["а", "б", "в"], null);
+    const wheel = document.getElementById("wheel");
+    expect(wheel.style.width).toBe("340px");
+  });
+
+  it("mobilde küçük ızgara hücre tavanı 56px, masaüstünde 76px", async () => {
+    const wrap = document.getElementById("grid-wrap");
+    Object.defineProperty(wrap, "clientWidth", { value: 400, configurable: true });
+    Object.defineProperty(wrap, "clientHeight", { value: 400, configurable: true });
+    const { buildGrid } = await import("../game/render.js");
+
+    globalThis.matchMedia = mm(true);
+    buildGrid();
+    expect(document.querySelector(".cell").style.width).toBe("56px");
+
+    globalThis.matchMedia = mm(false);
+    buildGrid();
+    expect(document.querySelector(".cell").style.width).toBe("76px");
+  });
+});
+
 // clearSel
 describe("clearSel", () => {
   it("returns a cleanup function that clears sel and removes sel class", async () => {
