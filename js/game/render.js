@@ -8,6 +8,12 @@ import { dispG, norm } from "../engine/grapheme.js";
 import { SFX } from "../engine/audio.js";
 import { getState, getBubbles } from "./state.js";
 
+/* Mobil (dokunmatik) düzen: çark büyük (parmak hedefi), ızgara kompakt.
+ * Her çağrıda okunur — masaüstünde touch ekran takılıp çıkabilir. */
+function isCoarse() {
+  return typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+}
+
 /* ---------- ÖNİZLEME (renderSel için önbellek) ---------- */
 let _capEl = null;
 let _capSpans = [];
@@ -67,7 +73,7 @@ export function buildGrid() {
   const availW = Math.min(wrap.clientWidth - 8, 536);
   const availH = wrap.clientHeight - 8;
   const gap = 5;
-  // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür
+  // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür.
   const maxSize = (rows <= 4 && cols <= 5) ? 76 : (rows <= 6 && cols <= 7) ? 62 : 52;
   const size = Math.max(22, Math.min(maxSize, Math.floor(Math.min(
     (availW - gap * (cols - 1)) / cols,
@@ -126,10 +132,35 @@ export function buildWheel(letters, onBubbleKey) {
   _polylineEl = null; // wheel yeniden oluştu, cache'i sıfırla
   const n = letters.length;
   const zone = document.getElementById("wheel-zone");
-  const D = Math.max(190, Math.min(340, Math.min(
-    innerWidth - 40,
-    Math.max(zone.clientHeight || 260, 200) + 60,
-  )));
+  // Mobilde öncelik kelime kutularında (ızgara): çark kompakt tutulur —
+  // genişliğin ~%62'si, 300px tavan. Zone yüksekliğine bakılmaz — zone çarka
+  // göre boyutlanır (döngüsel ölçüm); onun yerine sabit şeritler (başlık,
+  // bilgi, araçlar, önizleme) gerçek DOM'dan ölçülür (safe-area ve kompakt
+  // mod farkları cihazdan cihaza değişir), ızgaraya en az %30 (170px taban)
+  // pay bırakılır. Masaüstünde eski ölçü korunur.
+  let D;
+  if (isCoarse()) {
+    let fixed = 14; // zone dikey padding'i
+    const scr = document.getElementById("scr-game");
+    if (scr) {
+      for (const el of scr.children) {
+        if (el.id === "grid-wrap" || el.id === "wheel-zone") continue;
+        // akış dışı elemanlar dikey yer kaplamaz (mobilde araçlar çark köşelerinde)
+        if (getComputedStyle(el).position === "absolute") continue;
+        fixed += el.offsetHeight;
+      }
+    }
+    const gridBudget = Math.max(170, innerHeight * 0.3);
+    D = Math.max(170, Math.min(300, Math.min(
+      Math.round(innerWidth * 0.62),
+      innerHeight - fixed - gridBudget,
+    )));
+  } else {
+    D = Math.max(190, Math.min(340, Math.min(
+      innerWidth - 40,
+      Math.max(zone.clientHeight || 260, 200) + 60,
+    )));
+  }
   wheel.style.width = wheel.style.height = D + "px";
 
   const svg = wheel.querySelector("svg");
