@@ -263,11 +263,18 @@ button:active:not(#shuffle){transform:scale(.95)}
    ızgara kompakt, çark büyük (parmak hedefleri). dvh varyantı: mobil adres
    çubuğu açılıp kapansa da gerçek görünür yüksekliğe göre ölçülür. */
 @media (pointer:coarse) and (orientation:portrait){
-  /* Çark JS'te viewport'tan boyutlanır (render.js buildWheel); zone içeriğine
-     (flex-basis:auto) oturur ve artan boşluğu ızgarayla eşit paylaşır.
-     Izgara taban 0'dan büyür — çarktan artan alanı alır, 36dvh'yi aşmaz. */
-  #grid-wrap{flex:1 1 0;max-height:36vh;max-height:36dvh;padding:4px 10px}
+  /* Öncelik kelime kutularında: ızgara artan dikey alanın tamamını alır
+     (50dvh tavan), çark JS'te kompakt boyutlanır (render.js buildWheel) ve
+     zone içeriğine oturur. dvh: adres çubuğu açılıp kapansa da doğru ölçü. */
+  #grid-wrap{flex:1 1 0;max-height:50vh;max-height:50dvh;padding:4px 10px}
   #wheel-zone{flex:0 0 auto;min-height:0;padding:2px 0 8px}
+  /* İpucu araçları küçük: yalnızca ikon + fiyat rozeti, dar tek satır */
+  .toolrow{gap:6px;padding:4px 10px 10px}
+  .tool{min-height:40px;padding:6px 8px 10px}
+  .tool-label{display:none}
+  .tool-ic{font-size:18px}
+  .tool-ic svg{width:18px;height:18px}
+  .tool .price{font-size:9px;bottom:-6px;padding:1px 5px}
 }
 
 /* ---------- GERÇEK FOTOĞRAF ARKA PLAN (Ken Burns sinematik pan) ---------- */

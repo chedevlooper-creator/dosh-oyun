@@ -274,24 +274,24 @@ describe("mobil düzen (pointer: coarse)", () => {
     globalThis.innerHeight = origH;
   });
 
-  it("çark çapı ekran genişliğine göre büyür (genişlik - 20 tavanı)", async () => {
+  it("çark kompakt: ekran genişliğinin ~%62'si (ızgaraya alan kalır)", async () => {
     globalThis.matchMedia = mm(true);
     globalThis.innerWidth = 412;
     globalThis.innerHeight = 900;
     const { buildWheel } = await import("../game/render.js");
     buildWheel(["а", "б", "в"], null);
     const wheel = document.getElementById("wheel");
-    expect(wheel.style.width).toBe("392px"); // 412 - 20
+    expect(wheel.style.width).toBe("255px"); // round(412 * 0.62)
   });
 
-  it("aşırı kısa ekranda 220px tabanına oturur (negatif/dejenere boyut yok)", async () => {
+  it("aşırı kısa ekranda 170px tabanına oturur (negatif/dejenere boyut yok)", async () => {
     globalThis.matchMedia = mm(true);
     globalThis.innerWidth = 320;
     globalThis.innerHeight = 300;
     const { buildWheel } = await import("../game/render.js");
     buildWheel(["а", "б", "в"], null);
     const wheel = document.getElementById("wheel");
-    expect(wheel.style.width).toBe("220px");
+    expect(wheel.style.width).toBe("170px");
   });
 
   it("masaüstü yolunda eski 340px üst sınırı korunur", async () => {
@@ -306,7 +306,7 @@ describe("mobil düzen (pointer: coarse)", () => {
     expect(wheel.style.width).toBe("340px");
   });
 
-  it("mobilde küçük ızgara hücre tavanı 56px, masaüstünde 76px", async () => {
+  it("hücre tavanı mobilde de masaüstüyle aynı: 76px (kutular büyük)", async () => {
     const wrap = document.getElementById("grid-wrap");
     Object.defineProperty(wrap, "clientWidth", { value: 400, configurable: true });
     Object.defineProperty(wrap, "clientHeight", { value: 400, configurable: true });
@@ -314,7 +314,7 @@ describe("mobil düzen (pointer: coarse)", () => {
 
     globalThis.matchMedia = mm(true);
     buildGrid();
-    expect(document.querySelector(".cell").style.width).toBe("56px");
+    expect(document.querySelector(".cell").style.width).toBe("76px");
 
     globalThis.matchMedia = mm(false);
     buildGrid();

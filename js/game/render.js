@@ -74,11 +74,7 @@ export function buildGrid() {
   const availH = wrap.clientHeight - 8;
   const gap = 5;
   // Küçük ızgaralar geniş/uzun ekranlarda kaybolmasın: az hücre varsa üst sınır büyür.
-  // Mobilde hücreler daha kompakt — dikey alan çarka bırakılır.
-  const coarse = isCoarse();
-  const maxSize = (rows <= 4 && cols <= 5) ? (coarse ? 56 : 76)
-    : (rows <= 6 && cols <= 7) ? (coarse ? 46 : 62)
-      : (coarse ? 40 : 52);
+  const maxSize = (rows <= 4 && cols <= 5) ? 76 : (rows <= 6 && cols <= 7) ? 62 : 52;
   const size = Math.max(22, Math.min(maxSize, Math.floor(Math.min(
     (availW - gap * (cols - 1)) / cols,
     (availH - gap * (rows - 1)) / rows,
@@ -136,12 +132,12 @@ export function buildWheel(letters, onBubbleKey) {
   _polylineEl = null; // wheel yeniden oluştu, cache'i sıfırla
   const n = letters.length;
   const zone = document.getElementById("wheel-zone");
-  // Mobilde çark ekran genişliğini neredeyse tamamen kullanır (büyük parmak
-  // hedefleri). Zone yüksekliğine bakılmaz — zone çarka göre boyutlanır
-  // (döngüsel ölçüm); onun yerine sabit şeritler (başlık, bilgi, araçlar,
-  // önizleme) gerçek DOM'dan ölçülür (safe-area ve kompakt mod farkları
-  // cihazdan cihaza değişir), ızgaraya asgari pay bırakılır, kalan çarka.
-  // Masaüstünde eski kompakt ölçü korunur.
+  // Mobilde öncelik kelime kutularında (ızgara): çark kompakt tutulur —
+  // genişliğin ~%62'si, 300px tavan. Zone yüksekliğine bakılmaz — zone çarka
+  // göre boyutlanır (döngüsel ölçüm); onun yerine sabit şeritler (başlık,
+  // bilgi, araçlar, önizleme) gerçek DOM'dan ölçülür (safe-area ve kompakt
+  // mod farkları cihazdan cihaza değişir), ızgaraya en az %30 (170px taban)
+  // pay bırakılır. Masaüstünde eski ölçü korunur.
   let D;
   if (isCoarse()) {
     let fixed = 14; // zone dikey padding'i
@@ -151,9 +147,9 @@ export function buildWheel(letters, onBubbleKey) {
         if (el.id !== "grid-wrap" && el.id !== "wheel-zone") fixed += el.offsetHeight;
       }
     }
-    const gridBudget = Math.max(96, innerHeight * 0.16);
-    D = Math.max(220, Math.min(430, Math.min(
-      innerWidth - 20,
+    const gridBudget = Math.max(170, innerHeight * 0.3);
+    D = Math.max(170, Math.min(300, Math.min(
+      Math.round(innerWidth * 0.62),
       innerHeight - fixed - gridBudget,
     )));
   } else {
