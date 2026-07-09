@@ -242,8 +242,9 @@ button:active:not(#shuffle){transform:scale(.95)}
   #info-strip{min-height:18px;padding:2px 18px 4px}
 }
 /* Kısa ekran kompakt modu: araçlar tek satır yatay şerit olur,
-   grid ve çarka dikey alan bırakılır */
-@media (max-height:700px){
+   grid ve çarka dikey alan bırakılır. Dokunmatik dikey ekranlarda da
+   uygulanır — telefonlarda dikey alan her zaman çark/ızgaraya öncelikli. */
+@media (max-height:700px), (pointer:coarse) and (orientation:portrait){
   .toolrow{width:auto;max-width:calc(100% - 20px);margin:0 auto;gap:8px;padding:6px 10px 10px}
   .tool{min-height:56px;flex-direction:row;justify-content:center;gap:6px;padding:8px 6px 12px}
   .tool-ic svg{width:20px;height:20px}
@@ -257,6 +258,16 @@ button:active:not(#shuffle){transform:scale(.95)}
 @media (max-height:590px){
   .tool-label{display:none}
   .tool{min-height:46px;padding:8px 10px 12px}
+}
+/* Mobil (dokunmatik, dikey) oyun düzeni: dikey alan çark lehine paylaşılır —
+   ızgara kompakt, çark büyük (parmak hedefleri). dvh varyantı: mobil adres
+   çubuğu açılıp kapansa da gerçek görünür yüksekliğe göre ölçülür. */
+@media (pointer:coarse) and (orientation:portrait){
+  /* Çark JS'te viewport'tan boyutlanır (render.js buildWheel); zone içeriğine
+     (flex-basis:auto) oturur ve artan boşluğu ızgarayla eşit paylaşır.
+     Izgara taban 0'dan büyür — çarktan artan alanı alır, 36dvh'yi aşmaz. */
+  #grid-wrap{flex:1 1 0;max-height:36vh;max-height:36dvh;padding:4px 10px}
+  #wheel-zone{flex:0 0 auto;min-height:0;padding:2px 0 8px}
 }
 
 /* ---------- GERÇEK FOTOĞRAF ARKA PLAN (Ken Burns sinematik pan) ---------- */
