@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import { VitePWA } from "vite-plugin-pwa";
 
 /* Vitest: DOM gerektiren testler jsdom ortamında çalışsın, saf birim testler
  * node'da kalsın. Her test dosyası kendi başında ortamını isteyebilir,
@@ -16,4 +17,12 @@ export default defineConfig({
       reportsDirectory: "coverage",
     },
   },
+  plugins: [
+    // Minimal VitePWA for virtual:pwa-register resolution during tests
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: false,
+      workbox: { globPatterns: [] },
+    }),
+  ],
 });

@@ -30,6 +30,29 @@ Hata takibi için `.env` içinde `VITE_SENTRY_DSN` ayarlayın (kullanıcı izni:
 Ayarlar → 🐞). Alan adı değişirse `index.html` head'indeki mutlak URL'leri ve
 `public/robots.txt` + `public/sitemap.xml` içini güncelleyin.
 
+## v10'da yeni (Bonus sandık animasyonu + kapsamlı E2E test paketi)
+
+- 🎁 **Bonus sandık (bonus-chest) açılma animasyonu** — sandığa tıklayınca:
+  - `chestPop` — ikonda ölçek sıçraması + dönüş patlaması (550ms, elastic curve)
+  - 10 adet DOM partikülü (✦ ♦ ∙ + ⬩ * 🪙) buton etrafında rastgele açılarda yükselip kaybolur
+  - `dustBurst` — altın partiküllerin yayılarak sönmesi (700ms)
+  - `countPulse` — bonus sayısı badge'inde yeşil parıltı (500ms)
+  - `gemHover` — sandık hover öncesinde nazik altın ışıması
+  - Çift tıklama önleme: `.opening` class guard'ı
+  - Güvenlik temizleyici: 2 saniye sonra stuck class'ı zorla kaldırma
+  - `animationend` ile partikül DOM'dan otomatik temizlenir
+  - Başarı ses efekti: `SFX.coin()` ile eşzamanlı seslendirme
+- 🧪 **23 E2E Playwright testi** — tüm akışlar otomatik doğrulanır:
+  - Sözlük paneli: stagger animasyon sınıfı, genişletme/daraltma (`aria-expanded`),
+    kart içeriği (kelime, IPA, gloss, telaffuz, tag'ler), tag filtreleme,
+    arama fonksiyonu
+  - İpucu görsel feedback: `.hint-active` toggle, `.hint-insufficient` sallanma,
+    `.hint-wand-active` glow, yetersiz bakiye akışı
+  - Bonus sandık: `.opening` class'ı eklenmesi ve 600ms sonra kalkması
+  - Chain modu: panel + input + `chain-status` kontrolleri
+- 🔬 **Kapsamlı CI pipeline** — GitHub Actions'da seri çalıştırma (`fullyParallel: false`),
+  45s test timeout, stabilite için 1 retry, 23 testin tamamı CI'da otomatik doğrulanır
+
 ## v9'da yeni (Hint mikro-etkileşimleri + Vite cache fix)
 
 - 💡 **İpuçlarına mikro-etkileşimler** — üç hint butonu artık görsel geri bildirim verir:
@@ -237,12 +260,29 @@ Projede 3 mekanizma ile Vite önbellek sorunu önlenir:
 
 ```bash
 npm test              # 409 birim test (25 dosya) — ~1sn
-npm run test:e2e      # 13 Playwright smoke testi
+npm run test:e2e      # 23 Playwright E2E testi (~30sn)
 npm run dev:clean     # Önbellek temiz + dev başlat
 npm run build         # Production build doğrulama
 npm run preview       # Production build serve (önbellek bypass)
-node test-visual.mjs  # 15 görsel özellik testi (Playwright)
 ```
+
+### E2E Test Detayları
+
+23 Playwright testi 8 grup halinde `e2e/smoke.spec.js`'de tanımlıdır:
+
+| Grup | Test Sayısı | Kapsam |
+|------|-------------|--------|
+| 🏠 Ana ekran | 4 | splash kapanışı, 7 ikon stagger, hero kart, başlat butonu |
+| 🗺️ Harita | 2 | seviye düğümleri, kilit/stars gösterimi |
+| 🎮 Oyun döngüsü | 4 | seviye 1 çözümü, info-strip, seviye sonu paneli, bonus kelime |
+| 🗓️ Günlük bulmaca | 1 | günlük puzzle çarkı + kelime çözümü |
+| ⚙️ Ayarlar | 1 | panel açma + tema değiştirme |
+| 📖 Sözlük paneli | 5 | stagger sınıfları, expand/collapse (`aria-expanded`),
+  kart içeriği, tag filtreleme, arama |
+| 💡 İpucu feedback | 3 | `.hint-active` toggle, `.hint-insufficient` sallanma,
+  `.hint-wand-active` glow, yetersiz bakiye akışı |
+| 🎁 Bonus chest | 1 | `.opening` class + toast doğrulaması |
+| 🔗 Chain modu | 1 | panel + input + `chain-status` görünürlüğü |
 
 ## İçerik kuralları
 

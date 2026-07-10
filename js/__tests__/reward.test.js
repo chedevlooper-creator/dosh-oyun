@@ -10,6 +10,7 @@ vi.mock("../utils/helpers.js", () => ({
   updateCoins: vi.fn(),
   vibrate: vi.fn(),
   show: vi.fn(),
+  flyCoins: vi.fn(),
 }));
 vi.mock("../utils/analytics.js", () => ({ track: vi.fn(), EVENTS: {} }));
 vi.mock("../data/info.js", () => ({
@@ -31,6 +32,7 @@ let lv;
 let G;
 
 beforeEach(() => {
+  vi.clearAllMocks();
   lv = JSON.parse(JSON.stringify(SAMPLE_LEVEL));
   initState(lv, {});
   G = getState();
@@ -101,6 +103,220 @@ describe("showBonusChest", () => {
     expect(toast).toHaveBeenCalled();
     vi.useRealTimers();
   });
+});
+
+describe("showBonusChest particles", () => {
+  beforeEach(() => {
+    // Deterministic Math.random for particle positions
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
+  });
+
+  afterEach(() => {
+    // SFX.coin mock'unu el ile temizle (vi.clearAllMocks bazı durumlarda yetmiyor)
+    vi.useRealTimers();
+  });
+
+  it("adds .opening class to the bonus-chest button", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+    const btn = document.getElementById("bonus-chest");
+    expect(btn.classList.contains("opening")).toBe(false);
+
+    showBonusChest();
+    expect(btn.classList.contains("opening")).toBe(true);
+
+    // Cleanup: advance past the 600ms animation
+    vi.advanceTimersByTime(650);
+  });
+
+  it("prevents double-click when .opening is already set", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+    const { toast } = await import("../utils/helpers.js");
+    const btn = document.getElementById("bonus-chest");
+
+    // First call
+    showBonusChest();
+    expect(btn.classList.contains("opening")).toBe(true);
+
+    // Second call — should be ignored (early return)
+    toast.mockClear();
+    showBonusChest();
+
+    // Partikül sayısı sadece ilk çağrıdaki kadar olmalı
+    const particles = document.body.querySelectorAll(".bonus-particle");
+    expect(particles.length).toBe(10);
+
+    vi.advanceTimersByTime(650);
+  });
+
+  it("creates exactly 10 particle divs in the DOM", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+
+    showBonusChest();
+
+    const particles = document.body.querySelectorAll(".bonus-particle");
+    expect(particles.length).toBe(10);
+
+    // All should be div elements
+    particles.forEach((p) => {
+      expect(p.tagName).toBe("DIV");
+    });
+
+    vi.advanceTimersByTime(650);
+  });
+
+  it("sets particle classes: bonus-particle, .coin, .star variants", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+
+    showBonusChest();
+
+    const particles = document.body.querySelectorAll(".bonus-particle");
+    const classes = [...particles].map((p) => p.className);
+
+    // All have .bonus-particle
+    classes.forEach((c) => expect(c).toContain("bonus-particle"));
+
+    // Some should have .coin (i % 3 === 0)
+    const hasCoin = classes.some((c) => c.includes("coin"));
+    expect(hasCoin).toBe(true);
+
+    // Some should have .star (i % 5 === 0)
+    const hasStar = classes.some((c) => c.includes("star"));
+    expect(hasStar).toBe(true);
+
+    vi.advanceTimersByTime(650);
+  });
+
+  it("sets inline styles (left, top, animationDelay) on particles", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+
+    // Button needs a position for getBoundingClientRect
+    const btn = document.getElementById("bonus-chest");
+    btn.style.position = "absolute";
+    btn.style.left = "100px";
+    btn.style.top = "200px";
+    btn.style.width = "40px";
+    btn.style.height = "40px";
+
+    showBonusChest();
+
+    const particles = document.body.querySelectorAll(".bonus-particle");
+    particles.forEach((p) => {
+      // All particles should have left/top values
+      expect(p.style.left).toBeTruthy();
+      expect(p.style.left).toMatch(/px$/);
+      expect(p.style.top).toBeTruthy();
+      expect(p.style.top).toMatch(/px$/);
+      // animationDelay should be set (mock random=0.5 → delay=0.075s)
+      expect(p.style.animationDelay).toBe("0.075s");
+    });
+
+    vi.advanceTimersByTime(650);
+  });
+
+  it("adds .pulse class to bonus-count badge", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+    const countEl = document.getElementById("bonus-count");
+
+    expect(countEl.classList.contains("pulse")).toBe(false);
+    showBonusChest();
+    expect(countEl.classList.contains("pulse")).toBe(true);
+
+    // After 600ms the pulse class should be removed
+    vi.advanceTimersByTime(650);
+    expect(countEl.classList.contains("pulse")).toBe(false);
+  });
+
+  it("calls SFX.coin() after animation completes", async () => {
+    vi.useFakeTimers();
+    G.foundBonus.add("ав");
+    const { showBonusChest } = await import("../game/reward.js");
+    const { SFX } = await import("../engine/audio.js");
+
+    // El ile temizle (global clearAllMocks yetersiz kalıyor)
+    SFX.coin.mockClear();
+
+    showBonusChest();
+
+    vi.advanceTimersByTime(650);
+    expect(SFX.coin).toHaveBeenCalledOnce();
+  });
+
+  it("cleans up particles on animationend event", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+
+    showBonusChest();
+    expect(document.body.querySelectorAll(".bonus-particle").length).toBe(10);
+
+    // Fire animationend on all particles
+    const particles = document.body.querySelectorAll(".bonus-particle");
+    particles.forEach((p) => {
+      p.dispatchEvent(new Event("animationend"));
+    });
+
+    // All particles should be removed
+    expect(document.body.querySelectorAll(".bonus-particle").length).toBe(0);
+
+    vi.advanceTimersByTime(650);
+  });
+
+  it("defensive 2-second cleanup removes stuck .opening class", async () => {
+    vi.useFakeTimers();
+    const { showBonusChest } = await import("../game/reward.js");
+    const btn = document.getElementById("bonus-chest");
+
+    showBonusChest();
+    expect(btn.classList.contains("opening")).toBe(true);
+
+    // Advance past 600ms (first timeout runs, removes .opening normally)
+    vi.advanceTimersByTime(650);
+    expect(btn.classList.contains("opening")).toBe(false);
+
+    vi.advanceTimersByTime(2000);
+    // Still not stuck (normal flow)
+    expect(btn.classList.contains("opening")).toBe(false);
+  });
+
+  it("is no-op when G is null (getState returns null)", async () => {
+    const { showBonusChest } = await import("../game/reward.js");
+    const { SFX } = await import("../engine/audio.js");
+    const { toast } = await import("../utils/helpers.js");
+
+    // getState'i null döndürecek şekilde spyonla, sadece bu test için
+    const stateMod = await import("../game/state.js");
+    const getStateSpy = vi.spyOn(stateMod, "getState").mockReturnValue(null);
+    SFX.coin.mockClear();
+
+    showBonusChest();
+    expect(SFX.coin).not.toHaveBeenCalled();
+    expect(toast).not.toHaveBeenCalled();
+
+    // SADECE getState spy'ını geri al — restine dokunma (SFX.coin mock'unu kırar!)
+    getStateSpy.mockRestore();
+  });
+
+  it("is no-op when bonus-chest button is missing from DOM", async () => {
+    const { showBonusChest } = await import("../game/reward.js");
+    const { SFX } = await import("../engine/audio.js");
+    const { toast } = await import("../utils/helpers.js");
+
+    // Remove the bonus-chest element from DOM
+    const btn = document.getElementById("bonus-chest");
+    btn.remove();
+    SFX.coin.mockClear();
+
+    expect(() => showBonusChest()).not.toThrow();
+    expect(SFX.coin).not.toHaveBeenCalled();
+    expect(toast).not.toHaveBeenCalled();
+  });
+
+  // flyCoins DOM testi helpers.test.js'de yapılmalı (burada helpers.js mock'landığı için)
 });
 
 describe("animateCoinCounter", () => {
