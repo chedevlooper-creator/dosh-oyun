@@ -72,11 +72,24 @@ export function hintLetter(cbs) {
   const G = getState();
   if (!G || G.done) return;
   if (!unfilled().length) return;
-  if (!spend(CFG.hintCost)) return;
+  const btn = document.getElementById("hint-letter");
+  if (!spend(CFG.hintCost)) {
+    // Yetersiz bakiye: butonda sallanma feedback
+    if (btn) {
+      btn.classList.add("hint-insufficient");
+      setTimeout(() => btn.classList.remove("hint-insufficient"), 500);
+    }
+    return;
+  }
   const cell = randomUnfilled();
   if (!cell) return;
   fillCell(cell, true);
   SFX.hint();
+  // Başarı feedback: butona parıltı
+  if (btn) {
+    btn.classList.add("hint-success");
+    setTimeout(() => btn.classList.remove("hint-success"), 600);
+  }
   track(EVENTS.HINT_USED, { type: "letter", level: G.lv.id, cost: CFG.hintCost });
   cbs.checkAutoSolve();
   cbs.checkDone();
@@ -87,15 +100,26 @@ export function hintTarget() {
   const G = getState();
   if (!G || G.done) return;
   if (!unfilled().length) return;
+  const btn = document.getElementById("hint-target");
   if (S.coins < CFG.targetHintCost) {
     toast(t("game.needCoins", CFG.targetHintCost), "bad");
     SFX.bad();
+    if (btn) {
+      btn.classList.add("hint-insufficient");
+      btn.querySelector(".price")?.classList.add("price-shake");
+      setTimeout(() => {
+        btn.classList.remove("hint-insufficient");
+        btn.querySelector(".price")?.classList.remove("price-shake");
+      }, 500);
+    }
     return;
   }
   G.targeting = !G.targeting;
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.toggle("target", G.targeting);
   }
+  // Hedefleme modu aktif görsel feedback
+  if (btn) btn.classList.toggle("hint-active", G.targeting);
   if (G.targeting) toast(t("game.targetMsg"));
 }
 
@@ -122,6 +146,8 @@ export function onCellTap(cell, cbs) {
   for (const c of G.cells.values()) {
     if (c.el) c.el.classList.remove("target");
   }
+  // Hedefleme modu kapandı: butondan aktif glow kaldır
+  document.getElementById("hint-target")?.classList.remove("hint-active");
   if (!spend(CFG.targetHintCost)) return;
   fillCell(cell, true);
   SFX.hint();
@@ -135,13 +161,26 @@ export function hintWand(cbs) {
   const G = getState();
   if (!G || G.done) return;
   if (!unfilled().length) return;
-  if (!spend(CFG.magicWandCost)) return;
+  const btn = document.getElementById("hint-wand");
+  if (!spend(CFG.magicWandCost)) {
+    // Yetersiz bakiye: butonda sallanma feedback
+    if (btn) {
+      btn.classList.add("hint-insufficient");
+      setTimeout(() => btn.classList.remove("hint-insufficient"), 500);
+    }
+    return;
+  }
   for (let k = 0; k < 3; k++) {
     const cell = randomUnfilled();
     if (!cell) break;
     fillCell(cell, true);
   }
   SFX.hint();
+  // Başarı feedback: wand özel üçlü parıltı animasyonu
+  if (btn) {
+    btn.classList.add("hint-wand-active");
+    setTimeout(() => btn.classList.remove("hint-wand-active"), 800);
+  }
   track(EVENTS.HINT_USED, { type: "wand", level: G.lv.id, cost: CFG.magicWandCost });
   cbs.checkAutoSolve();
   cbs.checkDone();

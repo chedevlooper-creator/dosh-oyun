@@ -6,6 +6,8 @@
   "description": "Дош — Нохчийн дош. Chechen word puzzle game",
   "scripts": {
     "dev": "vite",
+    "dev:force": "vite --force",
+    "dev:clean": "node -e \"const fs=require('fs');['.vite','node_modules/.vite'].forEach(d=>fs.rmSync(d,{recursive:true,force:true}))\" && vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",

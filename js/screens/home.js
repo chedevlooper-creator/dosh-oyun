@@ -27,6 +27,15 @@ export function renderHome(){
       bar.style.width = percent.toFixed(1) + "%";
       bar.setAttribute("aria-valuenow", percent.toFixed(0));
     }
+    // İkon stagger girişi — her render'da yeniden tetikle
+    const icons = document.querySelectorAll(".dock .icon-btn");
+    icons.forEach((btn, i) => {
+      btn.classList.remove("icon-enter");
+      btn.style.animationDelay = `${i * 60}ms`;
+      // Force reflow
+      void btn.offsetWidth;
+      btn.classList.add("icon-enter");
+    });
   });
   $("btn-gift").classList.toggle("glow", S.lastGift !== today());
   // günlük bulmaca: yapılmadıysa parla, streak alevini güncelle

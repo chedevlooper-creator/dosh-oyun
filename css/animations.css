@@ -50,20 +50,50 @@
 @keyframes splashFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15);visibility:hidden}}
 /* Particles drift yavaşça yukarı */
 @keyframes driftUp{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-120px) translateX(20px);opacity:0}}
+
+/* ---------- FAZ 3: INFO KARTI ANİMASYONLARI ---------- */
+/* Kart yukarı süzülme girişi (stagger için) */
+@keyframes cardSlideUp{from{opacity:0;transform:translateY(24px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* Bilgi şeridi yaylanma (spring bounce) */
+@keyframes stripBounce{0%{transform:translateY(100%)}55%{transform:translateY(-6px)}75%{transform:translateY(3px)}90%{transform:translateY(-1px)}100%{transform:translateY(0)}}
+/* Detay bölümü aşağı açılma */
+@keyframes detailSlideDown{from{opacity:0;transform:translateY(-6px);max-height:0}to{opacity:1;transform:translateY(0);max-height:400px}}
+/* Hafif kıvılcım patlaması (CSS particle) */
+@keyframes sparkleBurst{0%{transform:scale(0) rotate(0);opacity:1}70%{opacity:.8}100%{transform:scale(1.6) rotate(160deg);opacity:0}}
+/* Home screen ikonlarının kademeli girişi */
+@keyframes iconPop{0%{opacity:0;transform:scale(.5) translateY(12px)}60%{transform:scale(1.15) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+
 /* Pin drop: harita düğümünün yerleşmesi (yumuşak iniş) */
 @keyframes pinDrop{0%{transform:translateY(-40px) scale(.6);opacity:0}70%{transform:translateY(4px) scale(1.08);opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
 /* Banner inme: başarı bandı */
 @keyframes bannerIn{0%{transform:translateY(-100%);opacity:0}60%{transform:translateY(8px);opacity:1}100%{transform:translateY(0);opacity:1}}
 /* Shake yoğun: yanlış kelime */
 @keyframes strongShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-8px,3px) rotate(-1deg)}30%{transform:translate(8px,-3px) rotate(1deg)}50%{transform:translate(-6px,2px)}70%{transform:translate(6px,-2px)}90%{transform:translate(-3px,1px)}}
-/* Pulse ring: dikkat çekici bildiri */
+/* Pulse ring: dikkat çekici bildiri (4 yanlışta hint butonu uyarısı) */
 @keyframes pulseRing{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.6);opacity:0}}
 /* Skeleton shimmer: yükleme durumu */
 @keyframes skeletonShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 /* Bounce in: yeni öğelerin girişi */
 @keyframes bounceIn{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.1)}70%{transform:scale(.95)}100%{transform:scale(1);opacity:1}}
+
+/* ---------- FAZ 5: İPUCU (HINT) MİKRO-ETKİLEŞİMLERİ ---------- */
+/* Başarılı ipucu kullanımı: parıltı + yaylanma */
+@keyframes hintSuccess{0%{box-shadow:0 0 0 0 rgba(242,181,61,.6)}50%{box-shadow:0 0 28px 8px rgba(242,181,61,.5);transform:scale(1.12)}100%{box-shadow:0 4px 10px rgba(0,0,0,.22);transform:scale(1)}}
+/* Yetersiz bakiye: hafif sallanma */
+@keyframes hintInsufficient{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px) rotate(-2deg)}30%{transform:translateX(6px) rotate(2deg)}45%{transform:translateX(-4px) rotate(-1deg)}60%{transform:translateX(4px) rotate(1deg)}75%{transform:translateX(-2px)}}
+/* Hedefleme modu aktif nabız: altın halka */
+@keyframes targetActive{0%{box-shadow:0 0 6px 0 rgba(242,181,61,.4),0 4px 10px rgba(0,0,0,.22)}50%{box-shadow:0 0 22px 6px rgba(242,181,61,.55),0 4px 14px rgba(0,0,0,.25)}100%{box-shadow:0 0 6px 0 rgba(242,181,61,.4),0 4px 10px rgba(0,0,0,.22)}}
+/* Sihirli değnek kullanımı: üçlü flaş */
+@keyframes wandGlow{0%{box-shadow:0 0 0 0 rgba(212,168,67,0);transform:scale(1)}25%{box-shadow:0 0 20px 6px rgba(212,168,67,.6);transform:scale(1.08)}50%{box-shadow:0 0 0 0 rgba(212,168,67,0);transform:scale(1)}75%{box-shadow:0 0 14px 4px rgba(212,168,67,.4);transform:scale(1.04)}100%{box-shadow:0 4px 10px rgba(0,0,0,.22);transform:scale(1)}}
 /* Glow sweep: parlama dalgası */
 @keyframes glowSweep{0%{transform:translateX(-100%) skewX(-20deg)}100%{transform:translateX(200%) skewX(-20deg)}}
+
+/* ---------- FAZ 5: İPUCU (HINT) YARDIMCI SINIFLARI ---------- */
+.tool.hint-success{animation:hintSuccess .55s cubic-bezier(.34,1.56,.64,1)}
+.tool.hint-insufficient{animation:hintInsufficient .45s ease-out}
+.tool.hint-active{animation:targetActive 1.2s ease-in-out infinite}
+.tool .price.price-shake{animation:hintInsufficient .4s ease-out}
+.tool.hint-wand-active{animation:wandGlow .7s cubic-bezier(.34,1.56,.64,1)}
 
 /* ---------- UYGULANABILIR YARDIMCI SINIFLAR ---------- */
 .press:active{animation:pressBounce .25s ease-out}

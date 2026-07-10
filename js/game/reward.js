@@ -17,6 +17,7 @@ import { recordDailyWin, dailyShareText } from "../engine/daily.js";
 import { INFO } from "../data/info.js";
 import { getState } from "./state.js";
 import { track, EVENTS } from "../utils/analytics.js";
+import { speak } from "../utils/tts.js";
 
 /**
  * Seviye içi ilerleme: çözülen/toplam kelime (üst barda, seviye numarasının yanında).
@@ -33,17 +34,146 @@ export function updateWordProgress() {
  * Bilgi şeridinde kelimenin anlamını göster (çözüm anında + dolu hücreye dokununca).
  * @param {import("./state.js").ProcessedWord} w
  */
+const TAG_COLORS = {
+  animal: "#4caf50", food: "#ff9800", body: "#e91e63",
+  abstract: "#9c27b0", language: "#2196f3", time: "#00bcd4",
+  nature: "#8bc34a", home: "#795548", weather: "#607d8b",
+  color: "#ff5722", family: "#f44336", object: "#673ab7",
+  action: "#03a9f4", number: "#ffc107",
+};
+
 export function showWordInfo(w) {
   const strip = document.getElementById("info-strip");
   if (!strip) return;
+  swipeState = null; // devam eden swipe'ı iptal et
   const info = INFO[w.norm];
   const ce = info ? (info.ce ?? "") : "";
   const tr = info ? (info.tr ?? "") : "";
+  const ipa = info ? (info.ipa ?? "") : "";
+  const etymology = info ? (info.etymology ?? "") : "";
+  const tags = info ? (info.tags ?? []) : [];
+  const examples = info ? (info.examples ?? []) : [];
+  const fallbackColor = "var(--ink2)";
   strip.innerHTML = `
-    <div class="info-word">${dispG(w.norm)}</div>
+    <div class="info-word">${dispG(w.norm)} <button class="info-speak" data-word="${w.norm}" aria-label="${t("tts.speakLabel")}">🔊</button></div>
+    ${ipa ? `<div class="info-ipa">${ipa}</div>` : ""}
     ${ce ? `<div class="info-line"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
-    ${tr ? `<div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}`;
+    ${tr ? `<div class="info-line"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
+    ${etymology ? `<div class="info-etym">${etymology}</div>` : ""}
+    ${examples.length ? `<div class="info-examples">${examples.map(ex => `<div class="info-ex">${ex}</div>`).join("")}</div>` : ""}
+    ${tags.length ? `<div class="info-tags">${tags.map((tag) => { const c = TAG_COLORS[tag] || fallbackColor; return `<span class="info-tag" style="background:${c}22;color:${c};border:1px solid ${c}44">${tag}</span>`; }).join("")}</div>` : ""}`;
   strip.className = "on";
+  // Bounce animasyonu: class'ı kaldır/ekle ile yeniden tetikle
+  strip.classList.remove("on");
+  void strip.offsetHeight; // reflow
+  strip.classList.add("on");
+}
+
+/* Delegated listener — #info-strip içindeki tüm .info-speak tıklamalarını yakala */
+if (typeof document !== "undefined") {
+  document.getElementById("info-strip")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".info-speak");
+    if (btn) speak(btn.dataset.word || "", S.settings.lang);
+  });
+}
+
+/* ================= SWIPE-TO-DISMISS (info-strip) =================
+ * Aşağı kaydırarak bilgi şeridini kapatma. Dokunmatik + fare desteği. */
+const SWIPE_THRESHOLD = 80; // px — bu kadar sürüklenince kapanır
+const SWIPE_FRICTION = 0.6; // direnç katsayısı (0-1)
+
+let swipeState = null;
+
+function initSwipe() {
+  const strip = document.getElementById("info-strip");
+  if (!strip) return;
+
+  const getY = (e) => {
+    if (e.touches) return e.touches[0].clientY;
+    return e.clientY;
+  };
+
+  const onStart = (e) => {
+    if (!strip.classList.contains("on")) return;
+    // Sadece tutamak bölgesinden (üst 30px) veya strip dışından başlat
+    const rect = strip.getBoundingClientRect();
+    const touchY = getY(e);
+    const relativeY = touchY - rect.top;
+    if (relativeY > 40) return; // içerik kaydırma için serbest bırak
+
+    swipeState = { startY: touchY, currentY: touchY, dismissed: false };
+    strip.classList.add("dragging");
+    strip.classList.remove("dismissing", "dismiss");
+    strip.style.transform = `translateY(0)`;
+  };
+
+  const onMove = (e) => {
+    if (!swipeState || swipeState.dismissed) return;
+    const y = getY(e);
+    swipeState.currentY = y;
+    const dy = (y - swipeState.startY) * SWIPE_FRICTION;
+    if (dy <= 0) return; // yukarı sürüklemeyi yok say
+
+    const clamped = Math.min(dy, window.innerHeight * 0.6);
+    strip.style.transform = `translateY(${clamped}px)`;
+    strip.style.opacity = Math.max(0, 1 - clamped / (SWIPE_THRESHOLD * 2));
+  };
+
+  const onEnd = () => {
+    if (!swipeState || swipeState.dismissed) return;
+    const dy = (swipeState.currentY - swipeState.startY) * SWIPE_FRICTION;
+    strip.classList.remove("dragging");
+    strip.style.opacity = "";
+
+    if (dy > SWIPE_THRESHOLD) {
+      // Kapat
+      swipeState.dismissed = true;
+      strip.classList.add("dismiss");
+      setTimeout(() => {
+        strip.classList.remove("on", "dismiss");
+        strip.style.transform = "";
+        swipeState = null;
+      }, 320);
+    } else {
+      // Geri dön (snap back)
+      strip.classList.add("dismissing");
+      strip.style.transform = "";
+      setTimeout(() => {
+        strip.classList.remove("dismissing");
+        if (swipeState) swipeState = null;
+      }, 300);
+    }
+  };
+
+  // Dokunmatik olaylar
+  strip.addEventListener("touchstart", onStart, { passive: true });
+  strip.addEventListener("touchmove", onMove, { passive: true });
+  strip.addEventListener("touchend", onEnd);
+  strip.addEventListener("touchcancel", onEnd);
+
+  // Fare olayları (masaüstü test için)
+  strip.addEventListener("pointerdown", (e) => {
+    // Dokunmatikse touch zaten handle ediyor
+    if (e.pointerType !== "mouse") return;
+    onStart(e);
+    const onPointerMove = (ev) => { ev.preventDefault(); onMove(ev); };
+    const onPointerUp = () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      onEnd();
+    };
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+  });
+}
+
+// Sayfa yüklendiğinde swipe dinleyicilerini kur
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSwipe);
+  } else {
+    initSwipe();
+  }
 }
 
 /**

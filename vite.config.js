@@ -16,10 +16,38 @@ function editorRewrite() {
   };
 }
 
+/**
+ * Vite önbellek temizleme (Windows fix).
+ * Vite, eski transform sonuçlarını cache'te tutar ve dosya değişse bile
+ * eski sürümü serve edebilir. Dosya değişikliklerinde ilgili modülü
+ * moduleGraph'ten düşürerek Vite'in yeniden derlemesini zorunlu kılar.
+ */
+function cacheBuster() {
+  return {
+    name: "cache-buster",
+    configureServer(server) {
+      // Dosya değişikliklerinde ilgili modülü cache'ten düşür
+      server.watcher.on("change", (path) => {
+        const mods = server.moduleGraph.getModulesByFile(path);
+        if (mods) {
+          for (const mod of mods) {
+            server.moduleGraph.invalidateModule(mod);
+          }
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   root: ".",
   base: "/",
   appType: "mpa",
+
+  // Önbellek dizini: node_modules/.vite yerine proje kökündeki .vite/
+  // (Windows'ta node_modules derin yol sorunlarına yol açabiliyor)
+  cacheDir: ".vite",
+
   build: {
     outDir: "dist",
     emptyOutDir: true,
@@ -39,12 +67,21 @@ export default defineConfig({
       },
     },
   },
+
   server: {
     port: 8765,
     open: false,
+    // Windows: chokidar bazen değişiklik bildirimini geç veya hiç
+    // göndermez. Polling fallback'i sadece Windows'ta etkinleştir.
+    watch: {
+      usePolling: process.platform === "win32",
+      interval: 100,
+    },
   },
+
   plugins: [
     editorRewrite(),
+    cacheBuster(),
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {

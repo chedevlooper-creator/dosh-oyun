@@ -43,3 +43,6 @@ desktop.ini
 test-results/
 playwright-report/
 .env*
+
+# Dev test files
+/dev/

@@ -15,6 +15,15 @@ import { t } from "../utils/i18n.js";
 import { speak } from "../utils/tts.js";
 import * as dict from "../data/dictionary.js";
 
+/** Tag renkleri — reward.js TAG_COLORS ile eşleşir */
+const TAG_COLORS = {
+  animal: "#4caf50", food: "#ff9800", body: "#e91e63",
+  abstract: "#9c27b0", language: "#2196f3", time: "#00bcd4",
+  nature: "#8bc34a", home: "#795548", weather: "#607d8b",
+  color: "#ff5722", family: "#f44336", object: "#673ab7",
+  action: "#03a9f4", number: "#ffc107",
+};
+
 /** Anlamı eksik kelime için önceden doldurulmuş GitHub issue bağlantısı */
 function contribURL(w) {
   const title = encodeURIComponent(`МаьӀна: ${w}`);
@@ -23,37 +32,78 @@ function contribURL(w) {
 }
 
 /**
- * Tek bir kelime satırı renderla.
+ * Detay görünümü renderla (expand olduğunda gösterilir).
+ * @param {import("../data/dictionary.js").DictEntry} e
+ */
+function renderDetail(e) {
+  const parts = [];
+  if (e.etymology) {
+    parts.push(`<div class="dict-detail-etym">ℹ ${e.etymology}</div>`);
+  }
+  if (e.examples && e.examples.length > 0) {
+    const exHtml = e.examples.map((ex) =>
+      `<div class="dict-ex">"${dispG(ex)}"</div>`,
+    ).join("");
+    parts.push(
+      `<div class="dict-detail-section">` +
+      `<div class="dict-detail-label">📝 Масаланаш</div>` +
+      `${exHtml}</div>`
+    );
+  }
+  // miss link kart gövdesinde zaten gösteriliyor, burada tekrar ekleme
+  return parts.join("");
+}
+
+/**
+ * Zengin kelime kartı renderla.
  * @param {import("../data/dictionary.js").DictEntry} e
  */
 function renderItem(e) {
   const ce = e.gloss.ce || "";
   const tr = e.gloss.tr || "";
-  const miss = !ce && !tr
-    ? `<div class="d dict-miss"><a href="${contribURL(e.lemma)}" target="_blank" rel="noopener">✍️ МаьӀна…</a></div>`
+  const ipa = e.ipa ? `<span class="dict-ipa">${e.ipa}</span>` : "";
+  const etymology = e.etymology
+    ? `<div class="dict-card-etym">${e.etymology}</div>`
     : "";
 
-  const examples = (e.examples || []).slice(0, 2).map((ex) =>
-    `<div class="d dict-ex">"${dispG(ex)}"</div>`,
-  ).join("");
-
-  const ipa = e.ipa ? `<span class="dict-ipa">[${e.ipa}]</span>` : "";
-  const tags = (e.tags || []).slice(0, 3).map((tag) =>
-    `<span class="dict-tag">${tag}</span>`,
-  ).join("");
-
   const statusBadge = e.found
-    ? `<span class="dict-badge dict-badge-found" aria-label="Bu kelimeyi oyunda çözdün">✓</span>`
+    ? `<span class="dict-badge-found" aria-label="Bu kelimeyi oyunda çözdün">✓</span>`
     : `<span class="dict-badge" aria-label="Henüz karşılaşmadın">○</span>`;
 
-  return `<div class="dict-item">
-    <button class="dict-fb" data-w="${e.lemma}" aria-label="✍️ ${dispG(e.lemma)}">✍️</button>
-    <div class="w">${dispG(e.lemma)} ${ipa} ${statusBadge} ${tags}</div>
-    <button class="dict-speak" data-w="${e.lemma}" aria-label="${t("tts.speakLabel")}">🔊</button>
-    ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
-    ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
-    ${examples}
-    ${miss}
+  const examples = (e.examples || []).slice(0, 1).map((ex) =>
+    `<div class="dict-ex">"${dispG(ex)}"</div>`,
+  ).join("");
+
+  const tags = (e.tags || []).map((tag) => {
+    const c = TAG_COLORS[tag] || "var(--ink2,#aaa)";
+    return `<span class="dict-tag" style="background:${c}22;color:${c};border:1px solid ${c}44">${tag}</span>`;
+  }).join("");
+
+  const miss = !ce && !tr
+    ? `<div class="dict-miss"><a href="${contribURL(e.lemma)}" target="_blank" rel="noopener">✍️ МаьӀна…</a></div>`
+    : "";
+
+  const hasExtra = (e.examples && e.examples.length > 1) || !!e.etymology;
+
+  return `<div class="dict-card" data-lemma="${e.lemma}" role="button" tabindex="0" aria-expanded="false">
+    <div class="dict-card-head">
+      <span class="dict-card-word">${dispG(e.lemma)}</span>
+      <button class="dict-speak" data-w="${e.lemma}" aria-label="${t("tts.speakLabel")}">🔊</button>
+      ${ipa}
+      <div class="dict-card-head-right">
+        ${statusBadge}
+        <button class="dict-fb" data-w="${e.lemma}" aria-label="✍️ ${dispG(e.lemma)}">✍️</button>
+      </div>
+    </div>
+    <div class="dict-card-body">
+      ${ce ? `<div class="d"><span class="lang">чеч.</span> ${dispG(ce)}</div>` : ""}
+      ${tr ? `<div class="d"><span class="lang">тр.</span> ${dispG(tr)}</div>` : ""}
+      ${etymology}
+      ${examples ? `<div class="dict-card-examples">${examples}</div>` : ""}
+      ${miss}
+    </div>
+    ${tags ? `<div class="dict-card-tags">${tags}</div>` : ""}
+    ${hasExtra ? `<div class="dict-card-detail"></div>` : ""}
   </div>`;
 }
 
@@ -74,6 +124,16 @@ export function openDict() {
       return `<p class="empty-state">${state.q ? t("dict.notFound") : t("dict.empty")}</p>`;
     }
     return list.map(renderItem).join("");
+  };
+
+  const applyStagger = () => {
+    const cards = document.querySelectorAll(".dict-card");
+    const maxTotal = 800; // max toplam stagger süresi (ms)
+    const delay = cards.length < 30 ? 35 : Math.floor(maxTotal / cards.length);
+    cards.forEach((card, i) => {
+      card.style.animationDelay = `${i * delay}ms`;
+      card.classList.add("card-enter");
+    });
   };
 
   const stat = dict.stats();
@@ -103,23 +163,30 @@ export function openDict() {
       <button class="btn small ghost" id="dict-export-csv" aria-label="CSV olarak dışa aktar">⬇ CSV</button>
       <button class="btn small" id="dc-close">${t("settings.back")}</button>
     </div>`);
+  // Açılışta stagger animasyonu
+  applyStagger();
 
   const $q = $("dict-q");
+  const reRender = () => {
+    $("dict-list").innerHTML = render();
+    applyStagger();
+  };
+
   $q.addEventListener("input", (e) => {
     state.q = e.target.value;
-    $("dict-list").innerHTML = render();
+    reRender();
   });
   $("dict-only-found").addEventListener("change", (e) => {
     state.onlyFound = e.target.checked;
     state.onlyMissing = false;
     $("dict-only-missing").checked = false;
-    $("dict-list").innerHTML = render();
+    reRender();
   });
   $("dict-only-missing").addEventListener("change", (e) => {
     state.onlyMissing = e.target.checked;
     state.onlyFound = false;
     $("dict-only-found").checked = false;
-    $("dict-list").innerHTML = render();
+    reRender();
   });
   // Tag toggle
   $("dict-list").parentElement.querySelectorAll(".dict-tag-btn").forEach((btn) => {
@@ -132,16 +199,51 @@ export function openDict() {
         state.tags.push(tg);
         btn.classList.add("on");
       }
-      $("dict-list").innerHTML = render();
+      reRender();
     });
   });
-  // Liste içi delegation
+  // Liste içi delegation — butonlar ve kart genişletme
   $("dict-list").addEventListener("click", (e) => {
     const target = /** @type {HTMLElement} */(e.target);
     const fb = target.closest?.(".dict-fb");
     if (fb) { openFeedback({ word: fb.dataset.w, type: "fix" }); return; }
     const sp = target.closest?.(".dict-speak");
-    if (sp) speak(sp.dataset.w, S.settings.lang);
+    if (sp) { speak(sp.dataset.w, S.settings.lang); return; }
+    const card = target.closest?.(".dict-card");
+    if (card) {
+      const expanded = card.getAttribute("aria-expanded") === "true";
+      // Diğer genişletilmiş kartları kapat
+      document.querySelectorAll(".dict-card[aria-expanded='true']").forEach((c) => {
+        if (c !== card) {
+          c.setAttribute("aria-expanded", "false");
+          const detail = c.querySelector(".dict-card-detail");
+          if (detail) detail.innerHTML = "";
+        }
+      });
+      if (expanded) {
+        // Daralt
+        card.setAttribute("aria-expanded", "false");
+        const detail = card.querySelector(".dict-card-detail");
+        if (detail) detail.innerHTML = "";
+      } else {
+        // Genişlet
+        card.setAttribute("aria-expanded", "true");
+        const lemma = card.dataset.lemma;
+        if (lemma) {
+          const info = dict.get(lemma);
+          const detail = card.querySelector(".dict-card-detail");
+          if (detail) detail.innerHTML = renderDetail(info);
+        }
+      }
+    }
+  });
+
+  // Klavye desteği (Enter/Space ile kart genişletme)
+  $("dict-list").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      const card = /** @type {HTMLElement} */(e.target).closest?.(".dict-card");
+      if (card) { e.preventDefault(); card.click(); }
+    }
   });
   // Export
   $("dict-export-json").onclick = () => {
@@ -162,3 +264,4 @@ export function openDict() {
   };
   $("dc-close").onclick = closePanel;
 }
+// VERSION: 2

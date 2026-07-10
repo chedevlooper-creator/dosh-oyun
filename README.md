@@ -7,21 +7,114 @@ Words-of-Wonders tarzı Çeçence kelime oyunu. Flutter gerekmez — saf HTML5/J
 
 ```bash
 npm install
-npm run dev        # geliştirme sunucusu (http://localhost:8765)
-npm run build      # üretim build'i → dist/
-npm run verify     # lint + birim testler + build
-npm run test:e2e   # Playwright smoke (gerçek tarayıcı akışı)
+npm run dev          # geliştirme sunucusu (http://localhost:8765)
+npm run dev:force    # vite --force (önbellek temizle + başlat)
+npm run dev:clean    # .vite/ + node_modules/.vite/ sil + başlat
+npm run build        # üretim build'i → dist/
+npm run preview      # üretim build'ini serve et (dist/)
+npm run verify       # lint + birim testler + build
+npm run test:e2e     # Playwright smoke (gerçek tarayıcı akışı)
 ```
-
 | Platform | Nasıl |
 |---|---|
 | Web'de yayın | Vercel'e bağlı (`vercel.json`); `dist/` herhangi bir statik hosta da yüklenebilir |
 | Android / iOS | Yayınlanan adresi aç → tarayıcı menüsünden **"Ana ekrana ekle"** — tam ekran, çevrimdışı çalışan uygulama olur (PWA) |
 | Mağaza (APK/IPA) | Klasörü [Capacitor](https://capacitorjs.com) ile sarmalayın: `npx cap add android` |
 
+> **💡 Windows'ta Vite önbellek sorunu mu yaşıyorsunuz?** `npm run dev:clean`
+> tüm önbellekleri temizler ve sunucuyu yeniden başlatır. Eğer hâlâ eski kod
+> serve ediliyorsa `npm run build && npm run preview` ile production build'i
+> kullanın (önbellek tamamen bypass edilir). Detaylı bilgi: [Geliştirici notları](#geliştirici-notları)
+
 Hata takibi için `.env` içinde `VITE_SENTRY_DSN` ayarlayın (kullanıcı izni:
 Ayarlar → 🐞). Alan adı değişirse `index.html` head'indeki mutlak URL'leri ve
 `public/robots.txt` + `public/sitemap.xml` içini güncelleyin.
+
+## v9'da yeni (Hint mikro-etkileşimleri + Vite cache fix)
+
+- 💡 **İpuçlarına mikro-etkileşimler** — üç hint butonu artık görsel geri bildirim verir:
+  - `#hint-letter` (ХӀарф хьахо): başarılı kullanımda altın parıltı (`hintSuccess`),
+    yetersiz bakiyede butonda sallanma (`hintInsufficient`)
+  - `#hint-target` (ХӀан хьахо): hedefleme modu açıkken nabız atan altın halka
+    (`targetActive`), tıklanan hücre ile kapanınca glow söner
+  - `#hint-wand` (Хьехаман тай): başarılı kullanımda üçlü flaş efekti (`wandGlow`)
+  - Tüm butonlarda yetersiz bakiye durumunda sallanma + fiyat rozetinde shake
+- 🔧 **Vite önbellek yönetimi** — Windows'ta eski versiyon serve edilme sorununa
+  kalıcı çözüm: `cacheDir: '.vite'` (node_modules dışı), `server.watch.usePolling`
+  (Windows polling fallback), `cacheBuster` plugin (değişen dosyaları moduleGraph'ten
+  otomatik düşürür)
+- 📦 **Yeni npm scriptleri:** `npm run dev:force` (önbellek temizle + başlat),
+  `npm run dev:clean` (.vite/ ve node_modules/.vite/ sil + başlat)
+- ✅ **Production build test** — `vite preview` ile önbellek bypass: 15/16 görsel test,
+  13/13 E2E smoke test başarılı
+
+## v8'de yeni (Zengin Kelime Kartı + Animasyonlar + Etkileşimler)
+
+- 📖 **Sözlük kartları yeniden tasarlandı** — her kelime artık zengin bir kart:
+  gold Russo One font, 🔊 telaffuz butonu, [IPA] yazılışı, ✓ bulundu rozeti,
+  чеч./тр. anlam satırları, ℹ etimoloji notu, 📝 örnek cümleler, renkli kategori
+  tag'leri (hayvan, doğa, renk vb.)
+- 🃏 **Kart genişletme (expand/collapse)** — `aria-expanded` ile erişilebilir:
+  karta tıklayınca altında etimoloji ve tüm örnek cümleler slide-down açar;
+  başka karta tıklayınca önceki otomatik kapanır (accordion mantığı)
+- 🏷️ **20+ kategori tag'i renklendirildi** — her tag kendi renginde:
+  yeşil=hayvan, turuncu=yemek, pembe=vücut, mor=abstract, mavi=dil,
+  kırmızı=action, kahverengi=home, lacivert=weather, vb.
+- 🎯 **Sözlük arama + filtreleme** — anlamda, IPA'da ve etimolojide arama,
+  tag filtresi (çoklu seçim), sadece çözülmüş/çözülmemiş filtreleri,
+  istatistik çubuğu (toplam/bulunan kelime sayısı)
+- 💬 **155+ kelimeye IPA, örnek cümle, etimoloji eklendi** — her kelime artık
+  telaffuz + örnek kullanım + köken bilgisi içerir; 8 dil kodu (ce, ru, ar, fa,
+  tr, en, el, la) ile çok dilli etimoloji gösterimi
+- 🎤 **Telaffuz butonu** — her kelime kartında 🔊 ile TTS (SpeechSynthesis API)
+- ✍️ **Geri bildirim butonu** — her kartta ✍️ ile hatalı anlam bildirimi
+
+### Animasyonlar
+
+- 🚀 **Kart giriş animasyonu (stagger)** — sözlük açıldığında kartlar teker teker
+  aşağıdan yukarı süzülerek gelir (adaptive delay ∼35ms/kart, max 800ms)
+- 🏀 **Bilgi şeridi yaylanma (bounce)** — kelime anlamı gösterildiğinde altın
+  strip aşağıdan yaylanarak açılır (`stripBounce` keyframe, spring curve)
+- ✦ **Kıvılcım efekti (sparkle burst)** — info-strip açıldığında sağ üstte
+  altın ✦ kıvılcımı patlar (`sparkleBurst`, 550ms ease-out)
+- 📋 **Detay açılma animasyonu** — kart genişletildiğinde detay bölümü
+  yumuşak slide-down ile açılır (`detailSlideDown`, 350ms)
+- 🏠 **Ana ekran ikon kademeli girişi (stagger icon reveal)** — butonlar sırayla
+  pop-in yapar (`iconPop`, scale bounce, 60ms ara ile, 7 ikon ~420ms)
+- 💡 **Hint butonu glow efektleri:**
+  - Başarılı ipucu: `hintSuccess` (550ms, box-shadow glow + scale bounce)
+  - Yetersiz bakiye: `hintInsufficient` (450ms, hafif shake + rotate)
+  - Hedefleme modu: `targetActive` (1.2s, sonsuz altın nabız)
+  - Sihirli değnek: `wandGlow` (700ms, üçlü flaş)
+- 🎬 **Sayısız V6 polish animasyonu:**
+  - `pressBounce` — tüm tıklanabilir öğelere haptik basma hissi
+  - `flashGlow` — başarı anlarında altın parıltı
+  - `toastIn` — bildirimlerin zıplayarak girişi
+  - `panel` girişi — 3D rotate + scale + translateY (22,1,36,1 spring)
+  - `coinSpin` — coin chip güncellemesinde sayı animasyonu
+  - 85+ CSS keyframe, 40+ utility class
+
+### Etkileşimler
+
+- 👆 **Swipe-to-dismiss (kaydırarak kapatma)** — bilgi şeridini aşağı
+  kaydırarak kapatabilirsiniz:
+  - Üstte 36×4px tutamak çubuğu görsel indikatör
+  - Parmak takibi (sürtünme katsayısı 0.6, opaklık fade)
+  - 80px altında → yaylanarak geri döner (snap back, 300ms)
+  - 80px üstünde → aşağı kayarak kapanır (dismiss)
+  - Fare ile de çalışır (pointer events)
+  - İçerik kaydırma ile çakışmaz (sadece üst 40px tetikler)
+- 🎮 **Oyun içi döngü:**
+  - `hintLetter()` başarı/başarısızlık anında buton feedback
+  - `hintTarget()` toggle ile `.hint-active` class yönetimi
+  - `hintWand()` üç harfli kullanımda buton görsel flaşı
+
+### Mobil Performans
+
+- Tüm giriş animasyonları `@media (pointer:coarse)` altında 80ms'e düşürülür
+- Sonsuz animasyonlar mobilde kapatılır (compositor yükü)
+- Drop-shadow/filter zincirleri tek katmana indirgenir
+- `backdrop-filter` mobil GPU'da tamamen kaldırılır
 
 ## v7'de yeni (gerçek fotoğraf arka planlar)
 
@@ -110,6 +203,46 @@ her build'de precache manifest'i yenilenir, elle sürüm artırmak gerekmez.
 Başlangıç 100 🪙 · kelime = grafem×5 🪙 · bonus +10 🪙 · 3'lü seri +15 🪙 ·
 ipuçları 25/35/60 🪙 · günlük hediye +100 🪙 ·
 ⭐⭐⭐ = 0 hata & 0 ipucu, ⭐⭐ = ≤2 hata & ≤1 ipucu
+
+## Geliştirici notları
+
+### Windows Vite önbellek sorunu
+
+Windows'ta Vite bazen eski transform sonuçlarını cache'te tutar ve dosya değişse
+bile eski sürümü serve etmeye devam eder (`/js/screens/dict.js`'te `dict-item`
+gösterip `dict-card` göstermemek gibi). Bu sorun için 3 çözüm katmanı:
+
+1. **`npm run dev:clean`** — `.vite/` ve `node_modules/.vite/` önbellek dizinlerini
+   siler, ardından Vite'i başlatır.
+2. **`npm run dev:force`** — `vite --force` ile çalışır, Vite'in dep cache'ini
+   temizler ve tüm bağımlılıkları yeniden ön-derler.
+3. **`npm run build && npm run preview`** — production build (`dist/`) statik
+   dosyalardan oluşur, Vite'in module graph cache'ine dokunmaz. Sorunun en
+   garantili çözümü.
+
+### vite.config.js cache ayarları
+
+Projede 3 mekanizma ile Vite önbellek sorunu önlenir:
+
+- `cacheDir: '.vite'` — Önbellek `node_modules/.vite` yerine proje kökündeki
+  `.vite/` dizinine yönlendirilir (Windows yol uzunluğu/izni sorunlarından kaçınmak
+  için). Zaten `.gitignore`'da.
+- `server.watch.usePolling` — Sadece Windows'ta polling tabanlı dosya izleme
+  (`process.platform === 'win32'`). Chokidar'ın Windows'taki bildirim gecikmelerini
+  aşar. macOS/Linux'ta etkin değil (gereksiz CPU yükü olmaz).
+- `cacheBuster()` plugin — Dosya değişikliklerinde `server.moduleGraph.invalidateModule()`
+  ile Vite'in transform cache'ini temizler.
+
+### Test stratejisi
+
+```bash
+npm test              # 409 birim test (25 dosya) — ~1sn
+npm run test:e2e      # 13 Playwright smoke testi
+npm run dev:clean     # Önbellek temiz + dev başlat
+npm run build         # Production build doğrulama
+npm run preview       # Production build serve (önbellek bypass)
+node test-visual.mjs  # 15 görsel özellik testi (Playwright)
+```
 
 ## İçerik kuralları
 

@@ -103,7 +103,7 @@ test("sözlük paneli tüm kelimeleri gösterir", async ({ page }) => {
   await page.click("#btn-dict");
   await expect(page.locator("#panel h2")).toContainText("Дошам");
   // INFO verisi yüklü olduğu için boş durum gösterilmez
-  await expect(page.locator("#panel .dict-item").first()).toBeVisible({ timeout: 5000 });
+  await expect(page.locator("#panel .dict-card").first()).toBeVisible({ timeout: 5000 });
 });
 
 /* ================= ADIM 7: GENİŞLETİLMİŞ E2E TESTS ================= */
