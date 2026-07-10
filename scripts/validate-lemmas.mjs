@@ -3,11 +3,18 @@
  * Wiktionary'den gelen lemmaları heuristik kalite kontrolünden geçirir.
  * Kirli / yanlış / düşük kaliteli olanları eler.
  *
+ * Validasyon mantığı js/data/validate-lemma.js'de yaşar.
+ * Bu script sadece dosya I/O ve akış yönetimi yapar.
+ *
  * Çıktı: scripts/cache/lemmas-validated.json */
 
 import { readFile, writeFile, mkdir, access } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+
+/* ---------- ortak validasyon modülü ---------- */
+import { validateLemma } from "../js/data/validate-lemma.js";
+export { validateLemma };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const IN_FILE = join(__dirname, "cache", "lemmas-raw.json");
@@ -15,50 +22,6 @@ const OUT_FILE = join(__dirname, "cache", "lemmas-validated.json");
 const SKIP_FILE = join(__dirname, "cache", "lemmas-skipped.json");
 
 /** @typedef {{ lemma: string, hash: string, source: string, pos: string, fetched_at: string }} Lemma */
-
-/** Kara liste: bilinen kirli/yanlış kelimeler. */
-const BLACKLIST = new Set([
-  "канза",
-  "паккха", // birden fazla anlam, bağlama göre değişir
-  "иэс", // çok genel
-]);
-
-/** Çok kısa veya Çok uzun kelimeleri ele. */
-function isLengthOk(lemma) {
-  return lemma.length >= 2 && lemma.length <= 30;
-}
-
-/** Chechen alfabesinde olmayan karakterler içeren kelimeleri ele. */
-function isChechenScript(lemma) {
-  // Kiril + Chechen (Ӏ, ӏ) + boşluk/tire
-  return /^[а-яёА-ЯЁӀӏ\-' ]+$/.test(lemma);
-}
-
-/** Tekrarlayan karakterler: "аааа", "----" gibi. */
-function hasRepeatedChars(lemma) {
-  return /(.)\1{3,}/.test(lemma);
-}
-
-/** Sadece tire/boşluk'tan oluşan kelimeler. */
-function isMeaningful(lemma) {
-  return /[а-яёА-ЯЁӀӏ]/.test(lemma);
-}
-
-/**
- * Tek bir lemma için validasyon sonucu.
- * @param {Lemma} l
- * @returns {{ ok: boolean, reason?: string }}
- */
-export function validateLemma(l) {
-  if (!l || typeof l.lemma !== "string") return { ok: false, reason: "no_lemma" };
-  const w = l.lemma;
-  if (BLACKLIST.has(w)) return { ok: false, reason: "blacklist" };
-  if (!isLengthOk(w)) return { ok: false, reason: "bad_length" };
-  if (!isChechenScript(w)) return { ok: false, reason: "non_chechen_script" };
-  if (hasRepeatedChars(w)) return { ok: false, reason: "repeated_chars" };
-  if (!isMeaningful(w)) return { ok: false, reason: "not_meaningful" };
-  return { ok: true };
-}
 
 /** @param {string} f */
 async function fileExists(f) {

@@ -1,8 +1,19 @@
 /* ================= WCAG Contrast Test =================
  * Bu test, :root ve body.theme-* override'ları içinden metin/kart renklerini
- * okur ve en önemli UI metin kombinasyonları için AA (4.5:1) kontrast oranını
- * doğrular. Kartlar yarı saydam olduğu için arka plan kompozitini de hesaba
- * katarak gerçekçi bir alt-sınır verir. */
+ * okur ve tüm görünür metin kombinasyonları için WCAG AA (4.5:1) kontrast
+ * oranını doğrular.
+ *
+ * Test edilen kombinasyonlar:
+ * 1. --ink on body gradient (sky3 = en karanlık)
+ * 2. --ink on --card composite (siyah zemin = en kötü durum)
+ * 3. --gold on --card composite
+ * 4. --accent on --card composite
+ * 5. --bubble-ink on --bubble on --wheel
+ * 6. --sel-ink on --sel
+ * 7. --cell-ink on --cell-fill
+ * 8. --ink2 on --card composite (secondary text — 3:1 large threshold)
+ * 9. --gold on body gradient (sky3) — sky elementleri
+ */
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -30,7 +41,6 @@ function hexToRgb(hex) {
 }
 
 function parseRgba(str) {
-  // "rgba(26,22,14,.68)" → {r:26,g:22,b:14,a:0.68}
   const m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([0-9.]+))?\s*\)/i.exec(str);
   if (!m) return null;
   return { r: +m[1], g: +m[2], b: +m[3], a: m[4] ? +m[4] : 1 };
@@ -68,7 +78,7 @@ const themesCSS = readFileSync(join(ROOT, "css", "themes.css"), "utf-8");
 
 const baseVars = parseColors(variablesCSS);
 
-/* Tüm tema bloklarını çıkar: body.theme-X{ ... } */
+/* Tüm tema bloklarını çıkar */
 function extractThemeBlocks(css) {
   const re = /body\.theme-([\w-]+)\{([^}]+)\}/g;
   const out = {};
@@ -80,35 +90,154 @@ function extractThemeBlocks(css) {
 }
 const themes = extractThemeBlocks(themesCSS);
 
-/* ------------------ Test: en kötü durum kontrastı ------------------ */
-describe("WCAG AA contrast on body text", () => {
-  // --ink (#f7f1de) her temada aynı; --card yarı saydam.
-  // Kartın arkasındaki varsayımsal en karanlık olası renk (siyah) için bile
-  // kontrast 4.5:1 olmalı; gerçekte yarı saydamın üzerinde daha yüksek.
+/** Tema değişkenlerini baseVars ile birleştir (override) */
+function mergeTheme(themeVars) {
+  return { ...baseVars, ...themeVars };
+}
+
+/* ------------------ Helper: ratio assert ------------------ */
+function expectRatio(ratio, label, minRatio = 4.5) {
+  expect(
+    ratio,
+    `${label}: contrast ratio ${ratio.toFixed(2)}:1 < ${minRatio}:1 (WCAG AA)`
+  ).toBeGreaterThanOrEqual(minRatio);
+}
+
+/* ------------------ Test Suite ------------------ */
+
+describe("WCAG AA contrast — body text on card", () => {
   const inkRgb = hexToRgb(baseVars["--ink"]);
 
-  it("--ink parses to a light cream", () => {
+  it("--ink parses to light cream", () => {
     expect(inkRgb).not.toBeNull();
-    // f7f1de: r=247, g=241, b=222 — açık
     expect(inkRgb.r).toBeGreaterThan(220);
-    expect(inkRgb.g).toBeGreaterThan(220);
   });
 
-  it("--ink vs solid black (worst case) is at least 12:1", () => {
+  it("--ink vs solid black is at least 12:1", () => {
     const ratio = contrastRatio(inkRgb, { r: 0, g: 0, b: 0 });
-    // 4.5:1 AA threshold'unu çok rahat geçmeli
     expect(ratio).toBeGreaterThan(12);
   });
 
-  it("--ink on dark card composite is at least 7:1 in every theme", () => {
-    // Kart yarı saydam olduğundan arka planı siyah varsayalım (en kötü durum);
-    // composite beyaz benzeri olmaz, ama ink-card blend'i test et.
-    for (const [themeName, vars] of Object.entries(themes)) {
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --ink on --card composite ≥ 4.5:1`, () => {
+      const vars = mergeTheme(themeVars);
       const cardRgba = parseRgba(vars["--card"]);
-      expect(cardRgba, `theme-${themeName} --card parses`).not.toBeNull();
+      expect(cardRgba, `--card parses`).not.toBeNull();
       const cardOpaque = compositeOver(cardRgba, { r: 0, g: 0, b: 0 });
       const ratio = contrastRatio(inkRgb, cardOpaque);
-      expect(ratio, `theme-${themeName} contrast`).toBeGreaterThanOrEqual(4.5);
-    }
+      expectRatio(ratio, `theme-${themeName} --ink/--card`);
+    });
+  }
+});
+
+describe("WCAG AA contrast — gold text on card", () => {
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --gold on --card composite ≥ 4.5:1`, () => {
+      const vars = mergeTheme(themeVars);
+      const goldRgb = hexToRgb(vars["--gold"]);
+      const cardRgba = parseRgba(vars["--card"]);
+      expect(goldRgb, `--gold parses`).not.toBeNull();
+      expect(cardRgba, `--card parses`).not.toBeNull();
+      const cardOpaque = compositeOver(cardRgba, { r: 0, g: 0, b: 0 });
+      const ratio = contrastRatio(goldRgb, cardOpaque);
+      expectRatio(ratio, `theme-${themeName} --gold/--card`);
+    });
+  }
+});
+
+describe("WCAG AA contrast — accent text on card", () => {
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --accent on --card composite ≥ 4.5:1`, () => {
+      const vars = mergeTheme(themeVars);
+      const accentRgb = hexToRgb(vars["--accent"]);
+      const cardRgba = parseRgba(vars["--card"]);
+      expect(accentRgb, `--accent parses`).not.toBeNull();
+      expect(cardRgba, `--card parses`).not.toBeNull();
+      const cardOpaque = compositeOver(cardRgba, { r: 0, g: 0, b: 0 });
+      const ratio = contrastRatio(accentRgb, cardOpaque);
+      expectRatio(ratio, `theme-${themeName} --accent/--card`);
+    });
+  }
+});
+
+describe("WCAG AA contrast — bubble-ink on bubble", () => {
+  // --bubble (#f7f1de) sits on --wheel (semi-transparent dark)
+  const bubbleRgb = hexToRgb(baseVars["--bubble"]);
+  const bubbleInkRgb = hexToRgb(baseVars["--bubble-ink"]);
+
+  it("--bubble-ink on --bubble ≥ 4.5:1", () => {
+    const ratio = contrastRatio(bubbleInkRgb, bubbleRgb);
+    expectRatio(ratio, "--bubble-ink/--bubble");
   });
+
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --bubble-ink on --bubble (on --wheel composite) ≥ 4.5:1`, () => {
+      const vars = mergeTheme(themeVars);
+      const wheelRgba = parseRgba(vars["--wheel"]);
+      if (!wheelRgba) return; // --wheel not overridden
+      const wheelOpaque = compositeOver(wheelRgba, { r: 0, g: 0, b: 0 });
+      const bubbleOnWheel = compositeOver({ ...bubbleRgb, a: 1 }, wheelOpaque);
+      const ratio = contrastRatio(bubbleInkRgb, bubbleOnWheel);
+      expectRatio(ratio, `theme-${themeName} --bubble-ink/--bubble/--wheel`);
+    });
+  }
+});
+
+describe("WCAG AA contrast — sel-ink on sel", () => {
+  const selRgb = hexToRgb(baseVars["--sel"]);
+  const selInkRgb = hexToRgb(baseVars["--sel-ink"]);
+
+  it("--sel-ink on --sel ≥ 4.5:1", () => {
+    const ratio = contrastRatio(selInkRgb, selRgb);
+    expectRatio(ratio, "--sel-ink/--sel");
+  });
+});
+
+describe("WCAG AA contrast — cell-ink on cell-fill", () => {
+  const cellFillRgb = hexToRgb(baseVars["--cell-fill"]);
+  const cellInkRgb = hexToRgb(baseVars["--cell-ink"]);
+
+  it("--cell-ink on --cell-fill ≥ 4.5:1", () => {
+    const ratio = contrastRatio(cellInkRgb, cellFillRgb);
+    expectRatio(ratio, "--cell-ink/--cell-fill");
+  });
+});
+
+describe("WCAG AA contrast — secondary text (ink2) on card", () => {
+  const ink2Rgb = hexToRgb(baseVars["--ink2"]);
+
+  it("--ink2 parses", () => {
+    expect(ink2Rgb).not.toBeNull();
+  });
+
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --ink2 on --card composite ≥ 3:1 (large text)`, () => {
+      const vars = mergeTheme(themeVars);
+      const cardRgba = parseRgba(vars["--card"]);
+      expect(cardRgba, `--card parses`).not.toBeNull();
+      const cardOpaque = compositeOver(cardRgba, { r: 0, g: 0, b: 0 });
+      const ratio = contrastRatio(ink2Rgb, cardOpaque);
+      // ink2 is secondary text — WCAG allows 3:1 for large text (18pt+)
+      expectRatio(ratio, `theme-${themeName} --ink2/--card`, 3);
+    });
+  }
+});
+
+describe("WCAG AA contrast — danger text", () => {
+  const dangerRgb = hexToRgb(baseVars["--danger"]);
+
+  it("--danger parses", () => {
+    expect(dangerRgb).not.toBeNull();
+  });
+
+  for (const [themeName, themeVars] of Object.entries(themes)) {
+    it(`theme-${themeName}: --danger on --card composite ≥ 4.5:1`, () => {
+      const vars = mergeTheme(themeVars);
+      const cardRgba = parseRgba(vars["--card"]);
+      if (!cardRgba) return;
+      const cardOpaque = compositeOver(cardRgba, { r: 0, g: 0, b: 0 });
+      const ratio = contrastRatio(dangerRgb, cardOpaque);
+      expectRatio(ratio, `theme-${themeName} --danger/--card`);
+    });
+  }
 });

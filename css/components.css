@@ -30,7 +30,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 /* ---------- HOME ---------- */
 #scr-home{align-items:center;justify-content:center;gap:18px;padding:24px}
 .tower{width:min(17vw,76px);height:auto;
-  filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) drop-shadow(0 0 26px rgba(242,181,61,.35));
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));
   animation:float 4s ease-in-out infinite}
 .logo{font-family:"Russo One",inherit;font-size:min(21vw,96px);font-weight:800;letter-spacing:.02em;
   background:linear-gradient(180deg,#ffffff 15%,#ffe596 65%,var(--gold) 100%);
@@ -46,7 +46,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;
   padding:16px 44px;border-radius:16px;font-size:21px;font-weight:700;color:#3a2c10;
   background:linear-gradient(180deg,#ffd35e,var(--gold) 55%,var(--gold2));
-  box-shadow:0 8px 0 rgba(0,0,0,.22),0 16px 34px rgba(0,0,0,.3),0 0 24px rgba(242,181,61,.35);
+  box-shadow:0 6px 0 rgba(0,0,0,.22),0 12px 28px rgba(0,0,0,.28);
   transition:transform .12s, box-shadow .15s;position:relative;overflow:hidden}
 .btn::before {
   content:"";position:absolute;top:0;left:-150%;width:50%;height:100%;
@@ -169,7 +169,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 #grid{position:relative}
 .cell{position:absolute;border-radius:22%;background:var(--cell);border:1.5px solid var(--cell-b);
   display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--cell-ink);
-  transition:background .25s,transform .25s;backdrop-filter:blur(2px);will-change:transform}
+  transition:background .25s,transform .25s}
 .cell.fill{background:var(--cell-fill);border-color:transparent;animation:pop .38s cubic-bezier(.34,1.56,.64,1)}
 .cell.hintfill{background:var(--cell-hint)}
 .cell.target{cursor:pointer;animation:targetBlink .8s infinite}
@@ -186,7 +186,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .toolrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:8px 14px}
 .tool{position:relative;min-height:76px;border-radius:18px;background:var(--card);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;padding:11px 6px 18px;
-  font-size:23px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  font-size:23px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.22)}
 .tool-ic{font-size:23px;line-height:1;display:flex;align-items:center;justify-content:center}
 .tool-ic svg{width:23px;height:23px;color:var(--gold);filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
 .tool-label{font-size:12px;line-height:1.15;color:var(--ink);opacity:.85;max-width:100%}
@@ -200,21 +200,21 @@ button:active:not(#shuffle){transform:scale(.95)}
 #preview .cap{display:flex;gap:5px;background:linear-gradient(180deg,#ffd35e,var(--gold) 55%,var(--gold2));
   color:#3a2c10;border-radius:13px;padding:9px 18px;
   font-size:20px;font-weight:800;letter-spacing:.14em;text-indent:.14em;
-  box-shadow:0 6px 18px rgba(0,0,0,.4),0 0 22px rgba(242,181,61,.45)}
+  box-shadow:0 5px 14px rgba(0,0,0,.35),0 0 16px rgba(242,181,61,.35)}
 #preview .cap.ok{background:rgba(12,26,18,.85);color:var(--accent);
   border:1.5px solid var(--accent);border-radius:999px;
-  box-shadow:0 6px 18px rgba(0,0,0,.4),0 0 18px rgba(62,201,126,.4)}
+  box-shadow:0 4px 14px rgba(0,0,0,.35),0 0 14px rgba(62,201,126,.35)}
 #preview .cap.ok::before{content:"✓";margin-inline-end:4px;font-weight:900}
 #preview .cap.bad{animation:shake .4s;background:var(--danger);color:#fff}
 #preview .cap.dup{animation:shake .4s}
 #wheel-zone{flex:2 1 auto;min-height:200px;display:flex;align-items:center;justify-content:center;padding:4px 0 10px}
-#wheel{position:relative;border-radius:50%;background:var(--wheel);backdrop-filter:blur(6px);
-  box-shadow:inset 0 0 0 1.5px rgba(242,181,61,.55),0 0 0 1px rgba(0,0,0,.3),0 14px 40px rgba(0,0,0,.45);touch-action:none}
+#wheel{position:relative;border-radius:50%;background:var(--wheel);
+  box-shadow:inset 0 0 0 1.5px rgba(242,181,61,.55),0 0 0 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);touch-action:none}
 #wheel > svg{position:absolute;inset:0;pointer-events:none}
 #wheel svg polyline{fill:none;stroke:var(--gold);stroke-width:11;stroke-linecap:round;stroke-linejoin:round;opacity:.95;filter:drop-shadow(0 2px 5px rgba(0,0,0,.4))}
 .bub{position:absolute;border-radius:50%;background:var(--bubble);color:var(--bubble-ink);
   display:flex;align-items:center;justify-content:center;font-weight:800;
-  box-shadow:0 5px 12px rgba(0,0,0,.35);transition:background .12s,color .12s,transform .12s;will-change:transform}
+  box-shadow:0 4px 10px rgba(0,0,0,.32);transition:background .12s,color .12s,transform .12s}
 .bub.sel{background:var(--sel);color:var(--sel-ink);transform:scale(1.14)}
 #shuffle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;z-index:2;
   border-radius:50%;background:rgba(247,241,222,.10);border:1.5px solid rgba(242,181,61,.45);
@@ -230,7 +230,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 #veil.on{opacity:1;pointer-events:auto}
 .panel{width:100%;max-width:420px;max-height:86vh;overflow-y:auto;background:var(--card2);
   border:1px solid rgba(255,255,255,.18);border-radius:26px;padding:26px 22px;
-  box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2);transform:scale(.92);transition:transform .3s;scrollbar-width:thin}
+  box-shadow:0 20px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.2);transform:scale(.92);transition:transform .3s;scrollbar-width:thin}
 #veil.on .panel{transform:scale(1)}
 .panel h2{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-weight:400;text-align:center;font-size:26px;margin-bottom:16px;
   color:#f7f1de;text-shadow:0 2px 8px rgba(0,0,0,.5)}
@@ -272,7 +272,7 @@ button:active:not(#shuffle){transform:scale(.95)}
 .dict-search{width:100%;padding:11px 15px;border-radius:13px;border:1px solid rgba(255,255,255,.16);
   background:rgba(255,255,255,.08);color:var(--ink);font-size:16px;outline:none;margin-bottom:12px;font-family:inherit}
 .dict-item{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:4px;
-  transition:background 0.25s,transform 0.2s cubic-bezier(.34,1.56,.64,1);will-change:transform}
+  transition:background 0.25s,transform 0.2s cubic-bezier(.34,1.56,.64,1)}
 .dict-item:hover{background:rgba(255,255,255,.04);transform:translateX(4px)}
 .dict-item .w{font-family:"Russo One","Segoe UI",system-ui,sans-serif;font-weight:400;font-size:17px;color:var(--gold);letter-spacing:.04em;
   transition:color .2s,text-shadow .2s}
@@ -283,7 +283,7 @@ button:active:not(#shuffle){transform:scale(.95)}
   background:rgba(242,181,61,.18);color:var(--gold);border:1px solid rgba(242,181,61,.35)}
 #toast{position:fixed;left:50%;top:16%;transform:translate(-50%,-16px);z-index:90;
   background:var(--card2);border:1px solid rgba(255,255,255,.14);border-radius:999px;
-  padding:11px 24px;font-weight:700;font-size:16px;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  padding:11px 24px;font-weight:700;font-size:16px;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast.gold{color:var(--gold)} #toast.bad{color:var(--danger)}
 .flycoin{position:fixed;z-index:95;font-size:20px;pointer-events:none;transition:all .8s cubic-bezier(.5,0,.7,.4)}
@@ -454,16 +454,14 @@ button:active:not(#shuffle){transform:scale(.95)}
 /* ---------- GERÇEK FOTOĞRAF ARKA PLAN (Ken Burns sinematik pan) ---------- */
 
 /* ---------- 3D KATMANI ---------- */
-#grid-wrap{perspective:900px}
-#grid{transform-style:preserve-3d}
-.cell.fill{animation:flip3d .55s cubic-bezier(.34,1.4,.64,1)}
-#wheel-zone{perspective:800px}
-#wheel{transform:rotateX(12deg)}
-.panel{transform:rotateX(14deg) scale(.9);transform-origin:top center}
-#veil.on .panel{transform:rotateX(0) scale(1)}
-.coins-chip.gain{animation:coinSpin .6s}
-.logo{transform-style:preserve-3d;animation:float 4s ease-in-out infinite, logoSway 7s ease-in-out infinite}
-.node.done{animation:nodePop .45s cubic-bezier(.34,1.56,.64,1)}
+#grid-wrap{perspective:600px}
+.cell.fill{animation:pop .32s cubic-bezier(.34,1.56,.64,1)}
+#wheel-zone{perspective:500px}
+#wheel{transform:rotateX(8deg)}
+.panel{transform-origin:top center}
+#veil.on .panel{transform:scale(1)}
+.coins-chip.gain{animation:coinSpin .5s}
+.logo{animation:float 4s ease-in-out infinite}
 
 /* ---------- ULTRA: font + splash + juice ---------- */
 .bub,.cell,#preview .cap,.gtop .lvl span,.node,.stars-row{font-family:"Russo One","Segoe UI",system-ui,sans-serif}
@@ -562,7 +560,7 @@ button:active:not(#shuffle){transform:scale(.95)}
    POLISH — mikro-etkileşimler ve giriş animasyonları
    ================================================================ */
 /* Çark: harfler kademeli pop-in (gecikme JS'ten, animationDelay) */
-.bub{animation:bubIn .34s cubic-bezier(.34,1.56,.64,1) backwards}
+.bub{animation:bubIn .22s cubic-bezier(.34,1.56,.64,1) backwards}
 /* Harf seçiminde tek seferlik halka (ping) */
 .bub::after{content:"";position:absolute;inset:-4px;border-radius:50%;
   border:2px solid var(--sel);opacity:0;pointer-events:none}
@@ -573,12 +571,12 @@ button:active:not(#shuffle){transform:scale(.95)}
 #preview .cap span:last-child{animation:capIn .17s cubic-bezier(.34,1.56,.64,1) backwards}
 #preview .cap.ok{animation:capOk .3s cubic-bezier(.34,1.56,.64,1)}
 /* Harita düğümleri: kademeli giriş (gecikme JS'ten) */
-.node.in{animation:nodeIn .38s cubic-bezier(.22,1,.36,1) backwards}
+.node.in{animation:nodeIn .25s cubic-bezier(.22,1,.36,1) backwards}
 /* Bilgi şeridi: yukarı süzülerek görünür */
 #info-strip{transform:translateY(6px);transition:opacity .4s,transform .4s}
 #info-strip.on{transform:none}
 /* Ana CTA: nazik nefes alma (dikkat çekici ama yumuşak) */
-#btn-start{animation:ctaPulse 3.2s ease-in-out 2s infinite}
+#btn-start{animation:ctaPulse 4s ease-in-out 3s infinite}
 /* Masaüstü hover geri bildirimleri */
 .tool,.rbtn{transition:transform .15s,box-shadow .15s}
 @media (hover:hover){
@@ -617,9 +615,10 @@ body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;
 /* --- IZGARA HÜCRELERİ: krem taşlar (video) --- */
 .cell{background:linear-gradient(180deg,rgba(247,241,222,.20),rgba(247,241,222,.07));
   border:1.5px solid rgba(247,241,222,.30);
-  box-shadow:inset 0 1px 0 rgba(255,252,238,.25),0 2px 6px rgba(0,0,0,.18)}
+  box-shadow:inset 0 1px 0 rgba(255,252,238,.25),0 2px 6px rgba(0,0,0,.18);
+  contain:style}
 .cell.fill{background:linear-gradient(180deg,#fffdf2,#ede2c2);border-color:transparent;
-  box-shadow:0 4px 10px rgba(0,0,0,.35),inset 0 1px 0 #fffdf4;text-shadow:0 1px 0 rgba(255,252,238,.85)}
+  box-shadow:0 3px 8px rgba(0,0,0,.3),inset 0 1px 0 #fffdf4;text-shadow:0 1px 0 rgba(255,252,238,.85)}
 .cell.hintfill{background:linear-gradient(180deg,#fff3cd,#ffe19a)}
 .cell.fill.glowup{box-shadow:0 0 24px 5px rgba(242,181,61,.75),0 4px 10px rgba(0,0,0,.32);
   animation:cellGlow 0.7s cubic-bezier(.34,1.56,.64,1) !important;z-index:5}
@@ -672,7 +671,7 @@ body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
   transform:skewX(-20deg);transition:left .6s ease;pointer-events:none}
 .btn:hover::before{left:120%}
-.btn:hover{transform:translateY(-1px);box-shadow:0 10px 0 rgba(0,0,0,.22),0 20px 40px rgba(0,0,0,.35),0 0 30px rgba(242,181,61,.55)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 0 rgba(0,0,0,.22),0 16px 32px rgba(0,0,0,.3),0 0 20px rgba(242,181,61,.3)}
 
 /* --- ICON BUTON: hover lift + active glow --- */
 .icon-btn{position:relative;cursor:pointer}
@@ -714,7 +713,7 @@ body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;
 #toast.on{animation:toastIn .4s cubic-bezier(.34,1.56,.64,1)}
 
 /* --- PANEL: gelişmiş giriş (3D rotate + scale) --- */
-.panel{animation:none;transform:rotateX(14deg) scale(.85) translateY(20px);opacity:0;transition:transform .42s cubic-bezier(.22,1,.36,1),opacity .32s}
+.panel{animation:none;transform:rotateX(4deg) scale(.92) translateY(14px);opacity:0;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .25s}
 #veil.on .panel{transform:rotateX(0) scale(1) translateY(0);opacity:1}
 
 /* --- SPLASH: yeni logo giriş animasyonu --- */
@@ -722,10 +721,10 @@ body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;
 #splash.off{animation:splashFadeOut .55s ease forwards}
 
 /* --- LOGO: yumuşak ışıltı ek --- */
-.logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.55)) drop-shadow(0 10px 30px rgba(0,0,0,.4)) drop-shadow(0 0 22px rgba(242,181,61,.18))}
+.logo{filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
 
 /* --- SCR- geçişleri: daha akıcı stagger --- */
-.screen{transform:translateY(34px) translateZ(-90px) rotateX(7deg) scale(.96);transition:opacity .42s,transform .55s cubic-bezier(.22,1,.36,1)}
+.screen{transform:translateY(24px) translateZ(-40px) rotateX(4deg) scale(.97);transition:opacity .3s,transform .4s cubic-bezier(.22,1,.36,1)}
 .screen.on{transform:none}
 
 /* --- SAYI ANİMASYONU: coin chip değişiminde parıltı --- */

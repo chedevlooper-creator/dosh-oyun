@@ -28,16 +28,16 @@ main{position:relative;z-index:10;height:100%;max-width:560px;margin:0 auto;disp
 .screen.on{opacity:1;pointer-events:auto}
 #photo{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0a1420}
 #photo .ph{position:absolute;inset:-7%;background-size:cover;background-position:center;
-  opacity:0;transition:opacity 1.4s ease;will-change:transform,opacity}
-#photo .ph.on{opacity:1;animation:kenburns 48s ease-in-out infinite alternate}
+  opacity:0;transition:opacity 1.4s ease}
+#photo .ph.on{opacity:1}
 #photo::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(12,10,6,.62),rgba(12,10,6,.42) 30%,rgba(12,10,6,.46) 58%,rgba(12,10,6,.72));}
 body.gl-on #bg{display:none}
 #bg{z-index:0}
 #gl{position:fixed;inset:0;z-index:1;pointer-events:none}
 body.gl-on #bg svg{display:none}
-main{perspective:1100px}
-.screen{transform:translateY(26px) translateZ(-70px) rotateX(5deg);transition:opacity .4s,transform .5s cubic-bezier(.22,1,.36,1)}
+main{perspective:800px}
+.screen{transition:opacity .3s,transform .4s cubic-bezier(.22,1,.36,1)}
 .screen.on{transform:none}
 .screen.st.on>*{opacity:0;animation:rise .6s cubic-bezier(.22,1,.36,1) forwards}
 .screen.st.on>*:nth-child(1){animation-delay:.04s}
@@ -61,8 +61,8 @@ main{perspective:1100px}
   /* perspective bile 3D compositing layer oluşturabilir */
   main{perspective:none}
   /* Çark ve panel 3D rotasyonunu küçült */
-  #wheel{transform:rotateX(6deg) translateZ(0)}
-  .panel{transform:rotateX(6deg) scale(.88) translateY(20px) translateZ(0)}
+  #wheel{transform:rotateX(4deg)}
+  .panel{transform:scale(.88) translateY(16px)}
   /* #grid-wrap içindeki .cell perspective zorla kaldır */
   #grid-wrap{transform:none !important}
   /* iOS Safari transform: compositing layer oluşturmaması için backface görünürlüğünü açık tut */

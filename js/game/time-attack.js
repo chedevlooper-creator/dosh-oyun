@@ -16,7 +16,7 @@ import { show, updateCoins, toast, flyCoins } from "../utils/helpers.js";
 import { initState, getState } from "./state.js";
 import { buildWheel, buildGrid, fillCell } from "./render.js";
 import { attachCellHandlers, onBubbleKey } from "./input.js";
-import { submitSel, selAdd } from "./index.js";
+import { submitSel, selAdd } from "./solve.js";
 import { showWordInfo } from "./reward.js";
 import { openPanel, closePanel } from "../screens/panel.js";
 import { getLevel, loadAllLevels } from "../data/level-loader.js";
