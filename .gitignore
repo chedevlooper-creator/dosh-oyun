@@ -38,6 +38,7 @@ _lexicon_expansion/batch_*.txt
 # OS
 Thumbs.db
 desktop.ini
+nul
 
 # Playwright
 test-results/

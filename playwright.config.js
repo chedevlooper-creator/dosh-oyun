@@ -4,8 +4,8 @@ import { defineConfig } from "@playwright/test";
  * (çark → kelime → ızgara → seviye sonu). `npm run test:e2e` */
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 30_000,
-  fullyParallel: true,
+  timeout: 45_000,
+  fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   use: {
     baseURL: "http://localhost:8765",

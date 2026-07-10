@@ -89,12 +89,17 @@ describe("showWordInfo", () => {
 });
 
 describe("showBonusChest", () => {
-  it("calls toast with bonus word info", async () => {
+  it("calls toast with bonus word info after animation", async () => {
+    vi.useFakeTimers();
     G.foundBonus.add("ав");
     const { showBonusChest } = await import("../game/reward.js");
     showBonusChest();
     const { toast } = await import("../utils/helpers.js");
+    // Toast 600ms gecikmeyle çağrılır (animasyon süresi)
+    expect(toast).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(650);
     expect(toast).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });
 

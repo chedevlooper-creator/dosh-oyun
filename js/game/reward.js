@@ -199,13 +199,60 @@ export function wordsRecapHTML() {
 }
 
 /**
- * Bonus kelime özetini toast ile göster.
+ * Bonus sandık açılma animasyonu: butona tıklanınca ikon patlar,
+ * altın partiküller saçılır, ardından toast ile bonus listesi gösterilir.
+ * Çağrılmışken tekrar tıklanmayı önler.
  */
 export function showBonusChest() {
   const G = getState();
   if (!G) return;
-  const list = [...G.foundBonus].map(dispG).join(", ") || "—";
-  toast(t("game.bonusChest", list));
+  const btn = document.getElementById("bonus-chest");
+  if (!btn || btn.classList.contains("opening")) return;
+
+  // Açılma animasyonu başlat
+  btn.classList.add("opening");
+
+  // Partikül patlaması: altın yıldızlar, elmaslar, ışıltılar
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const particles = ["✦", "♦", "∙", "+", "⬩", "*", "🪙"];
+  for (let i = 0; i < 10; i++) {
+    const el = document.createElement("div");
+    el.className = "bonus-particle" + (i % 3 === 0 ? " coin" : i % 5 === 0 ? " star" : "");
+    el.textContent = particles[i % particles.length];
+    const angle = (Math.PI * 2 * i) / 10 + (Math.random() - 0.5);
+    const dist = 40 + Math.random() * 60;
+    el.style.left = (cx + Math.cos(angle) * dist) + "px";
+    el.style.top = (cy + Math.sin(angle) * dist) + "px";
+    el.style.animationDelay = (Math.random() * 0.15) + "s";
+    document.body.appendChild(el);
+    // Animasyon sonunda temizle
+    el.addEventListener("animationend", () => el.remove(), { once: true });
+  }
+
+  // Sayı badge'inde parıltı
+  const countEl = document.getElementById("bonus-count");
+  if (countEl) {
+    countEl.classList.remove("pulse");
+    void countEl.offsetWidth; // reflow
+    countEl.classList.add("pulse");
+    setTimeout(() => countEl.classList.remove("pulse"), 600);
+  }
+
+  // Kısa bir gecikme ile buton animasyonunu bitir ve toast göster
+  setTimeout(() => {
+    btn.classList.remove("opening", "opening-error");
+    const list = [...G.foundBonus].map(dispG).join(", ") || "—";
+    toast(t("game.bonusChest", list));
+    SFX.coin();
+  }, 600);
+  // Güvenlik: 2sn sonra opening class hala varsa zorla temizle
+  setTimeout(() => {
+    if (btn.classList.contains("opening")) {
+      btn.classList.remove("opening");
+    }
+  }, 2000);
 }
 
 /**
