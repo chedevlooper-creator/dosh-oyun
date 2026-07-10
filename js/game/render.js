@@ -125,10 +125,12 @@ export function buildWheel(letters, onBubbleKey) {
   wheel.querySelectorAll(".bub").forEach((b) => b.remove());
   _polylineEl = null; // wheel yeniden oluştu, cache'i sıfırla
   const n = letters.length;
-  const zone = document.getElementById("wheel-zone");
-  const D = Math.max(190, Math.min(340, Math.min(
+  const isMobile = innerWidth <= 520 || innerHeight <= 800;
+  const maxD = isMobile ? 220 : 340;
+  const minD = isMobile ? 180 : 190;
+  const D = Math.max(minD, Math.min(maxD, Math.min(
     innerWidth - 40,
-    Math.max(zone.clientHeight || 260, 200) + 60,
+    innerHeight * 0.35
   )));
   wheel.style.width = wheel.style.height = D + "px";
 
@@ -137,7 +139,7 @@ export function buildWheel(letters, onBubbleKey) {
   svg.innerHTML = "<polyline points=''/>";
 
   // Baloncuk boyutu çark çapıyla orantılı: büyük çarkta boş görünmesin
-  const bs = Math.max(30, Math.min(D * 0.21, (D * 2.55) / n));
+  const bs = Math.max(36, Math.min(D * (isMobile ? 0.24 : 0.21), (D * 2.55) / n));
   const R = D / 2 - bs / 2 - 7;
 
   // Karıştır butonu çarkla orantılı ölçeklensin (ikon boyutu CSS % ile)
